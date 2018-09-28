@@ -72,6 +72,13 @@ class CGMWatchfaceApp extends App.AppBase {
         	}
         } else {
             fehler_code = data;
+    		var lastTime = Background.getLastTemporalEventTime();
+    		if (lastTime != null) {
+				var nextTime = lastTime.add(new Time.Duration(5 * 60));	
+				Background.registerForTemporalEvent(nextTime);
+			} else {
+    			Background.registerForTemporalEvent(Time.now());
+    		}
         }
         Ui.requestUpdate();
 	}
