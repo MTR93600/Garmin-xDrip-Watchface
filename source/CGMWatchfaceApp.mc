@@ -87,10 +87,5 @@ class CGMWatchfaceApp extends App.AppBase {
     function onSettingsChanged() {
         Ui.requestUpdate();
     }
-    
-    // Verzoegerung ermitteln
-    function minutesFromTimestamp(now, timestamp) {
-    	return( (now - timestamp/1000) / 60 );
-    }
 
 }
