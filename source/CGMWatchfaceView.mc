@@ -214,12 +214,27 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( punkte != null ) {      
         	dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);
             var now = Time.now().value();
+            var lowValue = 1000, highValue = 0, factor = 0.0033, correction = 0; // Faktor: 1/300
+            for( var i = 0; i < punkte.size(); i++ ) {
+            	if( lowValue > punkte[i]["sgv"] ) { lowValue = punkte[i]["sgv"]; }
+            	if( highValue < punkte[i]["sgv"] ) { highValue = punkte[i]["sgv"]; }
+            }
+            var difference = highValue - lowValue;
+            var corrCalculation = lowValue - difference;
+            if( difference < 90 ) { factor = 0.01; correction = corrCalculation; } // 1/100
+            else if( difference < 190) { factor = 0.005; correction = corrCalculation; } // 1/200
+            
             for( var i = 0; i < punkte.size(); i++ ) {
             	if(punkte[i]["sgv"] && punkte[i]["date"] ) {
-            		plotSGV = ( punkte[i]["sgv"] > 300 ) ? 300 : punkte[i]["sgv"];
+            		if( difference >= 190 ) {
+            			plotSGV = ( punkte[i]["sgv"] > 300 ) ? 300 : punkte[i]["sgv"];
+            		} else {
+            			plotSGV = punkte[i]["sgv"];
+            		}
+            		plotSGV = plotSGV - correction;
             	    // plotSGV = 300;
                 	var plotBreite = width*2/3 - 15 - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*2/3-15) * 0.0111) ); // Faktor 1 / 90 
-                	var plotHoehe = height/3 - ( plotSGV * (height/3*0.0033) - 5); // Faktor: 1/300
+                	var plotHoehe = height/3 - ( plotSGV * (height/3*factor) - 5); 
                 	if( 70 <= punkte[i]["sgv"] && punkte[i]["sgv"] <= 180 ) {
                 		dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT); 
                 	} else {
