@@ -29,8 +29,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
         setLayout(Rez.Layouts.WatchFace(dc));
         height = dc.getHeight();
         width = dc.getWidth();
-        punkte = App.Storage.getValue("punkte");
-        Sys.println("Punkte: " + punkte);
+        var temp = App.Storage.getValue("punkte");
+        if( temp!=null && temp instanceof Array) {
+        	punkte = temp; 
+        }
     }
 
     // Called when this View is brought to the foreground. Restore
@@ -77,9 +79,45 @@ class CGMWatchfaceView extends Ui.WatchFace {
     	//punkte = null;
     	if( punkte != null ) { 
     		Sys.println("CGM Daten");
-    		sgv = punkte[0]["sgv"]; 
-        	delta = punkte[0]["delta"]; 
-        	timestamp = punkte[0]["date"]; // Sekunden
+        	// Einheiten            
+        	if( punkte[0]["units_hint"] ) {
+            	if( punkte[0]["units_hint"].equals("mmol") ) {
+            		masseinheit = 1;
+            	} else {
+                	masseinheit = 0;
+               	}
+            } 
+    		if( masseinheit == 1 ) {  
+              	anzeigeSGV =  punkte[0]["sgv"] ? (0.05556 * punkte[0]["sgv"]).format("%.1f").toString() : "--";
+               	// Delta in mmol, in String umwandeln, bei positiven Werten + davor
+           		if( punkte[0]["delta"] ) {
+               		delta = 0.05556 * punkte[0]["delta"];
+               	 	if(delta > 0 ) {
+               			anzeigeDelta = "+" + delta.format("%.1f").toString();
+           			} else {
+           				anzeigeDelta= delta.format("%.1f").toString();
+           			}
+           		} else {
+           			anzeigeDelta = "--";
+           		}  
+           	} else {
+           		// mg
+               	anzeigeSGV = punkte[0]["sgv"] ? punkte[0]["sgv"].toString() : "--";
+               	// Delta in String umwandeln, bei positiven Werten + davor
+           		if( punkte[0]["delta"] ) {
+           			delta = punkte[0]["delta"];
+           			if( delta > 0 ) {
+              			anzeigeDelta = "+" + delta.format("%.0f").toString();
+           			} else {
+           				anzeigeDelta = delta.format("%.0f").toString();
+           			} 
+           		} else {
+           			anzeigeDelta = "--";
+           		}                	
+           	} 
+			verzoegerung = punkte[0]["date"] ? minutesFromTimestamp(Time.now().value(), punkte[0]["date"]) : "999";
+        	
+        	
         	//punkte[0]["aaps"] = "240% 10.06U(8.27|8.34) -17,24 35g"; 
         	if( punkte[0]["aaps"] ) {
         		Sys.println("AAPS");
@@ -104,42 +142,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
 				}
             }
             
-            // Einheiten            
-        	if( punkte[0]["units_hint"] ) {
-            	if( punkte[0]["units_hint"].equals("mmol") ) {
-            		masseinheit = 1;
-            	} else {
-                	masseinheit = 0;
-               	}
-            } 
-    		if( masseinheit == 1 ) { 
-              	anzeigeSGV =  (0.05556 * sgv).format("%.1f").toString();
-               	// Delta in mmol, in String umwandeln, bei positiven Werten + davor
-           		if( delta ) {
-               		delta = 0.05556 * delta;
-               	 	if(delta > 0 ) {
-               			anzeigeDelta = "+" + delta.format("%.1f").toString();
-           			} else {
-           				anzeigeDelta= delta.format("%.1f").toString();
-           			}
-           		} else {
-           			anzeigeDelta = "--";
-           		}  
-           	} else {
-           		// mg
-               	anzeigeSGV = sgv.toString();
-               	// Delta in String umwandeln, bei positiven Werten + davor
-           		if( delta ) {
-           			if( delta > 0 ) {
-              			anzeigeDelta = "+" + delta.format("%.0f").toString();
-           			} else {
-           				anzeigeDelta = delta.format("%.0f").toString();
-           			} 
-           		} else {
-           			anzeigeDelta = "--";
-           		}                	
-           	} 
-			verzoegerung = minutesFromTimestamp(Time.now().value(), timestamp);
+            
 			anzeigeFehler = "";
 		} else {
 			Sys.println("Keine CGM Daten");
@@ -270,7 +273,9 @@ class CGMWatchfaceView extends Ui.WatchFace {
     // state of this View here. This includes freeing resources from
     // memory.
     function onHide() {
-    	App.Storage.setValue("punkte", punkte);  
+    	if( punkte!=null && punkte instanceof Array) {
+    		App.Storage.setValue("punkte", punkte);  
+    	}
     }
 
     // The user has just looked at their watch. Timers and animations may be started here.
