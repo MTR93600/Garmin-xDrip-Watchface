@@ -75,7 +75,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
 		}
 		Sys.println("S+H:" + steps + " - " + heartrate);
     	// CGM Daten verarbeiten
-    	noAAPS = dc.getFontHeight(Gfx.FONT_SYSTEM_TINY);
+    	noAAPS = dc.getFontHeight(Gfx.FONT_TINY);
     	//punkte = null;
     	if( punkte != null ) { 
     		Sys.println("CGM Daten");
@@ -118,7 +118,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
 			verzoegerung = punkte[0]["date"] ? minutesFromTimestamp(Time.now().value(), punkte[0]["date"]) : "999";
         	
         	
-        	//punkte[0]["aaps"] = "240% 10.06U(8.27|8.34) -17,24 35g"; 
+        	punkte[0]["aaps"] = "240% 10.06U(8.27|8.34) -17,24 35g"; 
         	if( punkte[0]["aaps"] ) {
         		Sys.println("AAPS");
              	aaps = punkte[0]["aaps"].toString();   
@@ -126,11 +126,11 @@ class CGMWatchfaceView extends Ui.WatchFace {
         			var index = aaps.find("%");
             		anzeigeBasal = aaps.substring(0,index+1);
             		var index2 = aaps.find("U");
-            		anzeigeIOB = aaps.substring(index+2,index2-1)+"U";
+            		anzeigeIOB = aaps.substring(index+2,index2-1);
             		noAAPS = 0;
             	}
 			} else {
-					noAAPS = dc.getFontHeight(Gfx.FONT_SYSTEM_TINY);
+					noAAPS = dc.getFontHeight(Gfx.FONT_TINY);
 					anzeigeBasal = "";
 					anzeigeIOB = "";
 			}             	        	
@@ -138,7 +138,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 var verzoegerungAAPS = minutesFromTimestamp(Time.now().value(), punkte[0]["aaps-ts"]); 
                 if( verzoegerungAAPS > 20 ) {  
                 	anzeigeBasal = "--%";
-					anzeigeIOB = "--U";
+					anzeigeIOB = "--";
 				}
             }
             
@@ -159,44 +159,44 @@ class CGMWatchfaceView extends Ui.WatchFace {
         // Update the view
         var time = View.findDrawableById("TimeLabel");
         time.setText(timeString);
-        time.setLocation(width*2/3-15, height/3-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_LARGE));
+        time.setLocation(width*2/3-25, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_LARGE)-5);
         var date = View.findDrawableById("DateLabel");
         date.setText(datum);
-        date.setLocation(width*2/3-15, height/3-dc.getFontHeight(Gfx.FONT_TINY)-5);
+        date.setLocation(width*2/3-25, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-5);
         
         var verzAnzeige = View.findDrawableById("verzLabel");
         verzAnzeige.setText(verzoegerung.toString()+"'");
-        verzAnzeige.setLocation(width*2/3+5, height/3-dc.getFontHeight(Gfx.FONT_TINY)-5 + noAAPS);
+        verzAnzeige.setLocation(width*2/3-5, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-5 + noAAPS);
         var sgvAnzeige = View.findDrawableById("sgvLabel");
         sgvAnzeige.setText(anzeigeSGV);
-        sgvAnzeige.setLocation(width*2/3+5, height/3-7 + noAAPS);              
+        sgvAnzeige.setLocation(width*2/3-5, height/3+10 + noAAPS);              
         var deltaAnzeige = View.findDrawableById("deltaLabel");
         deltaAnzeige.setText(anzeigeDelta);
-        deltaAnzeige.setLocation(width*2/3+5, height/3+dc.getFontAscent(Gfx.FONT_LARGE)-4 + noAAPS);
+        deltaAnzeige.setLocation(width*2/3-5, height/3+10+dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM) + noAAPS);
         
         if( anzeigeBasal.equals("") == false ) {
         	var basalAnzeige = View.findDrawableById("basalLabel");
         	basalAnzeige.setText(anzeigeBasal);
-        	basalAnzeige.setLocation(width*2/3+5, height/3+dc.getFontAscent(Gfx.FONT_LARGE)+dc.getFontAscent(Gfx.FONT_MEDIUM)+2);           //width*2/3-15, height*2/3+5);
+        	basalAnzeige.setLocation(width*2/3-5, height/3+10+dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontAscent(Gfx.FONT_MEDIUM)+5);           //width*2/3-15, height*2/3+5);
         }
         if( anzeigeIOB.equals("") == false ) {
         	var iobAnzeige = View.findDrawableById("iobLabel");
         	iobAnzeige.setText(anzeigeIOB);
-        	iobAnzeige.setLocation(width*2/3+5, height/3+dc.getFontAscent(Gfx.FONT_LARGE)+dc.getFontAscent(Gfx.FONT_MEDIUM)+dc.getFontAscent(Gfx.FONT_TINY)+7);
+        	iobAnzeige.setLocation(width*2/3-5, height/3+10+dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontAscent(Gfx.FONT_MEDIUM)+dc.getFontAscent(Gfx.FONT_TINY)+10);
         }
         
         if( steps ) {
             var stepsAnzeige = View.findDrawableById("stepsLabel");
         	stepsAnzeige.setText(steps.toString());
-        	stepsAnzeige.setLocation(width*2/3-35, height*2/3+5);
+        	stepsAnzeige.setLocation(width*2/3-45, height*2/3+10+5);
         }
         if( heartrate ) {
             var heartAnzeige = View.findDrawableById("heartrateLabel");
         	heartAnzeige.setText(heartrate.toString());
         	if( steps ) {
-        		heartAnzeige.setLocation(width*2/3-35, height*2/3+5+dc.getFontAscent(Gfx.FONT_TINY)+5);
+        		heartAnzeige.setLocation(width*2/3-45, height*2/3+10+5+dc.getFontAscent(Gfx.FONT_TINY)+5);
         	} else {
-        		heartAnzeige.setLocation(width*2/3-35, height*2/3+5);
+        		heartAnzeige.setLocation(width*2/3-45, height*2/3+10+5);
         	}
         	
         }
@@ -210,10 +210,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
         } else {
         	dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
         }
-        dc.fillRectangle(width*2/3-10, 0, 10, height);
+        dc.fillRectangle(width*2/3-20, 0, 10, height);
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.drawLine(0, height/3, width*2/3-15, height/3);
-        dc.drawLine(0, height*2/3, width*2/3-15, height*2/3);
+        dc.drawLine(0, height/3+10, width*2/3-25, height/3+10);
+        dc.drawLine(0, height*2/3+10, width*2/3-25, height*2/3+10);
         
         if( punkte != null ) {      
         	dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);
@@ -237,55 +237,56 @@ class CGMWatchfaceView extends Ui.WatchFace {
             		}
             		plotSGV = plotSGV - correction;
             	    // plotSGV = 300;
-                	var plotBreite = width*2/3 - 15 - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*2/3-15) * 0.0111) ); // Faktor 1 / 90 
+                	var plotBreite = width*2/3 - 25 - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*2/3-25) * 0.0111) ); // Faktor 1 / 90 
                 	var plotHoehe = height/3 - ( plotSGV * (height/3*factor) - 5); 
                 	if( 70 <= punkte[i]["sgv"] && punkte[i]["sgv"] <= 180 ) {
                 		dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT); 
                 	} else {
                 		dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT); 
                 	}
-                	dc.fillCircle( plotBreite, height/3 + plotHoehe, 3 );
+                	dc.fillCircle( plotBreite, height/3+10 + plotHoehe, 3 );
                 }                           
             }
         }
         
         if( anzeigeFehler ) {
         	dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
-        	dc.drawText(width*2/3-15, height*2/3-dc.getFontHeight(Gfx.FONT_TINY)-5, Gfx.FONT_TINY, anzeigeFehler, Gfx.TEXT_JUSTIFY_RIGHT );
+        	dc.drawText(width*2/3-25, height*2/3+10-dc.getFontHeight(Gfx.FONT_TINY)-5, Gfx.FONT_TINY, anzeigeFehler, Gfx.TEXT_JUSTIFY_RIGHT );
         }
         
         if( System.getDeviceSettings().phoneConnected ) {	
         	var bmp = Ui.loadResource(Rez.Drawables.bluetooth);
-        	dc.drawBitmap(width*2/3+5, height/3-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontAscent(Gfx.FONT_LARGE), bmp);
+        	dc.drawBitmap(width*2/3+10, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), bmp);
         }
         
         if( adjustTime ) {
         	var bmp = Ui.loadResource(Rez.Drawables.stopwatch);
-        	dc.drawBitmap(width*2/3+10+dc.getTextWidthInPixels(verzoegerung.toString()+"'", Gfx.FONT_TINY), height/3-dc.getFontAscent(Gfx.FONT_TINY)-7+noAAPS, bmp);
+        	dc.drawBitmap(width*2/3+0+dc.getTextWidthInPixels(verzoegerung.toString()+"'", Gfx.FONT_TINY), height/3+10-dc.getFontAscent(Gfx.FONT_TINY)-7+noAAPS, bmp);
         }
         
         if( steps ) {
         	var bmp = Ui.loadResource(Rez.Drawables.steps);
-        	dc.drawBitmap(width*2/3-30, height*2/3+8, bmp);
+        	dc.drawBitmap(width*2/3-40, height*2/3+10+8, bmp);
         }
         if( heartrate ) {
         	var bmp = Ui.loadResource(Rez.Drawables.heart);
         	if( steps ) {
-        		dc.drawBitmap(width*2/3-30, height*2/3+8+dc.getFontAscent(Gfx.FONT_TINY)+5, bmp);
+        		dc.drawBitmap(width*2/3-40, height*2/3+10+8+dc.getFontAscent(Gfx.FONT_TINY)+5, bmp);
         	} else {
-        		dc.drawBitmap(width*2/3-30, height*2/3+8, bmp);
+        		dc.drawBitmap(width*2/3-40, height*2/3+10+8, bmp);
         	}
         }
         
         // Batteriestand
         Sys.println("Batteriestand");
         dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
-        dc.drawRoundedRectangle(width*2/3+5, height/3+dc.getFontAscent(Gfx.FONT_LARGE)+dc.getFontAscent(Gfx.FONT_MEDIUM)+2*dc.getFontAscent(Gfx.FONT_TINY)+17, 25, 10, 2);
-        dc.drawRoundedRectangle(width*2/3+5, height/3+dc.getFontAscent(Gfx.FONT_LARGE)+dc.getFontAscent(Gfx.FONT_MEDIUM)+2*dc.getFontAscent(Gfx.FONT_TINY)+18, 24, 10, 2);
-        dc.fillRectangle(width*2/3+5+25, height/3+dc.getFontAscent(Gfx.FONT_LARGE)+dc.getFontAscent(Gfx.FONT_MEDIUM)+2*dc.getFontAscent(Gfx.FONT_TINY)+20, 2, 4);
+        dc.fillRoundedRectangle(width*2/3-5, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 10, 24, 2);
+        dc.fillRectangle(width*2/3-5+4, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-2, 2, 4);
         var battery = Sys.getSystemStats().battery * 25 / 100;
-        dc.fillRoundedRectangle(width*2/3+5, height/3+dc.getFontAscent(Gfx.FONT_LARGE)+dc.getFontAscent(Gfx.FONT_MEDIUM)+2*dc.getFontAscent(Gfx.FONT_TINY)+17, battery, 10, 2);
-             
+        dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT); // Füllung
+        dc.fillRoundedRectangle(width*2/3-4, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 8, 24-battery, 2);
+        dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
+        dc.drawRoundedRectangle(width*2/3-5, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 10, 25, 2);            
     }
 
     // Called when this View is removed from the screen. Save the
