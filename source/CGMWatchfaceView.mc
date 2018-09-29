@@ -49,7 +49,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         var clockTime = Sys.getClockTime();
         var now = Time.now();
         var info = Gregorian.info(now, Time.FORMAT_SHORT);
-        var datum = info.day + "." + info.month + "." + info.year;
+        var datum = info.day + "." + info.month.format("%02d") + "." + info.year.toString().substring(2,4);
         Sys.println(datum);
         var hours = clockTime.hour;
         if (!Sys.getDeviceSettings().is24Hour) {
@@ -159,10 +159,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
         // Update the view
         var time = View.findDrawableById("TimeLabel");
         time.setText(timeString);
-        time.setLocation(width*2/3-25, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_LARGE)-5);
+        time.setLocation(width*2/3-25, height/3+10-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-10);
         var date = View.findDrawableById("DateLabel");
         date.setText(datum);
-        date.setLocation(width*2/3-25, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-5);
+        date.setLocation(width*2/3-25, height/3+10-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontHeight(Gfx.FONT_TINY)-15);
         
         var verzAnzeige = View.findDrawableById("verzLabel");
         verzAnzeige.setText(verzoegerung.toString()+"'");
@@ -280,13 +280,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
         // Batteriestand
         Sys.println("Batteriestand");
         dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
-        dc.fillRoundedRectangle(width*2/3-5, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 10, 24, 2);
-        dc.fillRectangle(width*2/3-5+4, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-2, 2, 4);
+        dc.fillRoundedRectangle(width*2/3-5, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 12, 24, 2);
+        dc.fillRectangle(width*2/3-5+4, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-2, 4, 2);
         var battery = Sys.getSystemStats().battery * 25 / 100;
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT); // Füllung
-        dc.fillRoundedRectangle(width*2/3-4, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 8, 24-battery, 2);
+        dc.fillRoundedRectangle(width*2/3-4, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 10, 24-battery, 2);
         dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
-        dc.drawRoundedRectangle(width*2/3-5, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 10, 25, 2);            
+        dc.drawRoundedRectangle(width*2/3-5, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 12, 25, 2);            
     }
 
     // Called when this View is removed from the screen. Save the
