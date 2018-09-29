@@ -118,7 +118,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
 			verzoegerung = punkte[0]["date"] ? minutesFromTimestamp(Time.now().value(), punkte[0]["date"]) : "999";
         	
         	
-        	punkte[0]["aaps"] = "240% 10.06U(8.27|8.34) -17,24 35g"; 
+        	//punkte[0]["aaps"] = "240% 10.06U(8.27|8.34) -17,24 35g"; 
         	if( punkte[0]["aaps"] ) {
         		Sys.println("AAPS");
              	aaps = punkte[0]["aaps"].toString();   
