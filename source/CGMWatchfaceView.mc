@@ -224,21 +224,26 @@ class CGMWatchfaceView extends Ui.WatchFace {
             	if( highValue < punkte[i]["sgv"] ) { highValue = punkte[i]["sgv"]; }
             }
             var difference = highValue - lowValue;
-            var corrCalculation = lowValue - difference;
-            if( difference < 90 ) { factor = 0.01; correction = corrCalculation; } // 1/100
-            else if( difference < 190) { factor = 0.005; correction = corrCalculation; } // 1/200
+            Sys.println("Differenz: " + difference);
+            if( difference < 90 ) {
+            	factor = 0.01; // 1/100
+            	correction = (100-difference)/2; 
+            } else if( difference < 190) { 
+            	factor = 0.005; // 1/200
+            	correction = (200-difference)/2; 
+            } else {
+            	correction = (300-difference)/2; 
+            }
+            Sys.println("Korrektur: " + correction);
             
             for( var i = 0; i < punkte.size(); i++ ) {
             	if(punkte[i]["sgv"] && punkte[i]["date"] ) {
-            		if( difference >= 190 ) {
-            			plotSGV = ( punkte[i]["sgv"] > 300 ) ? 300 : punkte[i]["sgv"];
-            		} else {
-            			plotSGV = punkte[i]["sgv"];
-            		}
-            		plotSGV = plotSGV - correction;
+            		plotSGV = punkte[i]["sgv"] - lowValue + correction;
+            		Sys.println("plotSGV: " + plotSGV + "Rechnung:" + punkte[i]["sgv"] + "-" + lowValue + "+" + correction);
+            		plotSGV = ( punkte[i]["sgv"] > 300 ) ? 300 : punkte[i]["sgv"];
             	    // plotSGV = 300;
                 	var plotBreite = width*2/3 - 25 - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*2/3-25) * 0.0111) ); // Faktor 1 / 90 
-                	var plotHoehe = height/3 - ( plotSGV * (height/3*factor) - 5); 
+                	var plotHoehe = height/3+10 - ( plotSGV * ((height/3)*factor) - 5); 
                 	if( 70 <= punkte[i]["sgv"] && punkte[i]["sgv"] <= 180 ) {
                 		dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT); 
                 	} else {
