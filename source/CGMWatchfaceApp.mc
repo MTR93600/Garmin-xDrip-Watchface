@@ -7,7 +7,7 @@ using Toybox.Lang as Lang;
 
 var counter = 0;
 var sgv, delta, aaps, timestamp, duration, masseinheit = 0, punkte;
-var fehler = false, fehler_code = ""; 
+var fehler, fehler_code = ""; 
 var adjustTime = true;
 
 class CGMWatchfaceApp extends App.AppBase {

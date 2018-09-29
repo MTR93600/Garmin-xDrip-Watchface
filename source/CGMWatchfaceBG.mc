@@ -44,9 +44,6 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
 		Sys.println(url); 
  		//url = "https://maysbz.herokuapp.com/api/v1/entries/sgv.json?count=18";
         Comm.makeWebRequest( url, {}, { :headers => { "Content-Type" => Comm.REQUEST_CONTENT_TYPE_URL_ENCODED }, :responseType => Comm.HTTP_RESPONSE_CONTENT_TYPE_JSON}, method(:verarbeiteWerte) );
-     
-        //just return the timestamp
-        //Background.exit(ts);
     }
     
     function verarbeiteWerte( responseCode, data ) {
