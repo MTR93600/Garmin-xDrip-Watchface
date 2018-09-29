@@ -205,7 +205,11 @@ class CGMWatchfaceView extends Ui.WatchFace {
         View.onUpdate(dc);
         Sys.println("View.onUpdate");
         
-        dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT);
+        if( punkte[0]["sgv"] && 70 < punkte[0]["sgv"] && punkte[0]["sgv"] < 180 ) {
+        	dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT);
+        } else {
+        	dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
+        }
         dc.fillRectangle(width*2/3-10, 0, 10, height);
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
         dc.drawLine(0, height/3, width*2/3-15, height/3);
