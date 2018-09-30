@@ -292,7 +292,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
         
         // Schritte-Ziel
 		var circlePosition = height - (steps * 100 / stepGoal);
-		Sys.println(circlePosition);
 		if( circlePosition > (height - 6) ) { circlePosition = height - 6; }
 		if( circlePosition < 6 ) { circlePosition = 6; }
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
