@@ -49,7 +49,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         var clockTime = Sys.getClockTime();
         var now = Time.now();
         var info = Gregorian.info(now, Time.FORMAT_SHORT);
-        var datum = info.day + "." + info.month.format("%02d"); // + "." + info.year.toString().substring(2,4);
+        var datum = info.day + "." + info.month.format("%02d")+ "."; //  + info.year.toString().substring(2,4);
         Sys.println(datum);
         var hours = clockTime.hour;
         if (!Sys.getDeviceSettings().is24Hour) {
