@@ -61,7 +61,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
         
         // Heartrate & Steps
         // Schritte einlesen
-        var steps = Act.getInfo().steps;      
+        var steps = Act.getInfo().steps;   
+        var stepGoal = Act.getInfo().stepGoal;   
         // Heartrate einlesen 
         var heartrate;        
         if (Act has :getHeartRateHistory) {      
@@ -210,7 +211,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         } else {
         	dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
         }
-        dc.fillRectangle(width*2/3-20, 0, 10, height);
+        dc.fillRectangle(width*2/3-20, 0, 11, height);
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
         dc.drawLine(0, height/3+10, width*2/3-25, height/3+10);
         dc.drawLine(0, height*2/3+10, width*2/3-25, height*2/3+10);
@@ -293,6 +294,14 @@ class CGMWatchfaceView extends Ui.WatchFace {
         var battery = Sys.getSystemStats().battery * 18 / 100;
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
         dc.fillRoundedRectangle(width*2/3, height/3+14-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 10, 18-battery, 2);
+        
+        // Schritte-Ziel
+		var circlePosition = height - (steps * 100 / stepGoal);
+		Sys.println(circlePosition);
+		if( circlePosition > (height - 6) ) { circlePosition = height - 6; }
+		if( circlePosition < 6 ) { circlePosition = 6; }
+        dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
+        dc.fillCircle(width*2/3-15, circlePosition, 8);
                     
     }
 
