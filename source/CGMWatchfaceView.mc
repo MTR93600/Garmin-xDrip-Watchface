@@ -291,7 +291,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         dc.fillRoundedRectangle(width*2/3-2, height/3+12-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 14, 22, 2);
         dc.fillRectangle(width*2/3-2+4, height/3+12-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-2, 6, 2);
         var battery = Sys.getSystemStats().battery * 25 / 100;
-        dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT); // Füllung
+        dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
         dc.fillRoundedRectangle(width*2/3, height/3+14-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 10, 18-battery, 2);
                     
     }
