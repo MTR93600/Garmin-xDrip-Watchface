@@ -218,17 +218,19 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( punkte != null ) {      
         	dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);
             var now = Time.now().value();
-            var lowValue = 1000, highValue = 0, factor = 0.0033, correction = 0; // Faktor: 1/300
+            var lowValue = 1000, highValue = 0;
+            var factor = 0.0033; // Faktor: 1/300
+            var correction = 0; 
             for( var i = 0; i < punkte.size(); i++ ) {
             	if( lowValue > punkte[i]["sgv"] ) { lowValue = punkte[i]["sgv"]; }
             	if( highValue < punkte[i]["sgv"] ) { highValue = punkte[i]["sgv"]; }
             }
             var difference = highValue - lowValue;
             Sys.println("Differenz: " + difference);
-            if( difference < 90 ) {
-            	factor = 0.01; // 1/100
-            	correction = (100-difference)/2; 
-            } else if( difference < 190) { 
+            if( difference <= 90 ) {
+            	factor = 0.01; // 1/100     	
+   				correction = (100-difference)/2; 
+            } else if( difference > 90 && difference <= 190) { 
             	factor = 0.005; // 1/200
             	correction = (200-difference)/2; 
             } else {
@@ -238,12 +240,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
             
             for( var i = 0; i < punkte.size(); i++ ) {
             	if(punkte[i]["sgv"] && punkte[i]["date"] ) {
-            		plotSGV = punkte[i]["sgv"] - lowValue + correction;
+            		plotSGV = (punkte[i]["sgv"] - lowValue) + correction;
             		Sys.println("plotSGV: " + plotSGV + "Rechnung:" + punkte[i]["sgv"] + "-" + lowValue + "+" + correction);
-            		plotSGV = ( punkte[i]["sgv"] > 300 ) ? 300 : punkte[i]["sgv"];
+            		plotSGV = ( plotSGV > 300 ) ? 300 : plotSGV;
             	    // plotSGV = 300;
                 	var plotBreite = width*2/3 - 25 - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*2/3-25) * 0.0111) ); // Faktor 1 / 90 
-                	var plotHoehe = height/3+10 - ( plotSGV * ((height/3)*factor) - 5); 
+                	var plotHoehe = height/3+10 - ( plotSGV * ((height/3)*factor) + 10); 
+                	Sys.println("plotHoehe: " + plotHoehe);
                 	if( 70 <= punkte[i]["sgv"] && punkte[i]["sgv"] <= 180 ) {
                 		dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT); 
                 	} else {
