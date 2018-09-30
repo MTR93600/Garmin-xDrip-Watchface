@@ -25,7 +25,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
     // Load your resources here
     function onLayout(dc) {
-    	Sys.println("OnLayout");
+    	//Sys.println("OnLayout");
         setLayout(Rez.Layouts.WatchFace(dc));
         height = dc.getHeight();
         width = dc.getWidth();
@@ -44,13 +44,12 @@ class CGMWatchfaceView extends Ui.WatchFace {
     // Update the view
     function onUpdate(dc) {
         // Get the current time and format it correctly
-        Sys.println("onUpdate");
+        //Sys.println("onUpdate");
         var timeFormat = "$1$:$2$";
         var clockTime = Sys.getClockTime();
         var now = Time.now();
         var info = Gregorian.info(now, Time.FORMAT_SHORT);
         var datum = info.day + "." + info.month.format("%02d")+ "."; //  + info.year.toString().substring(2,4);
-        Sys.println(datum);
         var hours = clockTime.hour;
         if (!Sys.getDeviceSettings().is24Hour) {
             if (hours > 12) {
@@ -74,12 +73,12 @@ class CGMWatchfaceView extends Ui.WatchFace {
 		} else {
 		    heartrate = null;
 		}
-		Sys.println("S+H:" + steps + " - " + heartrate);
+
     	// CGM Daten verarbeiten
     	noAAPS = dc.getFontHeight(Gfx.FONT_TINY);
     	//punkte = null;
     	if( punkte != null ) { 
-    		Sys.println("CGM Daten");
+    		//Sys.println("CGM Daten");
         	// Einheiten            
         	if( punkte[0]["units_hint"] ) {
             	if( punkte[0]["units_hint"].equals("mmol") ) {
@@ -121,7 +120,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         	
         	//punkte[0]["aaps"] = "240% 10.06U(8.27|8.34) -17,24 35g"; 
         	if( punkte[0]["aaps"] ) {
-        		Sys.println("AAPS");
+        		//Sys.println("AAPS");
              	aaps = punkte[0]["aaps"].toString();   
              	if( aaps != null && aaps.equals("") == false ) {
         			var index = aaps.find("%");
@@ -146,7 +145,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             
 			anzeigeFehler = "";
 		} else {
-			Sys.println("Keine CGM Daten");
+			//Sys.println("Keine CGM Daten");
 			anzeigeFehler = "Wait max. 5'";
 			verzoegerung = "--";
 			anzeigeSGV = "---";
@@ -154,7 +153,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
 		}
 		
 		// Fehleranzeige	
-		Sys.println("Fehler:" + fehler );
+		//Sys.println("Fehler:" + fehler );
  		if( fehler == true ) { anzeigeFehler = "Error: " + fehler_code; } 
 
         // Update the view
@@ -204,7 +203,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         
         // Call the parent onUpdate function to redraw the layout
         View.onUpdate(dc);
-        Sys.println("View.onUpdate");
+        //Sys.println("View.onUpdate");
         
         if( punkte[0]["sgv"] && 70 < punkte[0]["sgv"] && punkte[0]["sgv"] < 180 ) {
         	dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT);
@@ -227,7 +226,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
             	if( highValue < punkte[i]["sgv"] ) { highValue = punkte[i]["sgv"]; }
             }
             var difference = highValue - lowValue;
-            Sys.println("Differenz: " + difference);
             if( difference <= 90 ) {
             	factor = 0.01; // 1/100     	
    				correction = (100-difference)/2; 
@@ -237,17 +235,14 @@ class CGMWatchfaceView extends Ui.WatchFace {
             } else {
             	correction = (300-difference)/2; 
             }
-            Sys.println("Korrektur: " + correction);
             
             for( var i = 0; i < punkte.size(); i++ ) {
             	if(punkte[i]["sgv"] && punkte[i]["date"] ) {
             		plotSGV = (punkte[i]["sgv"] - lowValue) + correction;
-            		Sys.println("plotSGV: " + plotSGV + "Rechnung:" + punkte[i]["sgv"] + "-" + lowValue + "+" + correction);
             		plotSGV = ( plotSGV > 300 ) ? 300 : plotSGV;
             	    // plotSGV = 300;
                 	var plotBreite = width*2/3 - 25 - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*2/3-25) * 0.0111) ); // Faktor 1 / 90 
                 	var plotHoehe = height/3+10 - ( plotSGV * ((height/3)*factor) + 10); 
-                	Sys.println("plotHoehe: " + plotHoehe);
                 	if( 70 <= punkte[i]["sgv"] && punkte[i]["sgv"] <= 180 ) {
                 		dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT); 
                 	} else {
@@ -287,7 +282,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         }
         
         // Batteriestand
-        Sys.println("Batteriestand");
+        //Sys.println("Batteriestand");
         dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
         dc.fillRoundedRectangle(width*2/3-2, height/3+12-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 14, 22, 2);
         dc.fillRectangle(width*2/3-2+4, height/3+12-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-2, 6, 2);
