@@ -33,13 +33,11 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
 		}
 		
 		var url = "http://127.0.0.1:17580/sgv.json?brief_mode=Y&count=18&all_data=Y";
-		if( steps != null || heartrate != null ) {
-			if(steps != null) {
-    			url = url + "&steps=" + steps;
-			}
-			if( heartrate != null) {
-				url = url + "&heart=" + heartrate;
-			}
+		if(steps != null) {
+   			url = url + "&steps=" + steps;
+		}
+		if( heartrate != null) {
+			url = url + "&heart=" + heartrate;
 		}
 		Sys.println(url); 
  		//url = "https://maysbz.herokuapp.com/api/v1/entries/sgv.json?count=15";

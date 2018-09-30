@@ -44,24 +44,21 @@ class CGMWatchfaceApp extends App.AppBase {
     	var now=Sys.getClockTime();
     	var ts=now.hour+":"+now.min.format("%02d");
         Sys.println("onBackgroundData="+data+"\n"+counter+" at "+ts);
-        var testData = data.toString();
-        if( testData.substring(0,1).equals("[") ) { fehler = false; } else { fehler = true; }
-        if( fehler == false ) { 
-        	punkte = data;                    	
+        fehler = data.toString().substring(0,1).equals("[") ? false : true;
+        if( fehler == false && data != null && data instanceof Array && data[0]["date"] != null ) { 
+        	punkte = data;                   	
         	var differenz = Time.now().value() - data[0]["date"]/1000;
         	var dauer;
-        	if( differenz > 30 && differenz < 300 ) {
+        	if( differenz != null && differenz > 30 && differenz < 300 ) {
         		duration = new Time.Duration(600 - differenz + 15);
-        		dauer = 10 * 60 - differenz + 15;
         		adjustTime = true;
         	} else {
-        		if( differenz < 10 ) {
+        		if( differenz != null && differenz < 10 ) {
         			duration = new Time.Duration(5 * 60 + 15); 
         		} else {
         			duration = new Time.Duration(5 * 60);
         		}
         		adjustTime = false;
-        		dauer = 300;
         	}
         	var lastTime = Background.getLastTemporalEventTime();
         	if (lastTime != null) {
