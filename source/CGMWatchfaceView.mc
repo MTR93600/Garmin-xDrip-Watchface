@@ -291,11 +291,20 @@ class CGMWatchfaceView extends Ui.WatchFace {
         dc.fillRoundedRectangle(width*2/3, height/3+14-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 10, 18-battery, 2);
         
         // Schritte-Ziel
-		var circlePosition = height - (steps * 100 / stepGoal);
-		if( circlePosition > (height - 6) ) { circlePosition = height - 6; }
-		if( circlePosition < 6 ) { circlePosition = 6; }
+		var circlePosition = height - ( (steps * height) / stepGoal);
+		if( circlePosition > (height - 10) ) { circlePosition = height - 10; }
+		if( circlePosition < -10 ) { circlePosition = -10; }
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
-        dc.fillCircle(width*2/3-15, circlePosition, 8);
+        //dc.fillCircle(width*2/3-15, circlePosition, 8);
+        var polygon = [
+        	[width*2/3-15, circlePosition], 
+        	[width*2/3-15+8, circlePosition+5], 
+        	[width*2/3-15+8, circlePosition+20], 
+        	[width*2/3-15, circlePosition+12],
+        	[width*2/3-15-8, circlePosition+20],
+        	[width*2/3-15-8, circlePosition+5]
+        ];
+        dc.fillPolygon(polygon);
                     
     }
 
