@@ -159,44 +159,44 @@ class CGMWatchfaceView extends Ui.WatchFace {
         // Update the view
         var time = View.findDrawableById("TimeLabel");
         time.setText(timeString);
-        time.setLocation(width*2/3-25, height/3+10-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-10);
+        time.setLocation(width*2/3-28, height/3+10-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-10);
         var date = View.findDrawableById("DateLabel");
         date.setText(datum);
-        date.setLocation(width*2/3-25, height/3+10-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontHeight(Gfx.FONT_TINY)-15);
+        date.setLocation(width*2/3-28, height/3+10-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontHeight(Gfx.FONT_TINY)-15);
         
         var verzAnzeige = View.findDrawableById("verzLabel");
         verzAnzeige.setText(verzoegerung.toString()+"'");
-        verzAnzeige.setLocation(width*2/3-5, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-5 + noAAPS);
+        verzAnzeige.setLocation(width*2/3-2, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-5 + noAAPS);
         var sgvAnzeige = View.findDrawableById("sgvLabel");
         sgvAnzeige.setText(anzeigeSGV);
-        sgvAnzeige.setLocation(width*2/3-5, height/3+10 + noAAPS);              
+        sgvAnzeige.setLocation(width*2/3-2, height/3+10 + noAAPS);              
         var deltaAnzeige = View.findDrawableById("deltaLabel");
         deltaAnzeige.setText(anzeigeDelta);
-        deltaAnzeige.setLocation(width*2/3-5, height/3+10+dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM) + noAAPS);
+        deltaAnzeige.setLocation(width*2/3-2, height/3+10+dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM) + noAAPS);
         
         if( anzeigeBasal.equals("") == false ) {
         	var basalAnzeige = View.findDrawableById("basalLabel");
         	basalAnzeige.setText(anzeigeBasal);
-        	basalAnzeige.setLocation(width*2/3-5, height/3+10+dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontAscent(Gfx.FONT_MEDIUM)+5);           //width*2/3-15, height*2/3+5);
+        	basalAnzeige.setLocation(width*2/3-2, height/3+10+dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontAscent(Gfx.FONT_MEDIUM)+5);           //width*2/3-15, height*2/3+5);
         }
         if( anzeigeIOB.equals("") == false ) {
         	var iobAnzeige = View.findDrawableById("iobLabel");
         	iobAnzeige.setText(anzeigeIOB);
-        	iobAnzeige.setLocation(width*2/3-5, height/3+10+dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontAscent(Gfx.FONT_MEDIUM)+dc.getFontAscent(Gfx.FONT_TINY)+10);
+        	iobAnzeige.setLocation(width*2/3-2, height/3+10+dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontAscent(Gfx.FONT_MEDIUM)+dc.getFontAscent(Gfx.FONT_TINY)+10);
         }
         
         if( steps ) {
             var stepsAnzeige = View.findDrawableById("stepsLabel");
         	stepsAnzeige.setText(steps.toString());
-        	stepsAnzeige.setLocation(width*2/3-45, height*2/3+10+5);
+        	stepsAnzeige.setLocation(width*2/3-48, height*2/3+10+5);
         }
         if( heartrate ) {
             var heartAnzeige = View.findDrawableById("heartrateLabel");
         	heartAnzeige.setText(heartrate.toString());
         	if( steps ) {
-        		heartAnzeige.setLocation(width*2/3-45, height*2/3+10+5+dc.getFontAscent(Gfx.FONT_TINY)+5);
+        		heartAnzeige.setLocation(width*2/3-48, height*2/3+10+5+dc.getFontAscent(Gfx.FONT_TINY)+5);
         	} else {
-        		heartAnzeige.setLocation(width*2/3-45, height*2/3+10+5);
+        		heartAnzeige.setLocation(width*2/3-48, height*2/3+10+5);
         	}
         	
         }
@@ -259,42 +259,42 @@ class CGMWatchfaceView extends Ui.WatchFace {
         
         if( anzeigeFehler ) {
         	dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
-        	dc.drawText(width*2/3-25, height*2/3+10-dc.getFontHeight(Gfx.FONT_TINY)-5, Gfx.FONT_TINY, anzeigeFehler, Gfx.TEXT_JUSTIFY_RIGHT );
+        	dc.drawText(width*2/3-28, height*2/3+10-dc.getFontHeight(Gfx.FONT_TINY)-5, Gfx.FONT_TINY, anzeigeFehler, Gfx.TEXT_JUSTIFY_RIGHT );
         }
         
         if( System.getDeviceSettings().phoneConnected ) {	
         	var bmp = Ui.loadResource(Rez.Drawables.bluetooth);
-        	dc.drawBitmap(width*2/3+10, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), bmp);
+        	dc.drawBitmap(width*2/3+17, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), bmp);
         }
         
         if( adjustTime ) {
         	var bmp = Ui.loadResource(Rez.Drawables.stopwatch);
-        	dc.drawBitmap(width*2/3+0+dc.getTextWidthInPixels(verzoegerung.toString()+"'", Gfx.FONT_TINY), height/3+10-dc.getFontAscent(Gfx.FONT_TINY)-7+noAAPS, bmp);
+        	dc.drawBitmap(width*2/3+3+dc.getTextWidthInPixels(verzoegerung.toString()+"'", Gfx.FONT_TINY), height/3+10-dc.getFontAscent(Gfx.FONT_TINY)-7+noAAPS, bmp);
         }
         
         if( steps ) {
         	var bmp = Ui.loadResource(Rez.Drawables.steps);
-        	dc.drawBitmap(width*2/3-40, height*2/3+10+8, bmp);
+        	dc.drawBitmap(width*2/3-43, height*2/3+10+8, bmp);
         }
         if( heartrate ) {
         	var bmp = Ui.loadResource(Rez.Drawables.heart);
         	if( steps ) {
-        		dc.drawBitmap(width*2/3-40, height*2/3+10+8+dc.getFontAscent(Gfx.FONT_TINY)+5, bmp);
+        		dc.drawBitmap(width*2/3-43, height*2/3+10+8+dc.getFontAscent(Gfx.FONT_TINY)+5, bmp);
         	} else {
-        		dc.drawBitmap(width*2/3-40, height*2/3+10+8, bmp);
+        		dc.drawBitmap(width*2/3-43, height*2/3+10+8, bmp);
         	}
         }
         
         // Batteriestand
         Sys.println("Batteriestand");
         dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
-        dc.fillRoundedRectangle(width*2/3-5, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 12, 24, 2);
-        dc.fillRectangle(width*2/3-5+4, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-2, 4, 2);
+        dc.fillRoundedRectangle(width*2/3-2, height/3+12-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 14, 22, 2);
+        dc.fillRectangle(width*2/3-2+4, height/3+12-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-2, 6, 2);
         var battery = Sys.getSystemStats().battery * 25 / 100;
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT); // Füllung
-        dc.fillRoundedRectangle(width*2/3-4, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 10, 24-battery, 2);
+        dc.fillRoundedRectangle(width*2/3-1, height/3+12-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 12, 22-battery, 2);
         dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
-        dc.drawRoundedRectangle(width*2/3-5, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 12, 25, 2);            
+        dc.drawRoundedRectangle(width*2/3-2, height/3+12-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 14, 23, 2);            
     }
 
     // Called when this View is removed from the screen. Save the
