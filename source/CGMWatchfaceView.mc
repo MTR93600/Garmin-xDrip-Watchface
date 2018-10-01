@@ -267,7 +267,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         	dc.drawBitmap(width*2/3+17, height/3+10-dc.getFontHeight(Gfx.FONT_TINY)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), bmp);
         }
         
-        if( adjustTime != null ) {
+        if( adjustTime != null && adjustTime == true) {
         	var bmp = Ui.loadResource(Rez.Drawables.stopwatch);
         	dc.drawBitmap(width*2/3+3+dc.getTextWidthInPixels(verzoegerung.toString()+"'", Gfx.FONT_TINY), height/3+10-dc.getFontAscent(Gfx.FONT_TINY)-7+noAAPS, bmp);
         }

@@ -35,6 +35,7 @@ class CGMWatchfaceApp extends App.AppBase {
 			} else {
     			Background.registerForTemporalEvent(Time.now());
     		}
+    		adjustTime = false;
     	}
         return [ new CGMWatchfaceView() ];
     }
@@ -44,6 +45,8 @@ class CGMWatchfaceApp extends App.AppBase {
     	var now=Sys.getClockTime();
     	var ts=now.hour+":"+now.min.format("%02d");
         Sys.println("onBackgroundData="+data+"\n"+counter+" at "+ts);
+        
+        adjustTime = false;
         fehler = data.toString().substring(0,1).equals("[") ? false : true;
         if( fehler == false && data != null && data instanceof Array && data[0]["date"] != null ) { 
         	punkte = data;                   	
@@ -58,7 +61,6 @@ class CGMWatchfaceApp extends App.AppBase {
         		} else {
         			duration = new Time.Duration(5 * 60);
         		}
-        		adjustTime = false;
         	}
         	var lastTime = Background.getLastTemporalEventTime();
         	if (lastTime != null) {
