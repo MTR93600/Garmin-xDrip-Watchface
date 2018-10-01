@@ -163,10 +163,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
         // Update the view
         var time = View.findDrawableById("TimeLabel");
         time.setText(timeString);
-        time.setLocation(width*2/3-28, height/3+10-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-10);
+        time.setLocation(width*2/3-30, height/3+10-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-10);
         var date = View.findDrawableById("DateLabel");
         date.setText(datum);
-        date.setLocation(width*2/3-28, height/3+10-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontHeight(Gfx.FONT_TINY)-15);
+        date.setLocation(width*2/3-30, height/3+10-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontHeight(Gfx.FONT_TINY)-15);
         
         var verzAnzeige = View.findDrawableById("verzLabel");
         verzAnzeige.setText(verzoegerung.toString()+"'");
@@ -192,15 +192,15 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( steps != null ) {
             var stepsAnzeige = View.findDrawableById("stepsLabel");
         	stepsAnzeige.setText(steps.toString());
-        	stepsAnzeige.setLocation(width*2/3-48, height*2/3+10+5);
+        	stepsAnzeige.setLocation(width*2/3-50, height*2/3+10+5);
         }
         if( heartrate != null ) {
             var heartAnzeige = View.findDrawableById("heartrateLabel");
         	heartAnzeige.setText(heartrate.toString());
         	if( steps != null ) {
-        		heartAnzeige.setLocation(width*2/3-48, height*2/3+10+5+dc.getFontAscent(Gfx.FONT_TINY)+5);
+        		heartAnzeige.setLocation(width*2/3-50, height*2/3+10+5+dc.getFontAscent(Gfx.FONT_TINY)+5);
         	} else {
-        		heartAnzeige.setLocation(width*2/3-48, height*2/3+10+5);
+        		heartAnzeige.setLocation(width*2/3-50, height*2/3+10+5);
         	}
         	
         }
@@ -209,13 +209,15 @@ class CGMWatchfaceView extends Ui.WatchFace {
         View.onUpdate(dc);
         //Sys.println("View.onUpdate");
         
+        // Balken
         if( punkte != null && punkte instanceof Array  && punkte[0]["sgv"] != null && 70 < punkte[0]["sgv"] && punkte[0]["sgv"] < 180 ) {
         	dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT);
         } else {
         	dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
         }
-        dc.fillRectangle(width*2/3-20, 0, 11, height);
+        dc.fillRectangle(width*2/3-22, 0, 13, height);
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+        // Trennlinien
         dc.drawLine(0, height/3+10, width*2/3-25, height/3+10);
         dc.drawLine(0, height*2/3+10, width*2/3-25, height*2/3+10);
         
@@ -245,21 +247,21 @@ class CGMWatchfaceView extends Ui.WatchFace {
             		plotSGV = (punkte[i]["sgv"] - lowValue) + correction;
             		plotSGV = ( plotSGV > 300 ) ? 300 : plotSGV;
             	    // plotSGV = 300;
-                	var plotBreite = width*2/3 - 25 - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*2/3-25) * 0.0111) ); // Faktor 1 / 90 
+                	var plotBreite = width*2/3 - 27 - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*2/3-27) * 0.0111) ); // Faktor 1 / 90 
                 	var plotHoehe = height/3+10 - ( plotSGV * ((height/3)*factor) + 10); 
                 	if( 70 <= punkte[i]["sgv"] && punkte[i]["sgv"] <= 180 ) {
                 		dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT); 
                 	} else {
                 		dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT); 
                 	}
-                	dc.fillCircle( plotBreite, height/3+10 + plotHoehe, 3 );
+                	dc.fillpolygon( plotBreite, height/3+10 + plotHoehe, 3 );
                 }                           
             }
         }
         
         if( anzeigeFehler != null ) {
         	dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
-        	dc.drawText(width*2/3-28, height*2/3+10-dc.getFontHeight(Gfx.FONT_TINY)-5, Gfx.FONT_TINY, anzeigeFehler, Gfx.TEXT_JUSTIFY_RIGHT );
+        	dc.drawText(width*2/3-30, height*2/3+10-dc.getFontHeight(Gfx.FONT_TINY)-5, Gfx.FONT_TINY, anzeigeFehler, Gfx.TEXT_JUSTIFY_RIGHT );
         }
         
         if( System.getDeviceSettings().phoneConnected ) {	
@@ -274,14 +276,14 @@ class CGMWatchfaceView extends Ui.WatchFace {
         
         if( steps != null) {
         	var bmp = Ui.loadResource(Rez.Drawables.steps);
-        	dc.drawBitmap(width*2/3-43, height*2/3+10+8, bmp);
+        	dc.drawBitmap(width*2/3-45, height*2/3+10+8, bmp);
         }
         if( heartrate != null ) {
         	var bmp = Ui.loadResource(Rez.Drawables.heart);
         	if( steps != null ) {
-        		dc.drawBitmap(width*2/3-43, height*2/3+10+8+dc.getFontAscent(Gfx.FONT_TINY)+5, bmp);
+        		dc.drawBitmap(width*2/3-45, height*2/3+10+8+dc.getFontAscent(Gfx.FONT_TINY)+5, bmp);
         	} else {
-        		dc.drawBitmap(width*2/3-43, height*2/3+10+8, bmp);
+        		dc.drawBitmap(width*2/3-45, height*2/3+10+8, bmp);
         	}
         }
         
@@ -296,18 +298,17 @@ class CGMWatchfaceView extends Ui.WatchFace {
         
         // Schritte-Ziel
         if( steps != null && stepGoal != null ) {
-			var circlePosition = height - ( (steps * height) / stepGoal);
-			if( circlePosition > (height - 10) ) { circlePosition = height - 10; }
-			if( circlePosition < -10 ) { circlePosition = -10; }
+			var polygonPosition = height - ( (steps * height) / stepGoal);
+			if( polygonPosition > (height - 10) ) { polygonPosition = height - 10; }
+			if( polygonPosition < -10 ) { polygonPosition = -10; }
         	dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
-        	//dc.fillCircle(width*2/3-15, circlePosition, 8);
         	var polygon = [
-        		[width*2/3-15, circlePosition], 
-        		[width*2/3-15+8, circlePosition+5], 
-        		[width*2/3-15+8, circlePosition+20], 
-        		[width*2/3-15, circlePosition+12],
-        		[width*2/3-15-8, circlePosition+20],
-        		[width*2/3-15-8, circlePosition+5]
+        		[width*2/3-16, polygonPosition], 
+        		[width*2/3-15+8, polygonPosition+8], 
+        		[width*2/3-15+8, polygonPosition+22], 
+        		[width*2/3-16, polygonPosition+14],
+        		[width*2/3-15-9, polygonPosition+22],
+        		[width*2/3-15-9, polygonPosition+8]
         	];
         	dc.fillPolygon(polygon);
        }            
