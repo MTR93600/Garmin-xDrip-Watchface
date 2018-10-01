@@ -318,7 +318,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
     	if( punkte!=null && punkte instanceof Array) {
     		App.Storage.setValue("punkteWatchface", punkte);  
     	}
-    	Background.deleteTemporalEvent();
     }
 
     // The user has just looked at their watch. Timers and animations may be started here.
