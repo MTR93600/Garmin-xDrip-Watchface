@@ -235,17 +235,14 @@ class CGMWatchfaceView extends Ui.WatchFace {
             if( difference != null && difference <= 90 ) {
             	factor = 0.01; // 1/100     	
    				correction = (100-difference)/2; 
-            } else if( difference != null && difference > 90 && difference <= 190) { 
-            	factor = 0.005; // 1/200
-            	correction = (200-difference)/2; 
-            } else {
-            	correction = (300-difference)/2; 
+            } else { 
+            	factor = (1/(difference+10)); // 1/200
+            	correction = 5; 
             }
             
             for( var i = 0; i < punkte.size(); i++ ) {
             	if(punkte[i]["sgv"] != null && punkte[i]["date"] != null ) {
             		plotSGV = (punkte[i]["sgv"] - lowValue) + correction;
-            		plotSGV = ( plotSGV > 300 ) ? 300 : plotSGV;
             	    // plotSGV = 300;
                 	var plotBreite = width*2/3 - 27 - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*2/3-27) * 0.0111) ); // Faktor 1 / 90 
                 	var plotHoehe = height/3+10 - ( plotSGV * ((height/3)*factor) + 10); 
@@ -254,7 +251,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 	} else {
                 		dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT); 
                 	}
-                	dc.fillpolygon( plotBreite, height/3+10 + plotHoehe, 3 );
+                	dc.fillCircle( plotBreite, height/3+10 + plotHoehe, 2 );
                 }                           
             }
         }
