@@ -232,6 +232,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             	if( highValue < punkte[i]["sgv"] ) { highValue = punkte[i]["sgv"]; }
             }
             var difference = highValue - lowValue;
+            Sys.println("Differenz: " + difference + "/n");
             if( difference != null && difference <= 90 ) {
             	factor = 0.01; // 1/100     	
    				correction = (100-difference)/2; 
@@ -239,6 +240,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             	factor = (1/(difference+10)); // 1/200
             	correction = 5; 
             }
+            Sys.println("Faktor: " + factor + "/n");
             
             for( var i = 0; i < punkte.size(); i++ ) {
             	if(punkte[i]["sgv"] != null && punkte[i]["date"] != null ) {
@@ -307,8 +309,14 @@ class CGMWatchfaceView extends Ui.WatchFace {
         		[width*2/3-15-9, polygonPosition+22],
         		[width*2/3-15-9, polygonPosition+8]
         	];
+        	/*var polygon = [
+        		[width*2/3-22, polygonPosition], 
+        		[width*2/3-9, polygonPosition+6], 
+        		[width*2/3-9, polygonPosition+22], 
+        		[width*2/3-22, polygonPosition+16]
+        	];*/
         	dc.fillPolygon(polygon);
-       }            
+    	}            
     }
 
     // Called when this View is removed from the screen. Save the
