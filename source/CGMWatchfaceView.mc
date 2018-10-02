@@ -271,6 +271,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         // Zu alter Blutzucker
         //outdatedSGV = true;
         if( outdatedSGV != null && outdatedSGV == true && anzeigeSGV != null ) {
+        	dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
         	dc.fillRectangle(
         		width*2/3-2-2, 
         		height/3+10 + (dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)/2) + noAAPS, 
