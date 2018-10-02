@@ -318,11 +318,11 @@ class CGMWatchfaceView extends Ui.WatchFace {
         	dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
         	var polygon = [
         		[width*2/3-16, polygonPosition], 
-        		[width*2/3-15+8, polygonPosition+8], 
-        		[width*2/3-15+8, polygonPosition+22], 
+        		[width*2/3-15+8, polygonPosition+6], 
+        		[width*2/3-15+8, polygonPosition+20], 
         		[width*2/3-16, polygonPosition+14],
-        		[width*2/3-15-9, polygonPosition+22],
-        		[width*2/3-15-9, polygonPosition+8]
+        		[width*2/3-15-9, polygonPosition+20],
+        		[width*2/3-15-9, polygonPosition+6]
         	];
         	/*var polygon = [
         		[width*2/3-22, polygonPosition], 
