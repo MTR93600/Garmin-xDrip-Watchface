@@ -143,7 +143,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
 				}
             }
             
-            
 			anzeigeFehler = "";
 		} else {
 			//Sys.println("Keine CGM Daten");
