@@ -291,12 +291,11 @@ class CGMWatchfaceView extends Ui.WatchFace {
             	if( highValue < punkte[i]["sgv"] ) { highValue = punkte[i]["sgv"]; }
             }
             var difference = highValue - lowValue;
-
             if( difference != null && difference <= 90 ) {
             	factor = 0.01; // 1/100     	
    				correction = (100-difference)/2; 
             } else { 
-            	factor = (1/(difference+10)); // 1/200
+            	factor = 1.toFloat()/(difference+10); // 1/200
             	correction = 5; 
             	Sys.println("Faktor: " + factor + "\n");
             	Sys.println("Differenz: " + difference + "\n");
