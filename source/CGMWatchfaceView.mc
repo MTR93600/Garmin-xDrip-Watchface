@@ -8,6 +8,7 @@ using Toybox.ActivityMonitor as Act;
 
 var height, width;
 var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", verzoegerung;
+var outdatedSGV = false;
 var wert, anzeigeDelta, anzeigeFehler;
 var plotSGV;
 var noAAPS;
@@ -116,6 +117,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
            		}                	
            	} 
 			verzoegerung = punkte[0]["date"] ? minutesFromTimestamp(Time.now().value(), punkte[0]["date"]) : "999";
+			outdatedSGV = ( verzoegerung != null && verzoegerung > 11 ) ? true : false;
         	
         	
         	//punkte[0]["aaps"] = "240% 10.06U(8.27|8.34) -17,24 35g"; 
@@ -209,6 +211,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         View.onUpdate(dc);
         //Sys.println("View.onUpdate");
         
+        
         // Balken
         if( punkte != null && punkte instanceof Array  && punkte[0]["sgv"] != null && 70 < punkte[0]["sgv"] && punkte[0]["sgv"] < 180 ) {
         	dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT);
@@ -221,6 +224,18 @@ class CGMWatchfaceView extends Ui.WatchFace {
         dc.drawLine(0, height/3+10, width*2/3-25, height/3+10);
         dc.drawLine(0, height*2/3+10, width*2/3-25, height*2/3+10);
         
+        // Zu alter Blutzucker
+        //outdatedSGV = true;
+        if( outdatedSGV != null && outdatedSGV == true && anzeigeSGV != null ) {
+        	dc.fillRectangle(
+        		width*2/3-2-2, 
+        		height/3+10 + (dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)/2) + noAAPS, 
+        		dc.getTextWidthInPixels(anzeigeSGV, Gfx.FONT_NUMBER_MEDIUM)+4,
+        		4
+        	);
+        }
+        
+        // Graph
         if( punkte != null && punkte instanceof Array ) {      
         	dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);
             var now = Time.now().value();
