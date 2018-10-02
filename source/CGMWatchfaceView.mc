@@ -291,7 +291,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             	if( highValue < punkte[i]["sgv"] ) { highValue = punkte[i]["sgv"]; }
             }
             var difference = highValue - lowValue;
-            Sys.println("Differenz: " + difference + "/n");
+            Sys.println("Differenz: " + difference + "\n");
             if( difference != null && difference <= 90 ) {
             	factor = 0.01; // 1/100     	
    				correction = (100-difference)/2; 
@@ -299,7 +299,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             	factor = (1/(difference+10)); // 1/200
             	correction = 5; 
             }
-            Sys.println("Faktor: " + factor + "/n");
+            Sys.println("Faktor: " + factor + "\n");
             
             for( var i = 0; i < punkte.size(); i++ ) {
             	if(punkte[i]["sgv"] != null && punkte[i]["date"] != null ) {
