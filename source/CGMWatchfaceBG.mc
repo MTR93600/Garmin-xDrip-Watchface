@@ -14,11 +14,7 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
 		Sys.ServiceDelegate.initialize();
 	}
 	
-    function onTemporalEvent() {
-    	var now=Sys.getClockTime();
-    	var ts=now.hour+":"+now.min.format("%02d");
-        Sys.println("bg exit: "+ts);
-        
+    function onTemporalEvent() {        
          // Heartrate & Steps
         var steps = Act.getInfo().steps;  
 		var heartrate;        
@@ -31,7 +27,7 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
 		} else {
 		    heartrate = null;
 		}
-		
+		// Build URL & WebRequest
 		var url = "http://127.0.0.1:17580/sgv.json?brief_mode=Y&count=18&all_data=Y";
 		if(steps != null) {
    			url = url + "&steps=" + steps;
@@ -39,13 +35,12 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
 		if( heartrate != null) {
 			url = url + "&heart=" + heartrate;
 		}
-		Sys.println(url); 
  		//url = "https://maysbz.herokuapp.com/api/v1/entries/sgv.json?count=15";
         Comm.makeWebRequest( url, {}, { :headers => { "Content-Type" => Comm.REQUEST_CONTENT_TYPE_URL_ENCODED }, :responseType => Comm.HTTP_RESPONSE_CONTENT_TYPE_JSON}, method(:verarbeiteWerte) );
     }
     
     function verarbeiteWerte( responseCode, data ) {
-    	Sys.println("verarbeite Werte, Code:" + responseCode);
+    	//Sys.println("verarbeite Werte, Code:" + responseCode);
         if( responseCode == 200 ) { Background.exit(data); }
         else { Background.exit(responseCode); }
     }
