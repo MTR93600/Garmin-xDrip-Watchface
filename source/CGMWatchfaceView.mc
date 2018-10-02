@@ -275,7 +275,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         		width*2/3-2-2, 
         		height/3+10 + (dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)/2) + noAAPS, 
         		dc.getTextWidthInPixels(anzeigeSGV, Gfx.FONT_NUMBER_MEDIUM)+4,
-        		4
+        		6
         	);
         }
         
