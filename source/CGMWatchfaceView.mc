@@ -115,19 +115,25 @@ class CGMWatchfaceView extends Ui.WatchFace {
 			outdatedSGV = ( verzoegerung != null && verzoegerung > 11 ) ? true : false;
         	
         	// AAPS
+        	//punkte[0]["aaps"] = "10.06U";
         	//punkte[0]["aaps"] = "240% 10.06U(8.27|8.34) -17,24 35g"; 
         	if( punkte[0]["aaps"] != null ) {
         		//Sys.println("AAPS");
              	aaps = punkte[0]["aaps"].toString();   
              	if( aaps != null && aaps.equals("") == false ) {
-        			var index = aaps.find("%");
-        			if( index != null ) {
-            			anzeigeBasal = aaps.substring(0,index+1);
-            		}
-            		var index2 = aaps.find("U");
-            		if( index != null && index2 != null ) {
-            			anzeigeIOB = aaps.substring(index+2,index2-1);
-            		}
+        			var index1 = aaps.find(" ");
+        			anzeigeBasal = index1 != null ? aaps.substring(0,index1) : "--%";
+        			if( index1 ) {
+        				var aapsPart = aaps.substring(index1,20);
+        				var index2 = aapsPart.find("U");        			
+                   		anzeigeIOB = index2 != null ? aapsPart.substring(1,index2-1) : "--";
+                   	} else if( index1 == null && aaps.find("U") != null ) {
+                   		// Nur IOB angezeigt
+                   		var index3 = aaps.find("U");
+                   		anzeigeIOB = aaps.substring(0,index3-1);
+                   	} else {
+                   		anzeigeIOB = "--";
+                   	}
             		noAAPS = 0;
             	}
 			} else {
