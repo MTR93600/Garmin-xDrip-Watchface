@@ -1,6 +1,6 @@
 //! TODO
 //! Adjust fonts (tiny - small) & proof layout on vivoactive 3
-//! Battery in red?
+//! 
 
 using Toybox.WatchUi as Ui;
 using Toybox.Graphics as Gfx;
@@ -388,7 +388,12 @@ class CGMWatchfaceView extends Ui.WatchFace {
         
         // Batteriestand
         //Sys.println("Batteriestand");
-        dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
+        var batteryLoad = Sys.getSystemStats().battery;
+        if( batteryLoad < 20 ) {
+        	dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
+        } else {
+        	dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
+        }
         // Battery body
         dc.fillRoundedRectangle(
         	width*2/3-2,
@@ -405,7 +410,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         	2
         );
         // Battery state
-        var battery = Sys.getSystemStats().battery * 18 / 100;
+        var battery = batteryLoad * 18 / 100;
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
         dc.fillRoundedRectangle(
         	width*2/3, 
