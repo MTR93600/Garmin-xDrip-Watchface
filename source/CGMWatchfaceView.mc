@@ -1,3 +1,7 @@
+//! TODO
+//! Adjust fonts (tiny - small) & proof layout on vivoactive 3
+//! Battery in red?
+
 using Toybox.WatchUi as Ui;
 using Toybox.Graphics as Gfx;
 using Toybox.System as Sys;
