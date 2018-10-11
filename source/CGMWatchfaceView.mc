@@ -1,5 +1,5 @@
 //! TODO
-//! Adjust fonts (SMALL - small) & proof layout on vivoactive 3
+//! Proof layout on vivoactive 3
 //! 
 
 using Toybox.WatchUi as Ui;
@@ -15,7 +15,8 @@ var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", verzoegerung;
 var outdatedSGV = false;
 var wert, anzeigeDelta, anzeigeFehler;
 var plotSGV;
-var noAAPS;
+var noAAPS = 0;
+var correction = false;
 
 class CGMWatchfaceView extends Ui.WatchFace {
 
@@ -75,7 +76,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
 		}
 
     	// CGM Daten verarbeiten
-    	noAAPS = dc.getFontHeight(Gfx.FONT_SMALL);
+    	noAAPS = height / 6 - 20;
     	//punkte = null;
     	if( punkte != null && punkte instanceof Lang.Array) { 
     		//Sys.println("CGM Daten");
@@ -121,6 +122,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         	// AAPS
         	//punkte[0]["aaps"] = "10.06U";
         	//punkte[0]["aaps"] = "240% 10.06U(8.27|8.34) -17,24 35g"; 
+        	//punkte[0]["aaps"] = null;
         	if( punkte[0]["aaps"] != null ) {
         		//Sys.println("AAPS");
              	aaps = punkte[0]["aaps"].toString();   
@@ -141,7 +143,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             		noAAPS = 0;
             	}
 			} else {
-					noAAPS = dc.getFontHeight(Gfx.FONT_SMALL);
+					noAAPS = height / 6 - 20;
 					anzeigeBasal = "";
 					anzeigeIOB = "";
 			}             	        	
@@ -169,78 +171,63 @@ class CGMWatchfaceView extends Ui.WatchFace {
         // Update the view
         var time = View.findDrawableById("TimeLabel");
         time.setText(timeString);
-        time.setLocation(
-        	width*2/3-30, 
-        	height/3+10-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-10
-        );
         
         var date = View.findDrawableById("DateLabel");
         date.setText(datum);
-        date.setLocation(
-        	width*2/3-30, 
-        	height/3+10-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontHeight(Gfx.FONT_SMALL)-15
-        );
-        
+
         var verzAnzeige = View.findDrawableById("verzLabel");
         verzAnzeige.setText(verzoegerung.toString()+"'");
-        verzAnzeige.setLocation(
-        	width*2/3-2, 
-        	height/3+10-dc.getFontHeight(Gfx.FONT_SMALL)-5 + noAAPS
-        );
+        if( noAAPS != null && noAAPS > 0 && correction == false ) {
+        	verzAnzeige.setLocation(
+        		verzAnzeige.locX, 
+        	    verzAnzeige.locY + noAAPS 
+        	);
+        }
         
         var sgvAnzeige = View.findDrawableById("sgvLabel");
         sgvAnzeige.setText(anzeigeSGV);
-        sgvAnzeige.setLocation(
-        	width*2/3-2, 
-        	height/3+10 + noAAPS
-        );              
+        if( noAAPS != null && noAAPS > 0 && correction == false ) {
+        	sgvAnzeige.setLocation(
+        		sgvAnzeige.locX, 
+        	    sgvAnzeige.locY + noAAPS 
+        	);
+        }          
         
         var deltaAnzeige = View.findDrawableById("deltaLabel");
         deltaAnzeige.setText(anzeigeDelta);
-        deltaAnzeige.setLocation(
-        	width*2/3-2, 
-        	height/3+10+dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM) + noAAPS
-        );
+        if( noAAPS != null && noAAPS > 0 && correction == false ) {
+        	deltaAnzeige.setLocation(
+        		deltaAnzeige.locX, 
+        	    deltaAnzeige.locY + noAAPS 
+        	);
+        }
+        
+        if( noAAPS != null && noAAPS > 0 && correction == false ) {
+        	correction = true;
+        }
         
         if( anzeigeBasal != null && anzeigeBasal.equals("") == false ) {
         	var basalAnzeige = View.findDrawableById("basalLabel");
         	basalAnzeige.setText(anzeigeBasal);
-        	basalAnzeige.setLocation(
-        		width*2/3-2, 
-        		height/3+10+dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontAscent(Gfx.FONT_MEDIUM)+5
-        	);
         }
         
         if( anzeigeIOB != null && anzeigeIOB.equals("") == false ) {
         	var iobAnzeige = View.findDrawableById("iobLabel");
         	iobAnzeige.setText(anzeigeIOB);
-        	iobAnzeige.setLocation(
-        		width*2/3-2,
-        		height/3+10+dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontAscent(Gfx.FONT_MEDIUM)+dc.getFontAscent(Gfx.FONT_SMALL)+10
-        	);
         }
         
         if( steps != null ) {
             var stepsAnzeige = View.findDrawableById("stepsLabel");
         	stepsAnzeige.setText(steps.toString());
-        	stepsAnzeige.setLocation(
-        		width*2/3-50, 
-        		height*2/3+10+5
-        	);
         }
         
         if( heartrate != null ) {
             var heartAnzeige = View.findDrawableById("heartrateLabel");
         	heartAnzeige.setText(heartrate.toString());
-        	if( steps != null ) {
+        	if( steps == null ) {
         		heartAnzeige.setLocation(
-        			width*2/3-50, 
-        			height*2/3+10+5+dc.getFontAscent(Gfx.FONT_SMALL)+5
-        		);
-        	} else {
-        		heartAnzeige.setLocation(
-        			width*2/3-50, 
-        			height*2/3+10+5
+        			110, 
+        			173
         		);
         	}       	
         }
@@ -279,11 +266,11 @@ class CGMWatchfaceView extends Ui.WatchFace {
         );
         
         // Zu alter Blutzucker
-        //outdatedSGV = true;
+        outdatedSGV = true;
         if( outdatedSGV != null && outdatedSGV == true && anzeigeSGV != null ) {
         	dc.fillRectangle(
-        		width*2/3-2-2, 
-        		height/3+10 + (dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)/2) + noAAPS, 
+        		156, 
+        		106 + noAAPS,  
         		dc.getTextWidthInPixels(anzeigeSGV, Gfx.FONT_NUMBER_MEDIUM)+4,
         		6
         	);
@@ -345,8 +332,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( System.getDeviceSettings().phoneConnected ) {	
         	var bmp = Ui.loadResource(Rez.Drawables.bluetooth);
         	dc.drawBitmap(
-        		width*2/3+17,
-        		height/3+10-dc.getFontHeight(Gfx.FONT_SMALL)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 
+        		177, //width*2/3+17,
+        		25, //height/3+10-dc.getFontHeight(Gfx.FONT_SMALL)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 
         		bmp
         	);
         }
@@ -363,8 +350,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( steps != null) {
         	var bmp = Ui.loadResource(Rez.Drawables.steps);
         	dc.drawBitmap(
-        		width*2/3-45,
-        		height*2/3+10+8,
+        		115, //width*2/3-45,
+        		178, //height*2/3+10+8,
         		bmp
         	);
         }
@@ -373,14 +360,14 @@ class CGMWatchfaceView extends Ui.WatchFace {
         	var bmp = Ui.loadResource(Rez.Drawables.heart);
         	if( steps != null ) {
         		dc.drawBitmap(
-        			width*2/3-45,
-        			height*2/3+10+8+dc.getFontAscent(Gfx.FONT_SMALL)+5,
+        			115, //width*2/3-45,
+        			207, //height*2/3+10+8+dc.getFontAscent(Gfx.FONT_SMALL)+5,
         			bmp
         		);
         	} else {
         		dc.drawBitmap(
-        			width*2/3-45,
-        			height*2/3+10+8,
+        			115, //width*2/3-45,
+        			178, //height*2/3+10+8,
         			bmp
         		);
         	}
@@ -396,16 +383,16 @@ class CGMWatchfaceView extends Ui.WatchFace {
         }
         // Battery body
         dc.fillRoundedRectangle(
-        	width*2/3-2,
-        	height/3+12-dc.getFontHeight(Gfx.FONT_SMALL)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 
+        	158, //width*2/3-2,
+        	27, //height/3+12-dc.getFontHeight(Gfx.FONT_SMALL)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 
         	14, 
         	22,
         	2
         );
         // Battery contact
         dc.fillRectangle(
-        	width*2/3-2+4, 
-        	height/3+12-dc.getFontHeight(Gfx.FONT_SMALL)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-2,
+        	162, //width*2/3-2+4, 
+        	25, //height/3+12-dc.getFontHeight(Gfx.FONT_SMALL)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-2,
         	6,
         	2
         );
@@ -413,8 +400,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
         var battery = batteryLoad * 18 / 100;
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
         dc.fillRoundedRectangle(
-        	width*2/3, 
-        	height/3+14-dc.getFontHeight(Gfx.FONT_SMALL)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM),
+        	160, //width*2/3, 
+        	29, //height/3+14-dc.getFontHeight(Gfx.FONT_SMALL)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM),
         	10,
         	18-battery, 
         	2
