@@ -266,7 +266,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         );
         
         // Zu alter Blutzucker
-        outdatedSGV = true;
+        //outdatedSGV = true;
         if( outdatedSGV != null && outdatedSGV == true && anzeigeSGV != null ) {
         	dc.fillRectangle(
         		156, 
