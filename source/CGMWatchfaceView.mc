@@ -331,7 +331,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         	);
         }
         
-        adjustTime = true;
+        //adjustTime = true;
         if( adjustTime != null && adjustTime == true) {
         	var bmp = Ui.loadResource(Rez.Drawables.stopwatch);
         	dc.drawBitmap(
