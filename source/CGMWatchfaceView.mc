@@ -14,7 +14,7 @@ var height, width;
 var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", verzoegerung;
 var outdatedSGV = false;
 var wert, anzeigeDelta, anzeigeFehler;
-var heartAnzeige, stepsAnzeige, sgvAnzeige;
+var heartAnzeige, stepsAnzeige, sgvAnzeige, verzAnzeige;
 var plotSGV;
 var noAAPS = 0;
 var correction = false;
@@ -176,7 +176,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         var date = View.findDrawableById("DateLabel");
         date.setText(datum);
 
-        var verzAnzeige = View.findDrawableById("verzLabel");
+        verzAnzeige = View.findDrawableById("verzLabel");
         verzAnzeige.setText(verzoegerung.toString()+"'");
         if( noAAPS != null && noAAPS > 0 && correction == false ) {
         	verzAnzeige.setLocation(
@@ -331,11 +331,12 @@ class CGMWatchfaceView extends Ui.WatchFace {
         	);
         }
         
+        adjustTime = true;
         if( adjustTime != null && adjustTime == true) {
         	var bmp = Ui.loadResource(Rez.Drawables.stopwatch);
         	dc.drawBitmap(
-        		width*2/3+3+dc.getTextWidthInPixels(verzoegerung.toString()+"'", Gfx.FONT_SMALL),
-        		height/3+10-dc.getFontAscent(Gfx.FONT_SMALL)-7+noAAPS, 
+        		verzAnzeige.locX + dc.getTextWidthInPixels(verzoegerung.toString()+"'", Gfx.FONT_SMALL) + 5, // width*2/3+3+dc.getTextWidthInPixels(verzoegerung.toString()+"'", Gfx.FONT_SMALL),
+        		verzAnzeige.locY + 5 + noAAPS, //height/3+10-dc.getFontAscent(Gfx.FONT_SMALL)-7+noAAPS, 
         		bmp
         	);
         }
