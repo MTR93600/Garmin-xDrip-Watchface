@@ -14,6 +14,7 @@ var height, width;
 var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", verzoegerung;
 var outdatedSGV = false;
 var wert, anzeigeDelta, anzeigeFehler;
+var heartAnzeige, stepsAnzeige, sgvAnzeige;
 var plotSGV;
 var noAAPS = 0;
 var correction = false;
@@ -184,7 +185,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         	);
         }
         
-        var sgvAnzeige = View.findDrawableById("sgvLabel");
+        sgvAnzeige = View.findDrawableById("sgvLabel");
         sgvAnzeige.setText(anzeigeSGV);
         if( noAAPS != null && noAAPS > 0 && correction == false ) {
         	sgvAnzeige.setLocation(
@@ -217,17 +218,18 @@ class CGMWatchfaceView extends Ui.WatchFace {
         }
         
         if( steps != null ) {
-            var stepsAnzeige = View.findDrawableById("stepsLabel");
+            stepsAnzeige = View.findDrawableById("stepsLabel");
         	stepsAnzeige.setText(steps.toString());
         }
         
         if( heartrate != null ) {
-            var heartAnzeige = View.findDrawableById("heartrateLabel");
+            heartAnzeige = View.findDrawableById("heartrateLabel");
         	heartAnzeige.setText(heartrate.toString());
         	if( steps == null ) {
+        		stepsAnzeige = View.findDrawableById("stepsLabel");
         		heartAnzeige.setLocation(
-        			110, 
-        			173
+        			stepsAnzeige.locX, 
+        			stepsAnzeige.locY
         		);
         	}       	
         }
@@ -269,8 +271,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
         //outdatedSGV = true;
         if( outdatedSGV != null && outdatedSGV == true && anzeigeSGV != null ) {
         	dc.fillRectangle(
-        		156, 
-        		106 + noAAPS,  
+        		sgvAnzeige.locX - 2, 
+        		sgvAnzeige.locY + dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM) / 2 + noAAPS,  
         		dc.getTextWidthInPixels(anzeigeSGV, Gfx.FONT_NUMBER_MEDIUM)+4,
         		6
         	);
@@ -329,15 +331,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
         	);
         }
         
-        if( System.getDeviceSettings().phoneConnected ) {	
-        	var bmp = Ui.loadResource(Rez.Drawables.bluetooth);
-        	dc.drawBitmap(
-        		177, //width*2/3+17,
-        		25, //height/3+10-dc.getFontHeight(Gfx.FONT_SMALL)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 
-        		bmp
-        	);
-        }
-        
         if( adjustTime != null && adjustTime == true) {
         	var bmp = Ui.loadResource(Rez.Drawables.stopwatch);
         	dc.drawBitmap(
@@ -350,8 +343,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( steps != null) {
         	var bmp = Ui.loadResource(Rez.Drawables.steps);
         	dc.drawBitmap(
-        		115, //width*2/3-45,
-        		178, //height*2/3+10+8,
+        		stepsAnzeige.locX + 5, //width*2/3-45,
+        		stepsAnzeige.locY + 5, //height*2/3+10+8,
         		bmp
         	);
         }
@@ -360,14 +353,15 @@ class CGMWatchfaceView extends Ui.WatchFace {
         	var bmp = Ui.loadResource(Rez.Drawables.heart);
         	if( steps != null ) {
         		dc.drawBitmap(
-        			115, //width*2/3-45,
-        			207, //height*2/3+10+8+dc.getFontAscent(Gfx.FONT_SMALL)+5,
+        			heartAnzeige.locX + 5, //width*2/3-45,
+        			heartAnzeige.locY + 5, //height*2/3+10+8+dc.getFontAscent(Gfx.FONT_SMALL)+5,
         			bmp
         		);
         	} else {
+        		stepsAnzeige = View.findDrawableById("stepsLabel");
         		dc.drawBitmap(
-        			115, //width*2/3-45,
-        			178, //height*2/3+10+8,
+        			stepsAnzeige.locX + 5, //width*2/3-45,
+        			stepsAnzeige.locY + 5, //height*2/3+10+8,,
         			bmp
         		);
         	}
@@ -375,6 +369,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         
         // Batteriestand
         //Sys.println("Batteriestand");
+        var symbolAnzeige = View.findDrawableById("symbols");
         var batteryLoad = Sys.getSystemStats().battery;
         if( batteryLoad < 20 ) {
         	dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
@@ -383,16 +378,16 @@ class CGMWatchfaceView extends Ui.WatchFace {
         }
         // Battery body
         dc.fillRoundedRectangle(
-        	158, //width*2/3-2,
-        	27, //height/3+12-dc.getFontHeight(Gfx.FONT_SMALL)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 
+        	symbolAnzeige.locX, //158 // width*2/3-2,
+        	symbolAnzeige.locY, // 27 //height/3+12-dc.getFontHeight(Gfx.FONT_SMALL)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 
         	14, 
         	22,
         	2
         );
         // Battery contact
         dc.fillRectangle(
-        	162, //width*2/3-2+4, 
-        	25, //height/3+12-dc.getFontHeight(Gfx.FONT_SMALL)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-2,
+        	symbolAnzeige.locX + 4, //width*2/3-2+4, 
+        	symbolAnzeige.locY - 2, //height/3+12-dc.getFontHeight(Gfx.FONT_SMALL)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-2,
         	6,
         	2
         );
@@ -400,12 +395,22 @@ class CGMWatchfaceView extends Ui.WatchFace {
         var battery = batteryLoad * 18 / 100;
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
         dc.fillRoundedRectangle(
-        	160, //width*2/3, 
-        	29, //height/3+14-dc.getFontHeight(Gfx.FONT_SMALL)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM),
+        	symbolAnzeige.locX + 2, //width*2/3, 
+        	symbolAnzeige.locY + 2, //height/3+14-dc.getFontHeight(Gfx.FONT_SMALL)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM),
         	10,
         	18-battery, 
         	2
         );
+                
+        //Bluetooth connected
+        if( System.getDeviceSettings().phoneConnected ) {	
+        	var bmp = Ui.loadResource(Rez.Drawables.bluetooth);
+        	dc.drawBitmap(
+        		symbolAnzeige.locX + 19, //width*2/3+17,
+        		symbolAnzeige.locY - 2, //height/3+10-dc.getFontHeight(Gfx.FONT_SMALL)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM), 
+        		bmp
+        	);
+        }
         
         // Schritte-Ziel
         if( steps != null && stepGoal != null ) {
