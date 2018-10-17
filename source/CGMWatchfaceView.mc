@@ -1,5 +1,5 @@
 //! TODO
-//! Proof layout on vivoactive 3
+//! 
 //! 
 
 using Toybox.WatchUi as Ui;
@@ -9,6 +9,7 @@ using Toybox.Lang as Lang;
 using Toybox.Application as App;
 using Toybox.Time.Gregorian as Gregorian;
 using Toybox.ActivityMonitor as Act;
+using Toybox.Background;
 
 var height, width;
 var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", verzoegerung;
@@ -44,7 +45,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
     }
 
     // Update the view
-    function onUpdate(dc) {
+    function onUpdate(dc) {    	
+    	
         // Get the current time and format it correctly
         //Sys.println("onUpdate");
         var timeFormat = "$1$:$2$";
@@ -59,6 +61,17 @@ class CGMWatchfaceView extends Ui.WatchFace {
             }
         }
         var timeString = Lang.format(timeFormat, [hours, clockTime.min.format("%02d")]);
+        
+        // Background-Prozess neu starten, falls gestoppt
+        if(Toybox.System has :ServiceDelegate) {
+    		//Sys.println("InitialView: has Service Delegate");
+    		var lastTime = Background.getLastTemporalEventTime();
+    		if (lastTime == null || ( lastTime != null && lastTime.value() < now.value() - 600) ) {
+				Background.registerForTemporalEvent(Time.now());
+				adjustTime = false;
+				Sys.println("LastTime: " + lastTime.value() + "Now: " + now.value());
+    		}    		
+    	}
         
         // Heartrate & Steps
         // Schritte einlesen
