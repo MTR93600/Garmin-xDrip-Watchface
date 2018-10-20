@@ -69,7 +69,11 @@ class CGMWatchfaceView extends Ui.WatchFace {
     		if (lastTime == null || ( lastTime != null && lastTime.value() < now.value() - 600) ) {
 				Background.registerForTemporalEvent(Time.now());
 				adjustTime = false;
-				Sys.println("LastTime: " + lastTime.value() + "Now: " + now.value());
+				// if( lastTime != null ) {
+				//    Sys.println("LastTime: " + lastTime.value() + " Now: " + now.value() + "\n"); 
+				// } else {
+				//	  Sys.println("LastTime: Not yet" + " Now: " + now.value() + "\n"); 
+				// }						
     		}    		
     	}
         
@@ -137,6 +141,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         	//punkte[0]["aaps"] = "10.06U";
         	//punkte[0]["aaps"] = "240% 10.06U(8.27|8.34) -17,24 35g"; 
         	//punkte[0]["aaps"] = null;
+        	//punkte[0]["aaps"] = "1,81U -1,35 11g";
         	if( punkte[0]["aaps"] != null ) {
         		//Sys.println("AAPS");
              	aaps = punkte[0]["aaps"].toString();   
