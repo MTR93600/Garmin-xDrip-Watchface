@@ -138,28 +138,50 @@ class CGMWatchfaceView extends Ui.WatchFace {
 			outdatedSGV = ( verzoegerung != null && verzoegerung > 11 ) ? true : false;
         	
         	// AAPS
-        	//punkte[0]["aaps"] = "10.06U";
-        	//punkte[0]["aaps"] = "240% 10.06U(8.27|8.34) -17,24 35g"; 
-        	//punkte[0]["aaps"] = null;
-        	//punkte[0]["aaps"] = "1,81U -1,35 11g";
+        	//punkte[0]["aaps"] = "No Status";
+        	//punkte[0]["aaps"] = "10,06U";
+        	//punkte[0]["aaps"] = "240% 10,06U(8.27|8.34) -17,24 35g"; 
+        	//punkte[0]["aaps"] = "0,85U/h -0,36U(8.27|8.34) -17,24 35g";
+			//punkte[0]["aaps"] = "1,81U -1,35 11g";
+			//punkte[0]["aaps"] = "Loop deaktiviert\n0,46(0,46|0,00)";
+			//punkte[0]["aaps"] = null;
         	if( punkte[0]["aaps"] != null ) {
-        		//Sys.println("AAPS");
-             	aaps = punkte[0]["aaps"].toString();   
+             	aaps = punkte[0]["aaps"].toString(); 
+             	noAAPS = 0;  
+             	//if( aaps != null && aaps.equals("") == false ) {
+             	Sys.println("AAPS: " + aaps + "\n");
+             	var index1 = null, index2 = null, index3 = null, index4 = null;
              	if( aaps != null && aaps.equals("") == false ) {
-        			var index1 = aaps.find(" ");
-        			anzeigeBasal = index1 != null ? aaps.substring(0,index1) : "--%";
-        			if( index1 ) {
-        				var aapsPart = aaps.substring(index1,20);
-        				var index2 = aapsPart.find("U");        			
-                   		anzeigeIOB = index2 != null ? aapsPart.substring(1,index2-1) : "--";
-                   	} else if( index1 == null && aaps.find("U") != null ) {
-                   		// Nur IOB angezeigt
-                   		var index3 = aaps.find("U");
-                   		anzeigeIOB = aaps.substring(0,index3-1);
-                   	} else {
-                   		anzeigeIOB = "--";
-                   	}
-            		noAAPS = 0;
+					if( aaps.equals("No Status") ) {
+						anzeigeBasal = "--%";
+						anzeigeIOB = "--";
+					} else if( aaps.find("oop") == true ) {
+						anzeigeBasal = "--%";
+						anzeigeIOB = "--";
+					} else {
+						index1 = aaps.find(" ");
+						index2 = aaps.find("%");
+						index3 = aaps.find("U/h");
+						index4 = aaps.find("U");
+						// Basal
+						if( index2 != null ) {
+							anzeigeBasal = aaps.substring(0,index2+1);
+						} else if( index3 != null ) {
+							anzeigeBasal = "100%";
+						} else if( index3 == null && index4 != null ) {
+							anzeigeBasal = "100%";
+						}
+						// IOB
+						if(index2 == null && index3 == null && index4 != null ) {
+							anzeigeIOB = aaps.substring(0,index4-1);
+						} else if( index1 != null ) {
+							var aapsPart1 = aaps.substring(index1+1,aaps.length());
+							index4 = aapsPart1.find("U");
+							if( index4 != null ) {
+								anzeigeIOB = aapsPart1.substring(0,index4-1);	
+							}					
+						}
+					}
             	}
 			} else {
 					noAAPS = height / 6 - 20;
@@ -172,8 +194,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 	anzeigeBasal = "--%";
 					anzeigeIOB = "--";
 				}
-            }
-            
+            }            
 			anzeigeFehler = "";
 		} else {
 			//Sys.println("Keine CGM Daten");
