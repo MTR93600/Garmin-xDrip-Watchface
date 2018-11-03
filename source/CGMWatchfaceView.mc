@@ -279,7 +279,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         
 		//! Ui without layout.xml        
         // Balken
-        if( punkte != null && punkte instanceof Array  && punkte[0]["sgv"] != null && 70 < punkte[0]["sgv"] && punkte[0]["sgv"] < 180 ) {
+        if( punkte != null && punkte instanceof Array  && punkte[0]["sgv"] != null && 70 <= punkte[0]["sgv"] && punkte[0]["sgv"] <= 180 ) {
         	dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT);
         } else {
         	dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
