@@ -18,6 +18,9 @@ var wert, anzeigeDelta, anzeigeFehler;
 var heartAnzeige, stepsAnzeige, sgvAnzeige, verzAnzeige;
 var plotSGV;
 var noAAPS = 0;
+var corrAAPS = 0;
+// var correction wird benötigt, dass die Positionskorrektur noAAPS nicht bei jeder
+// Aktualisierung erneut zu den Koordinaten addiert wird.
 var correction = false;
 
 class CGMWatchfaceView extends Ui.WatchFace {
@@ -309,9 +312,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
         // Zu alter Blutzucker
         //outdatedSGV = true;
         if( outdatedSGV != null && outdatedSGV == true && anzeigeSGV != null ) {
+        	corrAAPS = noAAPS > 0 ? 20 : 0;
         	dc.fillRectangle(
         		sgvAnzeige.locX - 2, 
-        		sgvAnzeige.locY + dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM) / 2 + noAAPS,  
+        		sgvAnzeige.locY + dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM) / 2 + noAAPS - corrAAPS,  
         		dc.getTextWidthInPixels(anzeigeSGV, Gfx.FONT_NUMBER_MEDIUM)+4,
         		6
         	);
@@ -323,7 +327,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             var now = Time.now().value();
             var lowValue = 1000, highValue = 0;
             var factor = 0.0033; // Faktor: 1/300
-            var correction = 0; 
+            var graphCorr = 0; 
             for( var i = 0; i < punkte.size(); i++ ) {
             	if( lowValue > punkte[i]["sgv"] ) { lowValue = punkte[i]["sgv"]; }
             	if( highValue < punkte[i]["sgv"] ) { highValue = punkte[i]["sgv"]; }
@@ -331,17 +335,17 @@ class CGMWatchfaceView extends Ui.WatchFace {
             var difference = highValue - lowValue;
             if( difference != null && difference <= 90 ) {
             	factor = 0.01; // 1/100     	
-   				correction = (100-difference)/2; 
+   				graphCorr = (100-difference)/2; 
             } else { 
             	factor = 1.toFloat()/(difference+10); // 1/200
-            	correction = 5; 
+            	graphCorr = 5; 
             	Sys.println("Faktor: " + factor + "\n");
             	Sys.println("Differenz: " + difference + "\n");
             }
             
             for( var i = 0; i < punkte.size(); i++ ) {
             	if(punkte[i]["sgv"] != null && punkte[i]["date"] != null ) {
-            		plotSGV = (punkte[i]["sgv"] - lowValue) + correction;
+            		plotSGV = (punkte[i]["sgv"] - lowValue) + graphCorr;
             	    // plotSGV = 300;
                 	var plotBreite = width*2/3 - 27 - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*2/3-27) * 0.0111) ); // Faktor 1 / 90 
                 	var plotHoehe = height/3+10 - ( plotSGV * ((height/3)*factor) + 10); 
@@ -373,9 +377,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
         //adjustTime = true;
         if( adjustTime != null && adjustTime == true) {
         	var bmp = Ui.loadResource(Rez.Drawables.stopwatch);
+        	corrAAPS = noAAPS > 0 ? 20 : 0;
         	dc.drawBitmap(
-        		verzAnzeige.locX + dc.getTextWidthInPixels(verzoegerung.toString()+"'", Gfx.FONT_SMALL) + 5, // width*2/3+3+dc.getTextWidthInPixels(verzoegerung.toString()+"'", Gfx.FONT_SMALL),
-        		verzAnzeige.locY + 5 + noAAPS, //height/3+10-dc.getFontAscent(Gfx.FONT_SMALL)-7+noAAPS, 
+        		verzAnzeige.locX + dc.getTextWidthInPixels(verzoegerung.toString()+"'", Gfx.FONT_SMALL) + 5, 
+        		verzAnzeige.locY + 5 + noAAPS - corrAAPS, 
         		bmp
         	);
         }
