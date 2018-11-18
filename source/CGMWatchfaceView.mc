@@ -67,16 +67,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
         
         // Background-Prozess neu starten, falls gestoppt
         if(Toybox.System has :ServiceDelegate) {
-    		//Sys.println("InitialView: has Service Delegate");
     		var lastTime = Background.getLastTemporalEventTime();
     		if (lastTime == null || ( lastTime != null && lastTime.value() < now.value() - 600) ) {
 				Background.registerForTemporalEvent(Time.now());
-				adjustTime = false;
-				// if( lastTime != null ) {
-				//    Sys.println("LastTime: " + lastTime.value() + " Now: " + now.value() + "\n"); 
-				// } else {
-				//	  Sys.println("LastTime: Not yet" + " Now: " + now.value() + "\n"); 
-				// }						
+				adjustTime = false;					
     		}    		
     	}
         
@@ -150,8 +144,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
 			//punkte[0]["aaps"] = null;
         	if( punkte[0]["aaps"] != null ) {
              	aaps = punkte[0]["aaps"].toString(); 
-             	noAAPS = 0;  
-             	//if( aaps != null && aaps.equals("") == false ) {
+             	noAAPS = 0;
+             	adjustAAPS = 15;  
              	Sys.println("AAPS: " + aaps + "\n");
              	var index1 = null, index2 = null, index3 = null, index4 = null;
              	if( aaps != null && aaps.equals("") == false ) {

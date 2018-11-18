@@ -7,6 +7,7 @@ using Toybox.Lang as Lang;
 
 var sgv, delta, aaps, timestamp, duration, masseinheit = 0, punkte;
 var fehler, fehler_code = ""; 
+var adjustAAPS = 0;
 var adjustTime = true;
 
 class CGMWatchfaceApp extends App.AppBase {
@@ -46,11 +47,11 @@ class CGMWatchfaceApp extends App.AppBase {
         	punkte = data;                   	
         	var differenz = Time.now().value() - data[0]["date"]/1000;
         	if( differenz != null && differenz > 30 && differenz < 300 ) {
-        		duration = new Time.Duration(600 - differenz + 15);
+        		duration = new Time.Duration(600 - differenz + 15 + adjustAAPS);
         		adjustTime = true;
         	} else {
-        		if( differenz != null && differenz < 10 ) {
-        			duration = new Time.Duration(5 * 60 + 15); 
+        		if( differenz != null && differenz < (10 + adjustAAPS) ) {
+        			duration = new Time.Duration(5 * 60 + 15 + adjustAAPS); 
         		} else {
         			duration = new Time.Duration(5 * 60);
         		}
