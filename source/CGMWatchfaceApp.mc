@@ -46,7 +46,7 @@ class CGMWatchfaceApp extends App.AppBase {
         if( fehler == false && data != null && data instanceof Array && data[0]["date"] != null ) { 
         	punkte = data;                   	
         	var differenz = Time.now().value() - data[0]["date"]/1000;
-        	if( differenz != null && differenz > 30 && differenz < 300 ) {
+        	if( differenz != null && differenz > (30 + adjustAAPS) && differenz < 300 ) {
         		duration = new Time.Duration(600 - differenz + 15 + adjustAAPS);
         		adjustTime = true;
         	} else {
