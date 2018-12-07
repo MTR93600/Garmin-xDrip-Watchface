@@ -346,7 +346,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             		plotSGV = (punkte[i]["sgv"] - lowValue) + graphCorr;
             	    // plotSGV = 300;
                 	var plotBreite = width*2/3 - 27 - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*2/3-27) * 0.0111) ); // Faktor 1 / 90 
-                	var plotHoehe = height/3+5 - ( plotSGV * ((height/3)*factor) + 5); // früher: + 10 / + 10
+                	var plotHoehe = height/3+10 - ( plotSGV * ((height/3)*factor) + 10); // früher: + 10 / + 10
                 	if( zielbereichLow <= punkte[i]["sgv"] && punkte[i]["sgv"] <= zielbereichHigh ) {
                 		dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT); 
                 	} else {
@@ -354,7 +354,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 	}
                 	dc.fillCircle( 
                 		plotBreite, 
-                		height/3+10 + plotHoehe,
+                		height/3+10 + plotHoehe, // vorher:  +10
                 		2
                 	);
                 }                           
