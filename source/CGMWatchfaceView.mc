@@ -12,7 +12,6 @@ using Toybox.ActivityMonitor as Act;
 using Toybox.Background;
 
 var height, width;
-var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", verzoegerung;
 var outdatedSGV = false;
 var wert, anzeigeDelta, anzeigeFehler;
 var heartAnzeige, stepsAnzeige, sgvAnzeige, verzAnzeige;
@@ -52,7 +51,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
     }
 
     // Update the view
-    function onUpdate(dc) {    	
+    function onUpdate(dc) {    
+    	var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", verzoegerung;	
     	
         // Get the current time and format it correctly
         //Sys.println("onUpdate");
