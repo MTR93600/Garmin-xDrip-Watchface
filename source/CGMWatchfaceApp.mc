@@ -9,6 +9,7 @@ var sgv, delta, aaps, timestamp, duration, masseinheit = 0, punkte;
 var fehler, fehler_code = ""; 
 var adjustAAPS = 0;
 var adjustTime = true;
+var zielbereichLow, zielbereichHigh;
 
 class CGMWatchfaceApp extends App.AppBase {
 
@@ -82,6 +83,10 @@ class CGMWatchfaceApp extends App.AppBase {
     
     // New app settings have been received so trigger a UI update
     function onSettingsChanged() {
+    	zielbereichLow = App.getApp().getProperty("Zielbereich1").toNumber(); 
+        zielbereichHigh = App.getApp().getProperty("Zielbereich2").toNumber();
+        if( zielbereichLow == null ) { zielbereichLow = 70; }
+        if( zielbereichHigh == null ) { zielbereichHigh = 180; }
         Ui.requestUpdate();
     }
 

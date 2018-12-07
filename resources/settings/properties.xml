@@ -1,3 +1,4 @@
 <properties>
-
+	<property id="Zielbereich1" type="number">70</property>
+    <property id="Zielbereich2" type="number">180</property>
 </properties>

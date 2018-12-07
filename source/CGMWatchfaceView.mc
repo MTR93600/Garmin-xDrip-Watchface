@@ -36,9 +36,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
         height = dc.getHeight();
         width = dc.getWidth();
         var temp = App.Storage.getValue("punkteWatchface");
-        if( temp!=null && temp instanceof Lang.Array) {
+        if( temp!= null && temp instanceof Lang.Array) {
         	punkte = temp; 
         }
+        zielbereichLow = App.getApp().getProperty("Zielbereich1").toNumber(); 
+        zielbereichHigh = App.getApp().getProperty("Zielbereich2").toNumber();
+        if( zielbereichLow == null ) { zielbereichLow = 70; }
+        if( zielbereichHigh == null ) { zielbereichHigh = 180; }
     }
 
     // Called when this View is brought to the foreground. Restore
@@ -276,7 +280,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         
 		//! Ui without layout.xml        
         // Balken
-        if( punkte != null && punkte instanceof Array  && punkte[0]["sgv"] != null && 70 <= punkte[0]["sgv"] && punkte[0]["sgv"] <= 180 ) {
+        if( punkte != null && punkte instanceof Array  && punkte[0]["sgv"] != null && zielbereichLow <= punkte[0]["sgv"] && punkte[0]["sgv"] <= zielbereichHigh ) {
         	dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT);
         } else {
         	dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
@@ -343,7 +347,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             	    // plotSGV = 300;
                 	var plotBreite = width*2/3 - 27 - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*2/3-27) * 0.0111) ); // Faktor 1 / 90 
                 	var plotHoehe = height/3+10 - ( plotSGV * ((height/3)*factor) + 10); 
-                	if( 70 <= punkte[i]["sgv"] && punkte[i]["sgv"] <= 180 ) {
+                	if( zielbereichLow <= punkte[i]["sgv"] && punkte[i]["sgv"] <= zielbereichHigh ) {
                 		dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT); 
                 	} else {
                 		dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT); 

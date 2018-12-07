@@ -1,5 +1,24 @@
 <strings>
 
-    <string id="AppName">CGM Watchface</string>
+    <string id="AppName">xDrip+ Watchface</string>
+    
+    <string id="ZielbereichTitel1">Target BG range: Low</string>
+    <string id="ZielbereichTitel2">Target BG range: High</string>
+    <string id="ZielbereichPrompt">Choose from the list</string>
+    <string id="opt_zielbereich_2">60 mg/dl | 3,3 mmol</string>
+    <string id="opt_zielbereich_3">70 mg/dl | 3,9 mmol</string>
+    <string id="opt_zielbereich_4">80 mg/dl | 4,4 mmol</string>
+    <string id="opt_zielbereich_5">90 mg/dl | 5,0 mmol</string>
+    <string id="opt_zielbereich_6">100 mg/dl | 5,6 mmol</string>
+    <string id="opt_zielbereich_7">110 mg/dl | 6,2 mmol</string>
+    <string id="opt_zielbereich_8">120 mg/dl | 6,7 mmol</string>
+    <string id="opt_zielbereich_9">130 mg/dl | 7,2 mmol</string>
+    <string id="opt_zielbereich_10">140 mg/dl | 7,8 mmol</string>
+    <string id="opt_zielbereich_11">150 mg/dl | 8,3 mmol</string>
+    <string id="opt_zielbereich_12">160 mg/dl | 8,9 mmol</string>
+    <string id="opt_zielbereich_13">170 mg/dl | 9,4 mmol</string>
+    <string id="opt_zielbereich_14">180 mg/dl | 10,0 mmol</string>
+    <string id="opt_zielbereich_15">190 mg/dl | 10,5 mmol</string>
+    <string id="opt_zielbereich_16">200 mg/dl | 11,1 mmol</string>
 
 </strings>
