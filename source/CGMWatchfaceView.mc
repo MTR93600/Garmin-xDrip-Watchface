@@ -108,12 +108,18 @@ class CGMWatchfaceView extends Ui.WatchFace {
             	} else {
                 	masseinheit = 0;
                	}
-            } 
+            }
+            var delta_errechnet;
+            if( punkte[0]["sgv"] && punkte[1]["sgv"] ) {
+            	delta_errechnet = ( punkte[0]["sgv"] - punkte[1]["sgv"] ) / ( (punkte[0]["date"] - punkte[1]["date"]) * 0.001 )  * 5 * 60;
+            } else {
+            	delta_errechnet = null;
+            }  
     		if( masseinheit != null && masseinheit == 1 ) {  
               	anzeigeSGV =  punkte[0]["sgv"] ? (0.05556 * punkte[0]["sgv"]).format("%.1f").toString() : "--";
                	// Delta in mmol, in String umwandeln, bei positiven Werten + davor
-           		if( punkte[0]["delta"] != null ) {
-               		delta = 0.05556 * punkte[0]["delta"];
+           		if( delta_errechnet != null ) {
+               		delta = 0.05556 * delta_errechnet;
                	 	if(delta > 0 ) {
                			anzeigeDelta = "+" + delta.format("%.1f").toString();
            			} else {
@@ -126,8 +132,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
            		// mg
                	anzeigeSGV = punkte[0]["sgv"] ? punkte[0]["sgv"].toString() : "--";
                	// Delta in String umwandeln, bei positiven Werten + davor
-           		if( punkte[0]["delta"] != null ) {
-           			delta = punkte[0]["delta"];
+           		if( delta_errechnet != null ) {
+           			delta = delta_errechnet;
            			if( delta > 0 ) {
               			anzeigeDelta = "+" + delta.format("%.0f").toString();
            			} else {
