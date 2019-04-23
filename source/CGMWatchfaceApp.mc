@@ -7,7 +7,7 @@ using Toybox.Lang as Lang;
 
 var sgv, delta, aaps, timestamp, duration, masseinheit = 0, punkte;
 var fehler, fehler_code = ""; 
-var adjustAAPS = 0;
+var adjustAAPS = 0, delay = 0;
 var adjustTime = true;
 var zielbereichLow, zielbereichHigh;
 
@@ -47,18 +47,18 @@ class CGMWatchfaceApp extends App.AppBase {
         if( fehler == false && data != null && data instanceof Array && data[0]["date"] != null ) { 
         	punkte = data;                   	
         	var differenz = Time.now().value() - data[0]["date"]/1000;
-        	if( differenz != null && differenz > (30 + adjustAAPS) && differenz < 300 ) {
-        		duration = new Time.Duration(600 - differenz + 15 + adjustAAPS);
+        	if( differenz != null && differenz > (30 + adjustAAPS + delay) && differenz < 300 ) {
+        		duration = new Time.Duration(600 - differenz + 15 + adjustAAPS + delay);
         		adjustTime = true;
         	} else {
-        		if( differenz != null && differenz < (10 + adjustAAPS) ) {
-        			duration = new Time.Duration(5 * 60 + 15 + adjustAAPS); 
+        		if( differenz != null && differenz < (10 + adjustAAPS + delay) ) {
+        			duration = new Time.Duration(5 * 60 + 15 + adjustAAPS + delay); 
         		} else {
         			duration = new Time.Duration(5 * 60);
         		}
         	}
         	var lastTime = Background.getLastTemporalEventTime();
-        	if (lastTime != null) {
+        	if (lastTime != null ) {
         		var nextTime = lastTime.add(duration);
         		Background.registerForTemporalEvent(nextTime);	
         	} else {
@@ -85,8 +85,10 @@ class CGMWatchfaceApp extends App.AppBase {
     function onSettingsChanged() {
     	zielbereichLow = App.getApp().getProperty("Zielbereich1").toNumber(); 
         zielbereichHigh = App.getApp().getProperty("Zielbereich2").toNumber();
+        delay = App.getApp().getProperty("Delay").toNumber();
         if( zielbereichLow == null ) { zielbereichLow = 70; }
         if( zielbereichHigh == null ) { zielbereichHigh = 180; }
+        if( delay == null ) { delay = 0; }
         Ui.requestUpdate();
     }
 

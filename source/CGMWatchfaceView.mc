@@ -40,8 +40,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
         }
         zielbereichLow = App.getApp().getProperty("Zielbereich1").toNumber(); 
         zielbereichHigh = App.getApp().getProperty("Zielbereich2").toNumber();
+        delay = App.getApp().getProperty("Delay").toNumber();
         if( zielbereichLow == null ) { zielbereichLow = 70; }
         if( zielbereichHigh == null ) { zielbereichHigh = 180; }
+        if( delay == null ) { delay = 0; }
     }
 
     // Called when this View is brought to the foreground. Restore

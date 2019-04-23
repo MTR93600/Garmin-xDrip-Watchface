@@ -27,4 +27,16 @@
                <listEntry value="200">@Rez.Strings.opt_zielbereich_16</listEntry>
            </settingConfig>
 	</setting>
+	<setting propertyKey="@Properties.Delay" title="@Strings.DelayTitel" prompt="@Strings.ZielbereichPrompt">
+           <settingConfig type="list">
+               <listEntry value="-10">@Rez.Strings.opt_delay_3</listEntry>
+               <listEntry value="0">@Rez.Strings.opt_delay_4</listEntry>
+               <listEntry value="10">@Rez.Strings.opt_delay_5</listEntry>
+               <listEntry value="20">@Rez.Strings.opt_delay_6</listEntry>
+               <listEntry value="30">@Rez.Strings.opt_delay_7</listEntry>
+               <listEntry value="40">@Rez.Strings.opt_delay_8</listEntry>
+               <listEntry value="50">@Rez.Strings.opt_delay_9</listEntry>
+               <listEntry value="60">@Rez.Strings.opt_delay_10</listEntry>
+           </settingConfig>
+	</setting>
 </settings>
