@@ -151,7 +151,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         	// AAPS
         	//punkte[0]["aaps"] = "No Status";
         	//punkte[0]["aaps"] = "10,06U";
-        	//punkte[0]["aaps"] = "240% 10,06U(8.27|8.34) -17,24 35g"; 
+        	punkte[0]["aaps"] = "240% 10,06U(8.27|8.34) -17,24 35g"; 
         	//punkte[0]["aaps"] = "0,85U/h -0,36U(8.27|8.34) -17,24 35g";
 			//punkte[0]["aaps"] = "1,81U -1,35 11g";
 			//punkte[0]["aaps"] = "Loop deaktiviert\n0,46(0,46|0,00)";
@@ -160,7 +160,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
              	aaps = punkte[0]["aaps"].toString(); 
              	noAAPS = 0;
              	adjustAAPS = 20;  
-             	Sys.println("AAPS: " + aaps + "\n");
+             	//Sys.println("AAPS: " + aaps + "\n");
              	var index1 = null, index2 = null, index3 = null, index4 = null;
              	if( aaps != null && aaps.equals("") == false ) {
 					if( aaps.equals("No Status") ) {
@@ -347,8 +347,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
             } else { 
             	factor = 1.toFloat()/(difference+10); // 1/200
             	graphCorr = 5; 
-            	Sys.println("Faktor: " + factor + "\n");
-            	Sys.println("Differenz: " + difference + "\n");
+            	//Sys.println("Faktor: " + factor + "\n");
+            	//Sys.println("Differenz: " + difference + "\n");
             }
             
             for( var i = 0; i < punkte.size(); i++ ) {
