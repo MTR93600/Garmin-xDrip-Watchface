@@ -151,7 +151,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         	// AAPS
         	//punkte[0]["aaps"] = "No Status";
         	//punkte[0]["aaps"] = "10,06U";
-        	punkte[0]["aaps"] = "240% 10,06U(8.27|8.34) -17,24 35g"; 
+        	//punkte[0]["aaps"] = "240% 10,06U(8.27|8.34) -17,24 35g"; 
         	//punkte[0]["aaps"] = "0,85U/h -0,36U(8.27|8.34) -17,24 35g";
 			//punkte[0]["aaps"] = "1,81U -1,35 11g";
 			//punkte[0]["aaps"] = "Loop deaktiviert\n0,46(0,46|0,00)";
@@ -282,6 +282,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
         			stepsAnzeige.locY
         		);
         	}       	
+        } else {
+        	heartAnzeige.setText("");
         }
         
         // Call the parent onUpdate function to redraw the layout
