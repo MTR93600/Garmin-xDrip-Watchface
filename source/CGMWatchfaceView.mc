@@ -218,7 +218,15 @@ class CGMWatchfaceView extends Ui.WatchFace {
 		// Fehleranzeige	
 		//Sys.println("Fehler:" + fehler );
  		if( fehler != null && fehler == true ) { anzeigeFehler = "Error: " + fehler_code; } 
-
+		
+		//Test
+		/* anzeigeSGV = "224";
+		verzoegerung = "12";
+		anzeigeDelta = "+14";
+		correction = true;
+		anzeigeBasal = "120%";
+		anzeigeIOB = "12,1"; */
+		
         // Update the view
         var time = View.findDrawableById("TimeLabel");
         time.setText(timeString);
