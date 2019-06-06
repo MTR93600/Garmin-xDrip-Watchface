@@ -275,22 +275,25 @@ class CGMWatchfaceView extends Ui.WatchFace {
         	iobAnzeige.setText(anzeigeIOB);
         }
         
+        stepsAnzeige = View.findDrawableById("stepsLabel");
         if( steps != null ) {
-            stepsAnzeige = View.findDrawableById("stepsLabel");
         	stepsAnzeige.setText(steps.toString());
         }
         
+        heartAnzeige = View.findDrawableById("heartrateLabel");
         if( heartrate != null ) {
-            heartAnzeige = View.findDrawableById("heartrateLabel");
-        	heartAnzeige.setText(heartrate.toString());
+        	// heartrate Anzeige nach oben schieben wenn keine Schritte
         	if( steps == null ) {
-        		stepsAnzeige = View.findDrawableById("stepsLabel");
         		heartAnzeige.setLocation(
         			stepsAnzeige.locX, 
         			stepsAnzeige.locY
         		);
-        	}       	
+        	}
+        	heartAnzeige.setText(heartrate.toString());          	      	
+        } else {
+        	heartAnzeige.setText("");
         }
+         
         
         // Call the parent onUpdate function to redraw the layout
         View.onUpdate(dc);
@@ -432,17 +435,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
         //Sys.println("Batteriestand");
         var symbolAnzeige = View.findDrawableById("symbols"); // nötig für Rechteck
         var batteryLoad = Sys.getSystemStats().battery;
-        var battery;
-        if( batteryLoad == null ) {
-        	dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
-        	battery = 0;
+        if( batteryLoad < 20 ) {
+        	dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
         } else {
-        	if ( batteryLoad < 20 ) {
-        		dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
-        	} else {
-        		dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
-        	}
-        	battery = batteryLoad * 18 / 10;
+        	dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
         }
         // Battery body
         dc.fillRoundedRectangle(
@@ -460,7 +456,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         	2
         );
         // Battery state
-        
+        var battery = batteryLoad * 18 / 100;
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
         dc.fillRoundedRectangle(
         	symbolAnzeige.locX + 2, //width*2/3, 
