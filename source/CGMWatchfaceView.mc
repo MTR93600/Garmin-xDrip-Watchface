@@ -40,9 +40,11 @@ class CGMWatchfaceView extends Ui.WatchFace {
         }
         zielbereichLow = App.getApp().getProperty("Zielbereich1").toNumber(); 
         zielbereichHigh = App.getApp().getProperty("Zielbereich2").toNumber();
+        basalorcob = App.getApp().getProperty("BasalorCOB").toNumber();
         delay = App.getApp().getProperty("Delay").toNumber();
         if( zielbereichLow == null ) { zielbereichLow = 70; }
         if( zielbereichHigh == null ) { zielbereichHigh = 180; }
+        if( basalorcob == null ) { basalorcob = 0; }
         if( delay == null ) { delay = 0; }
     }
 
@@ -161,7 +163,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
              	noAAPS = 0;
              	adjustAAPS = 20;  
              	//Sys.println("AAPS: " + aaps + "\n");
-             	var index1 = null, index2 = null, index3 = null, index4 = null;
+             	var index1 = null, index2 = null, index3 = null, index4 = null, index5 = null;
              	if( aaps != null && aaps.equals("") == false ) {
 					if( aaps.equals("No Status") ) {
 						anzeigeBasal = "--%";
@@ -192,6 +194,16 @@ class CGMWatchfaceView extends Ui.WatchFace {
 								anzeigeIOB = aapsPart1.substring(0,index4-1);	
 							}					
 						}
+						// COB
+            			if( basalorcob == 1 && aaps.find("g") != null ) {
+            				var length = aaps.length();
+            				var aapsPart2 = aaps.substring(length-6, length);
+            				index5 = aapsPart2.find(" ");
+            				if( index5 != null ) {
+            					var cob = aapsPart2.substring((index5+1),(aapsPart2.length()-1));
+            					anzeigeBasal = cob.toString() + "g";
+            				}                				        			
+ 		           		}
 					}
             	}
 			} else {

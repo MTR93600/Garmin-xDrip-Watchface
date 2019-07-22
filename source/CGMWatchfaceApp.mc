@@ -10,6 +10,7 @@ var fehler, fehler_code = "";
 var adjustAAPS = 0, delay = 0;
 var adjustTime = true;
 var zielbereichLow, zielbereichHigh;
+var basalorcob;
 
 class CGMWatchfaceApp extends App.AppBase {
 
@@ -85,9 +86,11 @@ class CGMWatchfaceApp extends App.AppBase {
     function onSettingsChanged() {
     	zielbereichLow = App.getApp().getProperty("Zielbereich1").toNumber(); 
         zielbereichHigh = App.getApp().getProperty("Zielbereich2").toNumber();
+        basalorcob = App.getApp().getProperty("BasalorCOB").toNumber();
         delay = App.getApp().getProperty("Delay").toNumber();
         if( zielbereichLow == null ) { zielbereichLow = 70; }
         if( zielbereichHigh == null ) { zielbereichHigh = 180; }
+        if( basalorcob == null ) { basalorcob = 0; }
         if( delay == null ) { delay = 0; }
         Ui.requestUpdate();
     }
