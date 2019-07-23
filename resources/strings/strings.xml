@@ -21,10 +21,10 @@
     <string id="opt_zielbereich_15">190 mg/dl | 10,5 mmol</string>
     <string id="opt_zielbereich_16">200 mg/dl | 11,1 mmol</string>
     
-    <string id="BasalorCOBTitel">Show Basal or COB (AAPS only)</string>
+    <string id="BasalorCOBTitel">Show Basal or COB (if COB > 0, AAPS only)</string>
     <string id="BasalorCOBPrompt">Choose from the list</string>
-    <string id="opt_Basal">Basal in %</string>
-    <string id="opt_COB">COB in g</string>
+    <string id="opt_Basal">Show Basal always</string>
+    <string id="opt_COB">Show COB (if COB > 0) or Basal</string>
     
     <string id="DelayTitel">Adjustment of the request delay</string>
     <string id="opt_delay_3">-10 sec.</string>

@@ -35,13 +35,14 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
 		if( heartrate != null) {
 			url = url + "&heart=" + heartrate;
 		}
- 		//url = "https://maysbz.herokuapp.com/api/v1/entries/sgv.json?count=18";
+ 		//url = "https://maysbz.herokuapp.com/api/v1/entries/sgv.json?count=12";
         Comm.makeWebRequest( url, {}, { :headers => { "Content-Type" => Comm.REQUEST_CONTENT_TYPE_URL_ENCODED }, :responseType => Comm.HTTP_RESPONSE_CONTENT_TYPE_JSON}, method(:verarbeiteWerte) );
     }
     
     function verarbeiteWerte( responseCode, data ) {
     	//Sys.println("verarbeite Werte, Code:" + responseCode);
-        if( responseCode == 200 ) { Background.exit(data); }
+    	Sys.println(data);
+    	if( responseCode == 200 ) { Background.exit(data); }
         else { Background.exit(responseCode); }
     }
 
