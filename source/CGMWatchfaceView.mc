@@ -34,6 +34,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         setLayout(Rez.Layouts.WatchFace(dc));
         height = dc.getHeight();
         width = dc.getWidth();
+        noAAPS = height / 6 - 20;
         var temp = App.Storage.getValue("punkteWatchface");
         if( temp!= null && temp instanceof Lang.Array) {
         	punkte = temp; 
@@ -55,7 +56,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
     }
 
     // Update the view
-    function onUpdate(dc) {    
+    function onUpdate(dc) {   
     	var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", verzoegerung;	
     	
         // Get the current time and format it correctly
@@ -101,7 +102,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
 		}
 
     	// CGM Daten verarbeiten
-    	noAAPS = height / 6 - 20;
+
     	//punkte = null;
     	if( punkte != null && punkte instanceof Lang.Array) { 
     		//Sys.println("CGM Daten");
@@ -162,6 +163,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
              	aaps = punkte[0]["aaps"].toString(); 
              	noAAPS = 0;
              	adjustAAPS = 20;  
+             	setLayout(Rez.Layouts.WatchFace(dc)); 
              	//Sys.println("AAPS: " + aaps + "\n");
              	var index1 = null, index2 = null, index3 = null, index4 = null, index5 = null;
              	if( aaps != null && aaps.equals("") == false ) {
@@ -228,6 +230,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
 			anzeigeSGV = "---";
 			anzeigeDelta = "--";
 		}
+		Sys.println(noAAPS);
 		
 		// Fehleranzeige	
 		//Sys.println("Fehler:" + fehler );
@@ -278,6 +281,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( noAAPS != null && noAAPS > 0 && correction == false ) {
         	correction = true;
         }
+        
         
         if( anzeigeBasal != null && anzeigeBasal.equals("") == false ) {
         	var basalAnzeige = View.findDrawableById("basalLabel");
