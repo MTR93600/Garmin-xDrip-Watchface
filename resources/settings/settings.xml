@@ -1,5 +1,11 @@
 <settings>
-	<setting propertyKey="@Properties.Zielbereich1" title="@Strings.ZielbereichTitel1" prompt="@Strings.ZielbereichPrompt">
+	<setting propertyKey="@Properties.xDripSpike" title="@Strings.xDripSpikeTitle"  prompt="@Strings.AllgemeinPrompt">
+           <settingConfig type="list">
+               <listEntry value="0">@Rez.Strings.opt_xDripSpike_1</listEntry>
+               <listEntry value="1">@Rez.Strings.opt_xDripSpike_2</listEntry>
+           </settingConfig>   
+    </setting>
+    <setting propertyKey="@Properties.Zielbereich1" title="@Strings.ZielbereichTitel1" prompt="@Strings.AllgemeinPrompt">
            <settingConfig type="list">
                <listEntry value="60">@Rez.Strings.opt_zielbereich_2</listEntry>
                <listEntry value="70">@Rez.Strings.opt_zielbereich_3</listEntry>
@@ -12,7 +18,7 @@
                <listEntry value="140">@Rez.Strings.opt_zielbereich_10</listEntry>
            </settingConfig>
 	</setting>
-	<setting propertyKey="@Properties.Zielbereich2" title="@Strings.ZielbereichTitel2" prompt="@Strings.ZielbereichPrompt">
+	<setting propertyKey="@Properties.Zielbereich2" title="@Strings.ZielbereichTitel2" prompt="@Strings.AllgemeinPrompt">
            <settingConfig type="list">
                <listEntry value="100">@Rez.Strings.opt_zielbereich_6</listEntry>
                <listEntry value="110">@Rez.Strings.opt_zielbereich_7</listEntry>
@@ -27,13 +33,13 @@
                <listEntry value="200">@Rez.Strings.opt_zielbereich_16</listEntry>
            </settingConfig>
 	</setting>
-	<setting propertyKey="@Properties.BasalorCOB" title="@Strings.BasalorCOBTitel" prompt="@Strings.BasalorCOBPrompt">
+	<setting propertyKey="@Properties.BasalorCOB" title="@Strings.BasalorCOBTitel" prompt="@Strings.AllgemeinPrompt">
            <settingConfig type="list">
                <listEntry value="0">@Rez.Strings.opt_Basal</listEntry>
                <listEntry value="1">@Rez.Strings.opt_COB</listEntry>
            </settingConfig>
 	</setting>
-	<setting propertyKey="@Properties.Delay" title="@Strings.DelayTitel" prompt="@Strings.ZielbereichPrompt">
+	<setting propertyKey="@Properties.Delay" title="@Strings.DelayTitel" prompt="@Strings.AllgemeinPrompt">
            <settingConfig type="list">
                <listEntry value="-10">@Rez.Strings.opt_delay_3</listEntry>
                <listEntry value="0">@Rez.Strings.opt_delay_4</listEntry>

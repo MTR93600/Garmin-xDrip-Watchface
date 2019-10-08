@@ -2,9 +2,14 @@
 
     <string id="AppName">xDrip+ Watchface</string>
     
+    <string id="AllgemeinPrompt">Choose from the list. / Wähle aus der Liste.</string>
+    
+    <string id="xDripSpikeTitle">Which CGM app is running?</string>
+    <string id="opt_xDripSpike_1">xDrip+ (Android only)</string>
+    <string id="opt_xDripSpike_2">Spike (iOS only)</string>
+    
     <string id="ZielbereichTitel1">Target BG range: Low</string>
     <string id="ZielbereichTitel2">Target BG range: High</string>
-    <string id="ZielbereichPrompt">Choose from the list</string>
     <string id="opt_zielbereich_2">60 mg/dl | 3,3 mmol</string>
     <string id="opt_zielbereich_3">70 mg/dl | 3,9 mmol</string>
     <string id="opt_zielbereich_4">80 mg/dl | 4,4 mmol</string>
@@ -22,7 +27,6 @@
     <string id="opt_zielbereich_16">200 mg/dl | 11,1 mmol</string>
     
     <string id="BasalorCOBTitel">Show Basal or COB (if COB > 0, AAPS only)</string>
-    <string id="BasalorCOBPrompt">Choose from the list</string>
     <string id="opt_Basal">Show Basal always</string>
     <string id="opt_COB">Show COB (if COB > 0) or Basal</string>
     

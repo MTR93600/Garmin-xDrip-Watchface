@@ -230,7 +230,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
 			anzeigeSGV = "---";
 			anzeigeDelta = "--";
 		}
-		Sys.println(noAAPS);
+		//Sys.println(noAAPS);
 		
 		// Fehleranzeige	
 		//Sys.println("Fehler:" + fehler );
