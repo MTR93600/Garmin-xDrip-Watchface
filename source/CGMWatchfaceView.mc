@@ -67,7 +67,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         // var info = Gregorian.info(now, Time.FORMAT_SHORT);
         //var datum = info.day + "." + info.month.format("%02d")+ ".";
         var info = Gregorian.info(now, Time.FORMAT_MEDIUM);
-        var datum = info.day_of_week + " " + info.day;
+        var datum = info.day_of_week.substring(0,3) + " " + info.day;
         var hours = clockTime.hour;
         if (!Sys.getDeviceSettings().is24Hour) {
             if (hours > 12) {
@@ -77,7 +77,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         var timeString = Lang.format(timeFormat, [hours, clockTime.min.format("%02d")]);
         
         // Background-Prozess neu starten, falls gestoppt
-        if(Toybox.System has :ServiceDelegate) {
+        if( Toybox.System has :ServiceDelegate && System.getDeviceSettings().phoneConnected ) {
     		var lastTime = Background.getLastTemporalEventTime();
     		if (lastTime == null || ( lastTime != null && lastTime.value() < now.value() - 600) ) {
 				Background.registerForTemporalEvent(Time.now());
@@ -234,7 +234,12 @@ class CGMWatchfaceView extends Ui.WatchFace {
 		
 		// Fehleranzeige	
 		//Sys.println("Fehler:" + fehler );
- 		if( fehler != null && fehler == true ) { anzeigeFehler = "Error: " + fehler_code; } 
+ 		if( fehler != null && fehler == true ) {
+ 			anzeigeFehler = "Error: " + fehler_code; 
+ 		} 
+ 		if( anzeigeFehler.equals("") == false && System.getDeviceSettings().phoneConnected == false ) { 
+ 			anzeigeFehler = "Bluetooth!"; 
+ 		}
 		
 		//Test
 		/* anzeigeSGV = "224";

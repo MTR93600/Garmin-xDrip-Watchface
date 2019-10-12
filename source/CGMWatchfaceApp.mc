@@ -28,7 +28,7 @@ class CGMWatchfaceApp extends App.AppBase {
 
     // Return the initial view of your application here
     function getInitialView() {
-    	if(Toybox.System has :ServiceDelegate) {
+    	if( Toybox.System has :ServiceDelegate && System.getDeviceSettings().phoneConnected ) {
     		//Sys.println("InitialView: has Service Delegate");
     		var lastTime = Background.getLastTemporalEventTime();
     		if (lastTime != null) {
