@@ -115,7 +115,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                	}
             }
             var delta_errechnet;
-            if( punkte[0]["sgv"] && punkte[1]["sgv"] ) {
+            if( punkte.size() > 1 && punkte[0]["sgv"] && punkte[1]["sgv"] ) {
             	delta_errechnet = ( punkte[0]["sgv"] - punkte[1]["sgv"] ) / ( (punkte[0]["date"] - punkte[1]["date"]) * 0.001 )  * 5 * 60;
             } else {
             	delta_errechnet = null;
