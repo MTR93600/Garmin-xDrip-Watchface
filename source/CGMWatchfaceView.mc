@@ -104,7 +104,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
     	// CGM Daten verarbeiten
 
     	//punkte = null;
-    	if( punkte != null && punkte instanceof Lang.Array) { 
+    	if( punkte != null && punkte instanceof Lang.Array && punkte.size() > 0 ) { 
     		//Sys.println("CGM Daten");
         	// Einheiten            
         	if( punkte[0]["units_hint"] != null ) {
@@ -115,7 +115,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                	}
             }
             var delta_errechnet;
-            if( punkte.size() > 1 && punkte[0]["sgv"] && punkte[1]["sgv"] ) {
+            if( punkte.size() > 1 && punkte[0]["sgv"] && punkte[0]["date"] && punkte[1]["sgv"] && punkte[1]["date"] ) {
             	delta_errechnet = ( punkte[0]["sgv"] - punkte[1]["sgv"] ) / ( (punkte[0]["date"] - punkte[1]["date"]) * 0.001 )  * 5 * 60;
             } else {
             	delta_errechnet = null;
