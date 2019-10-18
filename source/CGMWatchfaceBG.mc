@@ -4,10 +4,6 @@ using Toybox.System as Sys;
 using Toybox.Communications as Comm;
 using Toybox.ActivityMonitor as Act;
 
-// The Service Delegate is the main entry point for background processes
-// our onTemporalEvent() method will get run each time our periodic event
-// is triggered by the system.
-
 (:background)
 class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
 	
@@ -29,10 +25,11 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
 		    heartrate = null;
 		}
 		// Build URL & WebRequest
-		var url = "http://127.0.0.1:17580/sgv.json?brief_mode=Y&count=18&all_data=Y";
+		var url;
 		var xDripSpike = App.getApp().getProperty("xDripSpike").toNumber(); 
-    	if( xDripSpike == null ) { xDripSpike = 0; }
-		if( xDripSpike == 1 ) {
+    	if( xDripSpike == null || xDripSpike == 0 ) {
+    		url = "http://127.0.0.1:17580/sgv.json?brief_mode=Y&count=18&all_data=Y"; // xDrip+-URL
+		} else {
 			url = "http://127.0.0.1:1979/sgv.json?brief_mode=Y&count=18&all_data=Y"; // Spike-URL
 		}
 		if(steps != null) {

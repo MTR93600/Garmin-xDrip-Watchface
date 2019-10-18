@@ -1,11 +1,8 @@
 using Toybox.Application as App;
-using Toybox.WatchUi as Ui;
 using Toybox.System as Sys;
 using Toybox.Background;
 using Toybox.Time;
-using Toybox.Lang as Lang;
 
-var sgv, delta, aaps, timestamp, duration, masseinheit = 0, punkte;
 var fehler, fehler_code = ""; 
 var adjustAAPS = 0, delay = 0;
 var adjustTime = true;
@@ -45,7 +42,7 @@ class CGMWatchfaceApp extends App.AppBase {
     function onBackgroundData(data) {     
         adjustTime = false;
         fehler = data.toString().substring(0,1).equals("[") ? false : true;
-        if( fehler == false && data != null && data instanceof Array && data[0]["date"] != null ) { 
+        if( fehler == false && data != null && data instanceof Toybox.Lang.Array && data[0]["date"] != null ) { 
         	punkte = data;                   	
         	var differenz = Time.now().value() - data[0]["date"]/1000;
         	if( differenz != null && differenz > (30 + adjustAAPS + delay) && differenz < 300 ) {
@@ -75,7 +72,7 @@ class CGMWatchfaceApp extends App.AppBase {
     			Background.registerForTemporalEvent(Time.now());
     		}
         }
-        Ui.requestUpdate();
+        //Ui.requestUpdate();
 	}
 	
 	function getServiceDelegate(){
@@ -92,7 +89,7 @@ class CGMWatchfaceApp extends App.AppBase {
         if( zielbereichHigh == null ) { zielbereichHigh = 180; }
         if( basalorcob == null ) { basalorcob = 0; }
         if( delay == null ) { delay = 0; }
-        Ui.requestUpdate();
+        //Ui.requestUpdate();
     }
 
 }

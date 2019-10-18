@@ -11,6 +11,7 @@ using Toybox.Time.Gregorian as Gregorian;
 using Toybox.ActivityMonitor as Act;
 using Toybox.Background;
 
+var sgv, aaps, timestamp, duration, masseinheit = 0, punkte;
 var height, width;
 var outdatedSGV = false;
 var wert, anzeigeDelta, anzeigeFehler;
@@ -20,7 +21,6 @@ var noAAPS = 0;
 var corrAAPS = 0;
 // var correction wird benötigt, dass die Positionskorrektur noAAPS nicht bei jeder
 // Aktualisierung erneut zu den Koordinaten addiert wird.
-var correction = false;
 
 class CGMWatchfaceView extends Ui.WatchFace {
 
@@ -31,7 +31,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
     // Load your resources here
     function onLayout(dc) {
     	//Sys.println("OnLayout");
-        setLayout(Rez.Layouts.WatchFace(dc));
+        //setLayout(Rez.Layouts.WatchFace(dc));
         height = dc.getHeight();
         width = dc.getWidth();
         noAAPS = height / 6 - 20;
@@ -59,6 +59,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
     function onUpdate(dc) {   
     	var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", verzoegerung;	
     	
+    	setLayout(Rez.Layouts.WatchFace(dc));
         // Get the current time and format it correctly
         //Sys.println("onUpdate");
         var timeFormat = "$1$:$2$";
@@ -115,40 +116,41 @@ class CGMWatchfaceView extends Ui.WatchFace {
                	}
             }
             var delta_errechnet;
-            if( punkte.size() > 1 && punkte[0]["sgv"] && punkte[0]["date"] && punkte[1]["sgv"] && punkte[1]["date"] ) {
+            if( punkte.size() > 1 && punkte[0]["sgv"] != null && punkte[0]["date"] != null && punkte[1]["sgv"] != null && punkte[1]["date"] != null ) {
             	delta_errechnet = ( punkte[0]["sgv"] - punkte[1]["sgv"] ) / ( (punkte[0]["date"] - punkte[1]["date"]) * 0.001 )  * 5 * 60;
             } else {
             	delta_errechnet = null;
             }  
-    		if( masseinheit != null && masseinheit == 1 ) {  
+            
+            if( masseinheit != null && masseinheit == 1 ) {  
+              	// mmol
               	anzeigeSGV =  punkte[0]["sgv"] ? (0.05556 * punkte[0]["sgv"]).format("%.1f").toString() : "--";
-               	// Delta in mmol, in String umwandeln, bei positiven Werten + davor
-           		if( delta_errechnet != null ) {
-               		delta = 0.05556 * delta_errechnet;
-               	 	if(delta > 0 ) {
-               			anzeigeDelta = "+" + delta.format("%.1f").toString();
+               	// Delta in mmol, in String umwandeln, bei positiven Werten + davor         		
+               	if( delta_errechnet != null ) {
+               		delta_errechnet = 0.05556 * delta_errechnet;
+               	 	if( delta_errechnet > 0 ) {
+               			anzeigeDelta = "+" + delta_errechnet.format("%.1f").toString();
            			} else {
-           				anzeigeDelta= delta.format("%.1f").toString();
-           			}
+           				anzeigeDelta= delta_errechnet.format("%.1f").toString();
+           			} 
            		} else {
            			anzeigeDelta = "--";
-           		}  
+           		}           			
            	} else {
            		// mg
-               	anzeigeSGV = punkte[0]["sgv"] ? punkte[0]["sgv"].toString() : "--";
+               	anzeigeSGV = punkte[0]["sgv"] != null ? punkte[0]["sgv"].toString() : "--";
                	// Delta in String umwandeln, bei positiven Werten + davor
            		if( delta_errechnet != null ) {
-           			delta = delta_errechnet;
-           			if( delta > 0 ) {
-              			anzeigeDelta = "+" + delta.format("%.0f").toString();
+           			if( delta_errechnet > 0 ) {
+              			anzeigeDelta = "+" + delta_errechnet.format("%.0f").toString();
            			} else {
-           				anzeigeDelta = delta.format("%.0f").toString();
+           				anzeigeDelta = delta_errechnet.format("%.0f").toString();
            			} 
            		} else {
            			anzeigeDelta = "--";
            		}                	
            	} 
-			verzoegerung = punkte[0]["date"] ? minutesFromTimestamp(Time.now().value(), punkte[0]["date"]) : "999";
+			verzoegerung = punkte[0]["date"] != null ? minutesFromTimestamp(Time.now().value(), punkte[0]["date"]) : "999";
 			outdatedSGV = ( verzoegerung != null && verzoegerung > 11 ) ? true : false;
         	
         	// AAPS
@@ -162,8 +164,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         	if( punkte[0]["aaps"] != null ) {
              	aaps = punkte[0]["aaps"].toString(); 
              	noAAPS = 0;
-             	adjustAAPS = 20;  
-             	setLayout(Rez.Layouts.WatchFace(dc)); 
+             	adjustAAPS = 20;   
              	//Sys.println("AAPS: " + aaps + "\n");
              	var index1 = null, index2 = null, index3 = null, index4 = null, index5 = null;
              	if( aaps != null && aaps.equals("") == false ) {
@@ -245,7 +246,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
 		/* anzeigeSGV = "224";
 		verzoegerung = "12";
 		anzeigeDelta = "+14";
-		correction = true;
 		anzeigeBasal = "120%";
 		anzeigeIOB = "12,1"; */
 		
@@ -258,7 +258,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
         verzAnzeige = View.findDrawableById("verzLabel");
         verzAnzeige.setText(verzoegerung.toString()+"'");
-        if( noAAPS != null && noAAPS > 0 && correction == false ) {
+        if( noAAPS != null && noAAPS > 0 ) {
         	verzAnzeige.setLocation(
         		verzAnzeige.locX, 
         	    verzAnzeige.locY + noAAPS 
@@ -267,7 +267,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         
         sgvAnzeige = View.findDrawableById("sgvLabel");
         sgvAnzeige.setText(anzeigeSGV);
-        if( noAAPS != null && noAAPS > 0 && correction == false ) {
+        if( noAAPS != null && noAAPS > 0 ) {
         	sgvAnzeige.setLocation(
         		sgvAnzeige.locX, 
         	    sgvAnzeige.locY + noAAPS 
@@ -276,17 +276,12 @@ class CGMWatchfaceView extends Ui.WatchFace {
         
         var deltaAnzeige = View.findDrawableById("deltaLabel");
         deltaAnzeige.setText(anzeigeDelta);
-        if( noAAPS != null && noAAPS > 0 && correction == false ) {
+        if( noAAPS != null && noAAPS > 0 ) {
         	deltaAnzeige.setLocation(
         		deltaAnzeige.locX, 
         	    deltaAnzeige.locY + noAAPS 
         	);
         }
-        
-        if( noAAPS != null && noAAPS > 0 && correction == false ) {
-        	correction = true;
-        }
-        
         
         if( anzeigeBasal != null && anzeigeBasal.equals("") == false ) {
         	var basalAnzeige = View.findDrawableById("basalLabel");
