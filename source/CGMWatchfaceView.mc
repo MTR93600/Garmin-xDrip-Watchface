@@ -319,7 +319,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         
 		//! Ui without layout.xml        
         // Balken
-        if( punkte != null && punkte instanceof Array  && punkte[0]["sgv"] != null && zielbereichLow <= punkte[0]["sgv"] && punkte[0]["sgv"] <= zielbereichHigh ) {
+        if( punkte != null && punkte instanceof Lang.Array  && punkte[0]["sgv"] != null && zielbereichLow <= punkte[0]["sgv"] && punkte[0]["sgv"] <= zielbereichHigh ) {
         	dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT);
         } else {
         	dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
@@ -359,7 +359,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         }
         
         // Graph
-        if( punkte != null && punkte instanceof Array ) {      
+        if( punkte != null && punkte instanceof Lang.Array ) {      
         	dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);
             var now = Time.now().value();
             var lowValue = 1000, highValue = 0;
@@ -516,7 +516,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
     // state of this View here. This includes freeing resources from
     // memory.
     function onHide() {
-    	if( punkte!=null && punkte instanceof Array) {
+    	if( punkte!=null && punkte instanceof Lang.Array ) {
     		App.Storage.setValue("punkteWatchface", punkte);  
     	}
     }
