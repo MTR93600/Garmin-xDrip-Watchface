@@ -358,7 +358,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         // Zu alter Blutzucker
         //outdatedSGV = true;
         if( outdatedSGV != null && outdatedSGV == true && anzeigeSGV != null ) {
-        	corrAAPS = noAAPS > 0 ? 20 : 0;
+        	corrAAPS = noAAPS > 0 ? height / 6 - 20 : 0;
         	dc.fillRectangle(
         		sgvAnzeige.locX - 2, 
         		sgvAnzeige.locY + dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM) / 2 + noAAPS - corrAAPS,  
@@ -423,13 +423,14 @@ class CGMWatchfaceView extends Ui.WatchFace {
         //adjustTime = true;
         if( adjustTime != null && adjustTime == true) {
         	var bmp = Ui.loadResource(Rez.Drawables.stopwatch);
-        	corrAAPS = noAAPS > 0 ? 20 : 0;
+        	corrAAPS = noAAPS > 0 ? height / 6 - 20 : 0;
         	dc.drawBitmap(
         		verzAnzeige.locX + dc.getTextWidthInPixels(verzoegerung.toString()+"'", Gfx.FONT_SMALL) + 5, 
         		verzAnzeige.locY + 5 + noAAPS - corrAAPS, 
         		bmp
         	);
         }
+        Sys.println(noAAPS);
         
         if( steps != null) {
         	var bmp = Ui.loadResource(Rez.Drawables.steps);
