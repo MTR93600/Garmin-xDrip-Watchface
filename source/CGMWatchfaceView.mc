@@ -35,24 +35,26 @@ class CGMWatchfaceView extends Ui.WatchFace {
         height = dc.getHeight();
         width = dc.getWidth();
         noAAPS = height / 6 - 20;
-        var temp = App.Storage.getValue("punkteWatchface");
-        if( temp!= null && temp instanceof Lang.Array) {
-        	punkte = temp; 
-        }
         zielbereichLow = App.getApp().getProperty("Zielbereich1").toNumber(); 
         zielbereichHigh = App.getApp().getProperty("Zielbereich2").toNumber();
         basalorcob = App.getApp().getProperty("BasalorCOB").toNumber();
         delay = App.getApp().getProperty("Delay").toNumber();
+        eco = App.getApp().getProperty("eco").toNumber();
         if( zielbereichLow == null ) { zielbereichLow = 70; }
         if( zielbereichHigh == null ) { zielbereichHigh = 180; }
         if( basalorcob == null ) { basalorcob = 0; }
         if( delay == null ) { delay = 0; }
+        if( eco == null ) { eco = 0; }
     }
 
     // Called when this View is brought to the foreground. Restore
     // the state of this View and prepare it to be shown. This includes
     // loading resources into memory.
     function onShow() {
+    	var temp = App.Storage.getValue("punkteWatchface");
+        if( temp!= null && temp instanceof Lang.Array) {
+        	punkte = temp; 
+        }
     }
 
     // Update the view
@@ -256,8 +258,15 @@ class CGMWatchfaceView extends Ui.WatchFace {
         var date = View.findDrawableById("DateLabel");
         date.setText(datum);
 
-        verzAnzeige = View.findDrawableById("verzLabel");
+        verzAnzeige = View.findDrawableById("verzLabel");        
+        //if( energy == 2 ) { verzAnzeige.setColor(0x33ff33); }
         verzAnzeige.setText(verzoegerung.toString()+"'");
+        if( energy == 1 ) {
+        	verzAnzeige.setText(verzoegerung.toString()+"'");
+        } else {
+        	verzAnzeige.setText(verzoegerung.toString()+"' eco");
+        	//verzAnzeige.setColor(Gfx.COLOR_GREEN); 
+        }
         if( noAAPS != null && noAAPS > 0 ) {
         	verzAnzeige.setLocation(
         		verzAnzeige.locX, 

@@ -8,6 +8,8 @@ var adjustAAPS = 0, delay = 0;
 var adjustTime = true;
 var zielbereichLow, zielbereichHigh;
 var basalorcob;
+var energy = 1;
+var eco = 0;
 
 class CGMWatchfaceApp extends App.AppBase {
 
@@ -48,11 +50,22 @@ class CGMWatchfaceApp extends App.AppBase {
         	if( differenz != null && differenz > (30 + adjustAAPS + delay) && differenz < 300 ) {
         		duration = new Time.Duration(600 - differenz + 15 + adjustAAPS + delay);
         		adjustTime = true;
+        		energy = 1;
         	} else {
+        		var delta_errechnet;
+        		//! TEST
+        		//eco = 1;
+            	if( data.size() > 1 && data[0]["sgv"] != null && data[0]["date"] != null && data[1]["sgv"] != null && data[1]["date"] != null ) {
+            		delta_errechnet = ( data[0]["sgv"] - data[1]["sgv"] ) / ( (data[0]["date"] - data[1]["date"]) * 0.001 )  * 5 * 60;
+            		energy = eco == 0 || (data[0]["sgv"] < 120 && delta_errechnet < -5) || delta_errechnet < -10 || data[0]["sgv"] < 90 ? 1 : 2;
+            		Sys.println(energy);           	
+            	} else {
+            		delta_errechnet = null;
+            	} 
         		if( differenz != null && differenz < (10 + adjustAAPS + delay) ) {
-        			duration = new Time.Duration(5 * 60 + 15 + adjustAAPS + delay); 
+        			duration = new Time.Duration(energy * 5 * 60 + 15 + adjustAAPS + delay); 
         		} else {
-        			duration = new Time.Duration(5 * 60);
+        			duration = new Time.Duration(energy * 5 * 60);
         		}
         	}
         	var lastTime = Background.getLastTemporalEventTime();
@@ -71,8 +84,8 @@ class CGMWatchfaceApp extends App.AppBase {
 			} else {
     			Background.registerForTemporalEvent(Time.now());
     		}
+    		energy = 1;
         }
-        //Ui.requestUpdate();
 	}
 	
 	function getServiceDelegate(){
@@ -85,11 +98,12 @@ class CGMWatchfaceApp extends App.AppBase {
         zielbereichHigh = App.getApp().getProperty("Zielbereich2").toNumber();
         basalorcob = App.getApp().getProperty("BasalorCOB").toNumber();
         delay = App.getApp().getProperty("Delay").toNumber();
+        eco = App.getApp().getProperty("eco").toNumber();
         if( zielbereichLow == null ) { zielbereichLow = 70; }
         if( zielbereichHigh == null ) { zielbereichHigh = 180; }
         if( basalorcob == null ) { basalorcob = 0; }
         if( delay == null ) { delay = 0; }
-        //Ui.requestUpdate();
+        if( eco == null ) { eco = 0; }
     }
 
 }

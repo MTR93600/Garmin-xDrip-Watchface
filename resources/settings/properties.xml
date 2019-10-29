@@ -4,4 +4,5 @@
     <property id="Zielbereich2" type="number">180</property>
     <property id="Delay" type="number">0</property>
     <property id="BasalorCOB" type="number">0</property>
+    <property id="eco" type="number">0</property> 
 </properties>

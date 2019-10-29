@@ -40,4 +40,8 @@
     <string id="opt_delay_9">+50 sec.</string>
     <string id="opt_delay_10">+60 sec.</string>
     
+    <string id="ecoTitle">ecoMode (reduces queries if bg is stable)</string>
+    <string id="opt_eco_1">Request usually after 5 min</string>
+    <string id="opt_eco_2">If bg is stable, a query is started every 10 min</string>
+    
 </strings>
