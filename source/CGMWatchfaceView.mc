@@ -18,9 +18,8 @@ var wert, anzeigeDelta, anzeigeFehler;
 var heartAnzeige, stepsAnzeige, sgvAnzeige, verzAnzeige;
 var plotSGV;
 var noAAPS = 0;
-var corrAAPS = 0;
-// var correction wird benötigt, dass die Positionskorrektur noAAPS nicht bei jeder
-// Aktualisierung erneut zu den Koordinaten addiert wird.
+// noAAPS nur einmal hinzurechnen (sgv, verz und delta), für die Uhr und den Strich durch den BZ ist
+// das dann nicht mehr nötig.
 
 class CGMWatchfaceView extends Ui.WatchFace {
 
@@ -358,10 +357,9 @@ class CGMWatchfaceView extends Ui.WatchFace {
         // Zu alter Blutzucker
         //outdatedSGV = true;
         if( outdatedSGV != null && outdatedSGV == true && anzeigeSGV != null ) {
-        	corrAAPS = noAAPS > 0 ? height / 6 - 20 : 0;
         	dc.fillRectangle(
         		sgvAnzeige.locX - 2, 
-        		sgvAnzeige.locY + dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM) / 2 + noAAPS - corrAAPS,  
+        		sgvAnzeige.locY + dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM) / 2,  
         		dc.getTextWidthInPixels(anzeigeSGV, Gfx.FONT_NUMBER_MEDIUM)+4,
         		6
         	);
@@ -423,14 +421,12 @@ class CGMWatchfaceView extends Ui.WatchFace {
         //adjustTime = true;
         if( adjustTime != null && adjustTime == true) {
         	var bmp = Ui.loadResource(Rez.Drawables.stopwatch);
-        	corrAAPS = noAAPS > 0 ? height / 6 - 20 : 0;
         	dc.drawBitmap(
         		verzAnzeige.locX + dc.getTextWidthInPixels(verzoegerung.toString()+"'", Gfx.FONT_SMALL) + 5, 
-        		verzAnzeige.locY + 5 + noAAPS - corrAAPS, 
+        		verzAnzeige.locY + 5, 
         		bmp
         	);
         }
-        Sys.println(noAAPS);
         
         if( steps != null) {
         	var bmp = Ui.loadResource(Rez.Drawables.steps);
