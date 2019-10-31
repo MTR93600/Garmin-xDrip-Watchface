@@ -53,11 +53,18 @@ class CGMWatchfaceApp extends App.AppBase {
         		energy = 1;
         	} else {
         		var delta_errechnet;
-        		//! TEST
-        		//eco = 1;
             	if( data.size() > 1 && data[0]["sgv"] != null && data[0]["date"] != null && data[1]["sgv"] != null && data[1]["date"] != null ) {
             		delta_errechnet = ( data[0]["sgv"] - data[1]["sgv"] ) / ( (data[0]["date"] - data[1]["date"]) * 0.001 )  * 5 * 60;
-            		energy = eco == 0 || (data[0]["sgv"] < 120 && delta_errechnet < -5) || delta_errechnet < -10 || data[0]["sgv"] < 90 ? 1 : 2;           	
+            		//ecoMode
+            		if( eco == 1 ) {
+            			if( (data[0]["sgv"] < 120 && delta_errechnet <= -5) || delta_errechnet <= -10 || data[0]["sgv"] < 90  ) {
+            				energy = 1;
+            			} else {
+            				energy = 2;
+            			}
+            		} else {
+            			energy = 1;
+            		}    	       	
             	} else {
             		delta_errechnet = null;
             	} 
