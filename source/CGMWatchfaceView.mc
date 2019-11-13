@@ -11,7 +11,7 @@ using Toybox.Time.Gregorian as Gregorian;
 using Toybox.ActivityMonitor as Act;
 using Toybox.Background;
 
-var sgv, aaps, timestamp, duration, masseinheit = 0, punkte;
+var sgv, aaps, timestamp, duration, masseinheit = 0;
 var height, width;
 var outdatedSGV = false;
 var wert, anzeigeDelta, anzeigeFehler;

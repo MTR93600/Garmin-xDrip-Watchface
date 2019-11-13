@@ -10,6 +10,7 @@ var zielbereichLow, zielbereichHigh;
 var basalorcob;
 var energy = 1;
 var eco = 0;
+var punkte;
 
 class CGMWatchfaceApp extends App.AppBase {
 
@@ -44,7 +45,7 @@ class CGMWatchfaceApp extends App.AppBase {
     function onBackgroundData(data) {     
         adjustTime = false;
         fehler = data.toString().substring(0,1).equals("[") ? false : true;
-        if( fehler == false && data != null && data instanceof Toybox.Lang.Array && data[0]["date"] != null ) { 
+        if( fehler == false && data != null && data instanceof Toybox.Lang.Array && data.size() > 0 && data[0]["date"] != null ) { 
         	punkte = data;                   	
         	var differenz = Time.now().value() - data[0]["date"]/1000;
         	if( differenz != null && differenz > (30 + adjustAAPS + delay) && differenz < 300 ) {
@@ -67,6 +68,7 @@ class CGMWatchfaceApp extends App.AppBase {
             		}    	       	
             	} else {
             		delta_errechnet = null;
+            		energy = 1;
             	} 
         		if( differenz != null && differenz < (10 + adjustAAPS + delay) ) {
         			duration = new Time.Duration(energy * 5 * 60 + 15 + adjustAAPS + delay); 
