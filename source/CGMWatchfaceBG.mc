@@ -9,6 +9,8 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
 	
 	function initialize() {
 		Sys.ServiceDelegate.initialize();
+		// BTL
+		isBackground = true;
 	}
 	
     function onTemporalEvent() {        
@@ -38,7 +40,7 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
 		if( heartrate != null) {
 			url = url + "&heart=" + heartrate;
 		}
- 		//url = "https://maysbz.herokuapp.com/api/v1/entries/sgv.json?count=10";
+ 		//url = "https://maysbz.herokuapp.com/api/v1/entries/sgv.json?count=12";
  		//Sys.println(url);
         Comm.makeWebRequest( url, {}, { :headers => { "Content-Type" => Comm.REQUEST_CONTENT_TYPE_URL_ENCODED }, :responseType => Comm.HTTP_RESPONSE_CONTENT_TYPE_JSON}, method(:verarbeiteWerte) );
     }

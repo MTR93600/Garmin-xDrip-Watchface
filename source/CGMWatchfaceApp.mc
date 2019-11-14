@@ -12,6 +12,11 @@ var energy = 1;
 var eco = 0;
 var punkte;
 
+//BTL
+var isBackground = false;
+var isClosing = false;
+var isHighPower = false;
+
 class CGMWatchfaceApp extends App.AppBase {
 
     function initialize() {
@@ -20,10 +25,23 @@ class CGMWatchfaceApp extends App.AppBase {
 
     // onStart() is called on application start up
     function onStart(state) {
+    	//BTL
+    	//Indicate the face has returned and we can draw updates again
+    	isClosing = false;
     }
 
     // onStop() is called when your application is exiting
     function onStop(state) {
+    	//BTL
+    	//Indicate the watch has navigated away for some reason, whether it was changing
+    	//widgets, settings menu, activity, etc. This will always be called in a watch
+    	//face when the face is hidden.
+    	isClosing = true;
+    	//Make sure we are not currently in the background thread, since you cannot use
+    	//the object store in the background context
+    	if( false == isBackground ) {
+    		App.Storage.setValue("punkteWatchface", punkte);
+    	}
     }
 
     // Return the initial view of your application here
@@ -42,7 +60,11 @@ class CGMWatchfaceApp extends App.AppBase {
         return [ new CGMWatchfaceView() ];
     }
     
-    function onBackgroundData(data) {     
+    function onBackgroundData(data) {
+    	//BTL
+    	//Indicate we are no longer in the background, so we can store data in the object store
+    	isBackground = false;
+    	     
         adjustTime = false;
         fehler = data.toString().substring(0,1).equals("[") ? false : true;
         if( fehler == false && data != null && data instanceof Toybox.Lang.Array && data.size() > 0 && data[0]["date"] != null ) { 

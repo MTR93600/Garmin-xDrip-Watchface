@@ -50,6 +50,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
     // the state of this View and prepare it to be shown. This includes
     // loading resources into memory.
     function onShow() {
+    	//BTL
+    	isClosing = false;
     	var temp = App.Storage.getValue("punkteWatchface");
         if( temp!= null && temp instanceof Lang.Array) {
         	punkte = temp; 
@@ -57,7 +59,14 @@ class CGMWatchfaceView extends Ui.WatchFace {
     }
 
     // Update the view
-    function onUpdate(dc) {   
+    function onUpdate(dc) {
+    	//BTL
+    	// Don't draw an update if we are closing or it will cause sluggish
+    	// peformance as the screen has to redraw before switching pages
+        if(isClosing){
+			return;
+		} 
+		  
     	var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", verzoegerung;	
     	
     	setLayout(Rez.Layouts.WatchFace(dc));
@@ -522,19 +531,23 @@ class CGMWatchfaceView extends Ui.WatchFace {
     // state of this View here. This includes freeing resources from
     // memory.
     function onHide() {
-    	if( punkte!=null && punkte instanceof Lang.Array ) {
-    		App.Storage.setValue("punkteWatchface", punkte);  
-    	}
+    	//BTL
+    	//if( punkte!=null && punkte instanceof Lang.Array ) {
+    		//App.Storage.setValue("punkteWatchface", punkte);  
+    	//}
     }
 
     // The user has just looked at their watch. Timers and animations may be started here.
     function onExitSleep() {
+    	//BTL
+    	isHighPower = true;
     }
 
     // Terminate any active timers and prepare for slow updates.
     function onEnterSleep() {
-    }    
-        
+    	//BTL
+    	isHighPower = false;
+    }  
     // Verzoegerung ermitteln
     function minutesFromTimestamp(now, timestamp) {
     	return( (now - timestamp/1000) / 60 );
