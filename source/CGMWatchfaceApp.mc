@@ -15,7 +15,7 @@ var punkte;
 //BTL
 var isBackground = false;
 var isClosing = false;
-var isHighPower = false;
+//var isHighPower = false;
 
 class CGMWatchfaceApp extends App.AppBase {
 

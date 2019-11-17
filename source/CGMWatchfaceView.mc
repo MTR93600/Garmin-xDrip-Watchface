@@ -540,13 +540,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
     // The user has just looked at their watch. Timers and animations may be started here.
     function onExitSleep() {
     	//BTL
-    	isHighPower = true;
+    	//isHighPower = true;
     }
 
     // Terminate any active timers and prepare for slow updates.
     function onEnterSleep() {
     	//BTL
-    	isHighPower = false;
+    	//isHighPower = false;
     }  
     // Verzoegerung ermitteln
     function minutesFromTimestamp(now, timestamp) {
