@@ -126,8 +126,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
                	}
             }
             var delta_errechnet;
-            if( punkte.size() > 1 && punkte[0]["sgv"] != null && punkte[0]["date"] != null && punkte[1]["sgv"] != null && punkte[1]["date"] != null ) {
+            if( punkte.size() > 1 && punkte[0]["sgv"] != null && punkte[0]["date"] != null && punkte[1]["sgv"] != null && punkte[1]["date"] != null && punkte[0]["date"] > punkte[1]["date"] ) {
             	delta_errechnet = ( punkte[0]["sgv"] - punkte[1]["sgv"] ) / ( (punkte[0]["date"] - punkte[1]["date"]) * 0.001 )  * 5 * 60;
+            } else if ( punkte[0]["delta"] != null ) {
+            	delta_errechnet = punkte[0]["delta"];            
             } else {
             	delta_errechnet = null;
             }  
