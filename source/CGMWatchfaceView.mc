@@ -18,6 +18,8 @@ var wert, anzeigeDelta, anzeigeFehler;
 var heartAnzeige, stepsAnzeige, sgvAnzeige, verzAnzeige;
 var plotSGV;
 var noAAPS = 0;
+var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", verzoegerung;	
+
 // noAAPS nur einmal hinzurechnen (sgv, verz und delta), für die Uhr und den Strich durch den BZ ist
 // das dann nicht mehr nötig.
 
@@ -55,6 +57,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
     	var temp = App.Storage.getValue("punkteWatchface");
         if( temp!= null && temp instanceof Lang.Array) {
         	punkte = temp; 
+        	calculation = true;
         }
     }
 
@@ -66,9 +69,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if(isClosing){
 			return;
 		} 
-		  
-    	var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", verzoegerung;	
-    	
+				    	    	
     	setLayout(Rez.Layouts.WatchFace(dc));
         // Get the current time and format it correctly
         //Sys.println("onUpdate");
@@ -117,124 +118,129 @@ class CGMWatchfaceView extends Ui.WatchFace {
     	//punkte = null;
     	if( punkte != null && punkte instanceof Lang.Array && punkte.size() > 0 ) { 
     		//Sys.println("CGM Daten");
-        	// Einheiten            
-        	if( punkte[0]["units_hint"] != null ) {
-            	if( punkte[0]["units_hint"].equals("mmol") ) {
-            		masseinheit = 1;
-            	} else {
-                	masseinheit = 0;
-               	}
-            }
-            var delta_errechnet;
-            if( punkte.size() > 1 && punkte[0]["sgv"] != null && punkte[0]["date"] != null && punkte[1]["sgv"] != null && punkte[1]["date"] != null && punkte[0]["date"] > punkte[1]["date"] ) {
-            	delta_errechnet = ( punkte[0]["sgv"] - punkte[1]["sgv"] ) / ( (punkte[0]["date"] - punkte[1]["date"]) * 0.001 )  * 5 * 60;
-            } else if ( punkte[0]["delta"] != null ) {
-            	delta_errechnet = punkte[0]["delta"];            
-            } else {
-            	delta_errechnet = null;
-            }  
-            
-            if( masseinheit != null && masseinheit == 1 ) {  
-              	// mmol
-              	anzeigeSGV =  punkte[0]["sgv"] ? (0.05556 * punkte[0]["sgv"]).format("%.1f").toString() : "--";
-               	// Delta in mmol, in String umwandeln, bei positiven Werten + davor         		
-               	if( delta_errechnet != null ) {
-               		delta_errechnet = 0.05556 * delta_errechnet;
-               	 	if( delta_errechnet > 0 ) {
-               			anzeigeDelta = "+" + delta_errechnet.format("%.1f").toString();
-           			} else {
-           				anzeigeDelta= delta_errechnet.format("%.1f").toString();
-           			} 
-           		} else {
-           			anzeigeDelta = "--";
-           		}           			
-           	} else {
-           		// mg
-               	anzeigeSGV = punkte[0]["sgv"] != null ? punkte[0]["sgv"].toString() : "--";
-               	// Delta in String umwandeln, bei positiven Werten + davor
-           		if( delta_errechnet != null ) {
-           			if( delta_errechnet > 0 ) {
-              			anzeigeDelta = "+" + delta_errechnet.format("%.0f").toString();
-           			} else {
-           				anzeigeDelta = delta_errechnet.format("%.0f").toString();
-           			} 
-           		} else {
-           			anzeigeDelta = "--";
-           		}                	
-           	} 
-			verzoegerung = punkte[0]["date"] != null ? minutesFromTimestamp(Time.now().value(), punkte[0]["date"]) : "999";
-			outdatedSGV = ( verzoegerung != null && verzoegerung > 11 ) ? true : false;
-        	
-        	// AAPS
-        	//punkte[0]["aaps"] = "No Status";
-        	//punkte[0]["aaps"] = "10,06U";
-        	//punkte[0]["aaps"] = "240% 10,06U(8.27|8.34) -17,24 0g"; 
-        	//punkte[0]["aaps"] = "0,85U/h -0,36U(8.27|8.34) -17,24 35g";
-			//punkte[0]["aaps"] = "1,81U -1,35 11g";
-			//punkte[0]["aaps"] = "Loop deaktiviert\n0,46(0,46|0,00)";
-			//punkte[0]["aaps"] = null;
-        	if( punkte[0]["aaps"] != null ) {
-             	aaps = punkte[0]["aaps"].toString(); 
-             	noAAPS = 0;  
-             	//Sys.println("AAPS: " + aaps + "\n");
-             	var index1 = null, index2 = null, index3 = null, index4 = null, index5 = null;
-             	if( aaps != null && aaps.equals("") == false ) {
-					if( aaps.equals("No Status") ) {
-						anzeigeBasal = "--%";
-						anzeigeIOB = "--";
-					} else if( aaps.find("oop") == true ) {
-						anzeigeBasal = "--%";
-						anzeigeIOB = "--";
-					} else {
-						index1 = aaps.find(" ");
-						index2 = aaps.find("%");
-						index3 = aaps.find("U/h");
-						index4 = aaps.find("U");
-						// Basal
-						if( index2 != null ) {
-							anzeigeBasal = aaps.substring(0,index2+1);
-						} else if( index3 != null ) {
-							anzeigeBasal = "100%";
-						} else if( index3 == null && index4 != null ) {
-							anzeigeBasal = "100%";
-						}
-						// IOB
-						if(index2 == null && index3 == null && index4 != null ) {
-							anzeigeIOB = aaps.substring(0,index4-1);
-						} else if( index1 != null ) {
-							var aapsPart1 = aaps.substring(index1+1,aaps.length());
-							index4 = aapsPart1.find("U");
-							if( index4 != null ) {
-								anzeigeIOB = aapsPart1.substring(0,index4-1);	
-							}					
-						}
-						// COB
-            			if( basalorcob == 1 && aaps.find("g") != null ) {
-            				var length = aaps.length();
-            				var aapsPart2 = aaps.substring(length-6, length);
-            				index5 = aapsPart2.find(" ");
-            				if( index5 != null ) {
-            					var cob = aapsPart2.substring((index5+1),(aapsPart2.length()-1));
-            					if( cob.equals("0") == false ) {
-            						anzeigeBasal = cob.toString() + "g";
-            					}
-            				}                				        			
- 		           		}
-					}
+        	if( calculation == true ) {  
+        		calculation = false;   
+        		// Units: mmol/l or mg/dl      
+        		if( punkte[0]["units_hint"] != null ) {
+            		if( punkte[0]["units_hint"].equals("mmol") ) {
+            			masseinheit = 1;
+            		} else {
+                		masseinheit = 0;
+               		}
             	}
-			} else {
+            	// Calculate delta
+            	var delta_errechnet;
+            	if( punkte.size() > 1 && punkte[0]["sgv"] != null && punkte[0]["date"] != null && punkte[1]["sgv"] != null && punkte[1]["date"] != null && punkte[0]["date"] > punkte[1]["date"] ) {
+            		delta_errechnet = ( punkte[0]["sgv"] - punkte[1]["sgv"] ) / ( (punkte[0]["date"] - punkte[1]["date"]) * 0.001 )  * 5 * 60;
+            	} else if ( punkte[0]["delta"] != null ) {
+            		delta_errechnet = punkte[0]["delta"];            
+            	} else {
+            		delta_errechnet = null;
+            	}  
+            
+            	if( masseinheit != null && masseinheit == 1 ) {  
+              		// mmol
+              		anzeigeSGV =  punkte[0]["sgv"] ? (0.05556 * punkte[0]["sgv"]).format("%.1f").toString() : "--";
+               		// Delta in mmol, in String umwandeln, bei positiven Werten + davor         		
+               		if( delta_errechnet != null ) {
+               			delta_errechnet = 0.05556 * delta_errechnet;
+               	 		if( delta_errechnet > 0 ) {
+               				anzeigeDelta = "+" + delta_errechnet.format("%.1f").toString();
+           				} else {
+           					anzeigeDelta= delta_errechnet.format("%.1f").toString();
+           				} 
+           			} else {
+           				anzeigeDelta = "--";
+           			}           			
+           		} else {
+	           		// mg
+    	           	anzeigeSGV = punkte[0]["sgv"] != null ? punkte[0]["sgv"].toString() : "--";
+        	       	// Delta in String umwandeln, bei positiven Werten + davor
+           			if( delta_errechnet != null ) {
+           				if( delta_errechnet > 0 ) {
+              				anzeigeDelta = "+" + delta_errechnet.format("%.0f").toString();
+	           			} else {
+    	       				anzeigeDelta = delta_errechnet.format("%.0f").toString();
+        	   			} 
+           			} else {
+           				anzeigeDelta = "--";
+           			}   	             	
+           		} 
+        	
+	        	// AAPS
+    	    	//punkte[0]["aaps"] = "No Status";
+        		//punkte[0]["aaps"] = "10,06U";
+        		//punkte[0]["aaps"] = "240% 10,06U(8.27|8.34) -17,24 0g"; 
+	        	//punkte[0]["aaps"] = "0,85U/h -0,36U(8.27|8.34) -17,24 35g";
+				//punkte[0]["aaps"] = "1,81U -1,35 11g";
+				//punkte[0]["aaps"] = "Loop deaktiviert\n0,46(0,46|0,00)";
+				//punkte[0]["aaps"] = null;
+	        	if( punkte[0]["aaps"] != null ) {
+    	         	aaps = punkte[0]["aaps"].toString(); 
+        	     	noAAPS = 0;  
+            	 	//Sys.println("AAPS: " + aaps + "\n");
+             		var index1 = null, index2 = null, index3 = null, index4 = null, index5 = null;
+	             	if( aaps != null && aaps.equals("") == false ) {
+						if( aaps.equals("No Status") ) {
+							anzeigeBasal = "--%";
+							anzeigeIOB = "--";
+						} else if( aaps.find("oop") == true ) {
+							anzeigeBasal = "--%";
+							anzeigeIOB = "--";
+						} else {
+							index1 = aaps.find(" ");
+							index2 = aaps.find("%");
+							index3 = aaps.find("U/h");
+							index4 = aaps.find("U");
+							// Basal
+							if( index2 != null ) {
+								anzeigeBasal = aaps.substring(0,index2+1);
+							} else if( index3 != null ) {
+								anzeigeBasal = "100%";
+							} else if( index3 == null && index4 != null ) {
+								anzeigeBasal = "100%";
+							}
+							// IOB
+							if(index2 == null && index3 == null && index4 != null ) {
+								anzeigeIOB = aaps.substring(0,index4-1);
+							} else if( index1 != null ) {
+								var aapsPart1 = aaps.substring(index1+1,aaps.length());
+								index4 = aapsPart1.find("U");
+								if( index4 != null ) {
+									anzeigeIOB = aapsPart1.substring(0,index4-1);	
+								}					
+							}
+							// COB
+        	    			if( basalorcob == 1 && aaps.find("g") != null ) {
+            					var length = aaps.length();
+            					var aapsPart2 = aaps.substring(length-6, length);
+            					index5 = aapsPart2.find(" ");
+            					if( index5 != null ) {
+            						var cob = aapsPart2.substring((index5+1),(aapsPart2.length()-1));
+            						if( cob.equals("0") == false ) {
+            							anzeigeBasal = cob.toString() + "g";
+	            					}
+    	        				}                				        			
+ 			           		}
+						}
+            		}
+				} else {
 					noAAPS = height / 6 - 20;
 					anzeigeBasal = "";
 					anzeigeIOB = "";
-			}             	        	
-            if( punkte[0]["aaps-ts"] != null) { // Meldung AAPS Status nicht aktuell
-                var verzoegerungAAPS = minutesFromTimestamp(Time.now().value(), punkte[0]["aaps-ts"]); 
-                if( verzoegerungAAPS != null && verzoegerungAAPS > 20 ) {  
-                	anzeigeBasal = "--%";
-					anzeigeIOB = "--";
-				}
-            }            
-			anzeigeFehler = "";
+				}             	        	
+        	    if( punkte[0]["aaps-ts"] != null) { // Meldung AAPS Status nicht aktuell
+            	    var verzoegerungAAPS = minutesFromTimestamp(Time.now().value(), punkte[0]["aaps-ts"]); 
+                	if( verzoegerungAAPS != null && verzoegerungAAPS > 20 ) {  
+                		anzeigeBasal = "--%";
+						anzeigeIOB = "--";
+					}
+        	    }            
+				anzeigeFehler = "";
+			}
+			// Delay in minutes, proof if SGV is outdated
+			verzoegerung = punkte[0]["date"] != null ? minutesFromTimestamp(Time.now().value(), punkte[0]["date"]) : "999";
+			outdatedSGV = ( verzoegerung != null && verzoegerung > 11 ) ? true : false;
 		} else {
 			//Sys.println("Keine CGM Daten");
 			anzeigeFehler = "Wait max. 5'";

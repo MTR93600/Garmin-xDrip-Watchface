@@ -11,6 +11,7 @@ var basalorcob;
 var energy = 1;
 var eco = 0;
 var punkte;
+var calculation = true;
 
 //BTL
 var isBackground = false;
@@ -68,7 +69,8 @@ class CGMWatchfaceApp extends App.AppBase {
         adjustTime = false;
         fehler = data.toString().substring(0,1).equals("[") ? false : true;
         if( fehler == false && data != null && data instanceof Toybox.Lang.Array && data.size() > 0 && data[0]["date"] != null ) { 
-        	punkte = data;                   	
+        	punkte = data;        
+        	calculation = true;           	
         	var differenz = Time.now().value() - data[0]["date"]/1000;
         	if( differenz != null && differenz > (30 + delay) && differenz < 300 ) {
         		duration = new Time.Duration(600 - differenz + 15 + delay);
@@ -76,7 +78,7 @@ class CGMWatchfaceApp extends App.AppBase {
         		energy = 1;
         	} else {
         		var delta_errechnet;
-            	if( data.size() > 1 && data[0]["sgv"] != null && data[0]["date"] != null && data[1]["sgv"] != null && data[1]["date"] != null ) {
+            	if( data.size() > 1 && data[0]["sgv"] != null && data[0]["date"] != null && data[1]["sgv"] != null && data[1]["date"] != null  && punkte[0]["date"] > punkte[1]["date"] ) {
             		delta_errechnet = ( data[0]["sgv"] - data[1]["sgv"] ) / ( (data[0]["date"] - data[1]["date"]) * 0.001 )  * 5 * 60;
             		//ecoMode
             		if( eco == 1 ) {
