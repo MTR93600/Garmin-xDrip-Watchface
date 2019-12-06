@@ -175,8 +175,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
 			//punkte[0]["aaps"] = null;
         	if( punkte[0]["aaps"] != null ) {
              	aaps = punkte[0]["aaps"].toString(); 
-             	noAAPS = 0;
-             	adjustAAPS = 20;   
+             	noAAPS = 0;  
              	//Sys.println("AAPS: " + aaps + "\n");
              	var index1 = null, index2 = null, index3 = null, index4 = null, index5 = null;
              	if( aaps != null && aaps.equals("") == false ) {

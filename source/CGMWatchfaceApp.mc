@@ -4,7 +4,7 @@ using Toybox.Background;
 using Toybox.Time;
 
 var fehler, fehler_code = ""; 
-var adjustAAPS = 0, delay = 0;
+var delay = 0;
 var adjustTime = true;
 var zielbereichLow, zielbereichHigh;
 var basalorcob;
@@ -70,8 +70,8 @@ class CGMWatchfaceApp extends App.AppBase {
         if( fehler == false && data != null && data instanceof Toybox.Lang.Array && data.size() > 0 && data[0]["date"] != null ) { 
         	punkte = data;                   	
         	var differenz = Time.now().value() - data[0]["date"]/1000;
-        	if( differenz != null && differenz > (30 + adjustAAPS + delay) && differenz < 300 ) {
-        		duration = new Time.Duration(600 - differenz + 15 + adjustAAPS + delay);
+        	if( differenz != null && differenz > (30 + delay) && differenz < 300 ) {
+        		duration = new Time.Duration(600 - differenz + 15 + delay);
         		adjustTime = true;
         		energy = 1;
         	} else {
@@ -92,8 +92,8 @@ class CGMWatchfaceApp extends App.AppBase {
             		delta_errechnet = null;
             		energy = 1;
             	} 
-        		if( differenz != null && differenz < (10 + adjustAAPS + delay) ) {
-        			duration = new Time.Duration(energy * 5 * 60 + 15 + adjustAAPS + delay); 
+        		if( differenz != null && differenz < (10 + delay) ) {
+        			duration = new Time.Duration(energy * 5 * 60 + 15 + delay); 
         		} else {
         			duration = new Time.Duration(energy * 5 * 60);
         		}
