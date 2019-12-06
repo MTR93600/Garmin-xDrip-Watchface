@@ -238,9 +238,11 @@ class CGMWatchfaceView extends Ui.WatchFace {
         	    }            
 				anzeigeFehler = "";
 			}
+			
 			// Delay in minutes, proof if SGV is outdated
 			verzoegerung = punkte[0]["date"] != null ? minutesFromTimestamp(Time.now().value(), punkte[0]["date"]) : "999";
 			outdatedSGV = ( verzoegerung != null && verzoegerung > 11 ) ? true : false;
+			
 		} else {
 			//Sys.println("Keine CGM Daten");
 			anzeigeFehler = "Wait max. 5'";
