@@ -409,7 +409,9 @@ class CGMWatchfaceView extends Ui.WatchFace {
             	if(punkte[i]["sgv"] != null && punkte[i]["date"] != null ) {
             		plotSGV = (punkte[i]["sgv"] - lowValue) + graphCorr;
             	    // plotSGV = 300;
-                	var plotBreite = width*2/3 - 27 - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*2/3-27) * 0.0111) ); // Faktor 1 / 90 
+            	    // Factor for stretching / compressing the values on the x-axis depending on the number of sgv values
+            	    var factorX = 1/(5 * punkte.size()).toFloat(); // 5 minutes * x readings
+                	var plotBreite = width*2/3 - 27 - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*2/3-27) * factorX) ); // Faktor 1 / 90 
                 	var plotHoehe = height/3+10 - ( plotSGV * ((height/3)*factor) + 10); // früher: + 10 / + 10
                 	if( zielbereichLow <= punkte[i]["sgv"] && punkte[i]["sgv"] <= zielbereichHigh ) {
                 		dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT); 
