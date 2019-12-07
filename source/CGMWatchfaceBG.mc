@@ -27,12 +27,18 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
 		    heartrate = null;
 		}
 		// Build URL & WebRequest
-		var url;
+		var url = "http://127.0.0.1:17580/sgv.json?brief_mode=Y&count=18&all_data=Y"; // xDrip+-URL
 		var xDripSpike = App.getApp().getProperty("xDripSpike").toNumber(); 
-    	if( xDripSpike == null || xDripSpike == 0 ) {
-    		url = "http://127.0.0.1:17580/sgv.json?brief_mode=Y&count=18&all_data=Y"; // xDrip+-URL
-		} else {
+		if( xDripSpike == null ) {
+			xDripSpike = 0;
+		}
+    	if( xDripSpike == 1 ) {
 			url = "http://127.0.0.1:1979/sgv.json?brief_mode=Y&count=18&all_data=Y"; // Spike-URL
+		} else if ( xDripSpike == 2 ) {
+			var nightscoutURL = App.getApp().getProperty("URL").toString(); 
+			if( nightscoutURL != null ) {
+				url = "https:/" + nightscoutURL + "/api/v1/entries/sgv.json?count=12"; // Nightscout-URL
+			}				
 		}
 		if(steps != null) {
    			url = url + "&steps=" + steps;
@@ -40,7 +46,6 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
 		if( heartrate != null) {
 			url = url + "&heart=" + heartrate;
 		}
- 		//url = "https://maysbz.herokuapp.com/api/v1/entries/sgv.json?count=12";
  		//Sys.println(url);
         Comm.makeWebRequest( url, {}, { :headers => { "Content-Type" => Comm.REQUEST_CONTENT_TYPE_URL_ENCODED }, :responseType => Comm.HTTP_RESPONSE_CONTENT_TYPE_JSON}, method(:verarbeiteWerte) );
     }
