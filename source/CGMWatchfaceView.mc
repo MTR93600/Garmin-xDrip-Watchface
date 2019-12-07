@@ -388,7 +388,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         	dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);
             var now = Time.now().value();
             var lowValue = 1000, highValue = 0;
-            var factor = 0.0033; // Faktor: 1/300
+            var factorY = 0.0033; // Faktor: 1/300
             var graphCorr = 0; 
             for( var i = 0; i < punkte.size(); i++ ) {
             	if( lowValue > punkte[i]["sgv"] ) { lowValue = punkte[i]["sgv"]; }
@@ -396,12 +396,12 @@ class CGMWatchfaceView extends Ui.WatchFace {
             }
             var difference = highValue - lowValue;
             if( difference != null && difference <= 90 ) {
-            	factor = 0.01; // 1/100     	
+            	factorY = 0.01; // 1/100     	
    				graphCorr = (100-difference)/2; 
             } else { 
-            	factor = 1.toFloat()/(difference+10); // 1/200
+            	factorY = 1/(difference+10).toFloat(); // 1/200
             	graphCorr = 5; 
-            	//Sys.println("Faktor: " + factor + "\n");
+            	//Sys.println("Faktor: " + factorY + "\n");
             	//Sys.println("Differenz: " + difference + "\n");
             }
             
@@ -410,9 +410,9 @@ class CGMWatchfaceView extends Ui.WatchFace {
             		plotSGV = (punkte[i]["sgv"] - lowValue) + graphCorr;
             	    // plotSGV = 300;
             	    // Factor for stretching / compressing the values on the x-axis depending on the number of sgv values
-            	    var factorX = 1/(5 * punkte.size()).toFloat(); // 5 minutes * x readings
-                	var plotBreite = width*2/3 - 27 - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*2/3-27) * factorX) ); // Faktor 1 / 90 
-                	var plotHoehe = height/3+10 - ( plotSGV * ((height/3)*factor) + 10); // früher: + 10 / + 10
+            	    var factorX = 1/(5 * punkte.size()).toFloat(); // 1 / ( 5 minutes * x readings )
+                	var plotBreite = width*2/3 - 27 - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*2/3-27) * factorX) );
+                	var plotHoehe = height/3+10 - ( plotSGV * ((height/3)*factorY) + 10); // früher: + 10 / + 10
                 	if( zielbereichLow <= punkte[i]["sgv"] && punkte[i]["sgv"] <= zielbereichHigh ) {
                 		dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT); 
                 	} else {
