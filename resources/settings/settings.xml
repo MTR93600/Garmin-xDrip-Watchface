@@ -9,6 +9,13 @@
     <setting propertyKey="@Properties.URL" title="@Strings.URLTitle"  prompt="@Strings.URLPrompt">
        	<settingConfig type="alphaNumeric" />
     </setting>
+    <setting propertyKey="@Properties.Einheiten" title="@Strings.EinheitenTitle">
+        <settingConfig type="list">
+           <listEntry value="2">@Rez.Strings.opt_einheit_2</listEntry>
+           <listEntry value="0">@Rez.Strings.opt_einheit_0</listEntry>
+           <listEntry value="1">@Rez.Strings.opt_einheit_1</listEntry>
+        </settingConfig>
+    </setting>
     <setting propertyKey="@Properties.Zielbereich1" title="@Strings.ZielbereichTitel1" prompt="@Strings.AllgemeinPrompt">
            <settingConfig type="list">
                <listEntry value="60">@Rez.Strings.opt_zielbereich_2</listEntry>

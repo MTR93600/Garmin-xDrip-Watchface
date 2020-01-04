@@ -1,6 +1,7 @@
 <properties>
 	<property id="xDripSpike" type="number">0</property>
 	<property id="URL" type="string">yourname.herokuapp.com</property>
+	<property id="Einheiten" type="number">2</property>
 	<property id="Zielbereich1" type="number">70</property>
     <property id="Zielbereich2" type="number">180</property>
     <property id="Delay" type="number">0</property>
