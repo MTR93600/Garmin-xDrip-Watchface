@@ -523,7 +523,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         }
 
         // Schritte-Ziel
-        if( steps != null && stepGoal != null ) {
+        if( steps != null && stepGoal != null && stepGoal != 0 ) {
             var polygonPosition = height - ( (steps * height) / stepGoal);
             if( polygonPosition > (height - 10) ) { polygonPosition = height - 10; }
             if( polygonPosition < -10 ) { polygonPosition = -10; }
