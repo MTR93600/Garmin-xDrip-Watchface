@@ -246,7 +246,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
         } else {
             //Sys.println("Keine CGM Daten");
-            anzeigeFehler = "Wait max. \n 5 min";
+            anzeigeFehler = "Wait max.\n5 min";
             verzoegerung = "--";
             anzeigeSGV = "---";
             anzeigeDelta = "--";
@@ -381,9 +381,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             6,
             height
         );
-
         // Horizontale Trennlinien
-        //dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
         dc.drawLine(
             0,
             height/2,
@@ -418,22 +416,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
             width/2-4-7,
             hoeheGraph
         );
-        /*dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_DK_GRAY);
-        dc.drawLine(
-            0,
-            height/2 + 7,
-            width/2-4-5,
-            height/2 + 5
-        );
-        dc.drawLine(
-             0,
-             height/2 + 7 + hoeheGraph,
-             width/2-4-5,
-             height/2 + 7 + hoeheGraph
-        );*/
 
         if( punkte != null && punkte instanceof Lang.Array ) {
-
             var now = Time.now().value();
             var lowValue = 1000, highValue = 0;
             var factorY = 0.0033; // Faktor: 1/300
@@ -453,7 +437,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 //Sys.println("Differenz: " + difference + "\n");
             }
             dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_BLACK);
-            dc.setPenWidth(2);
+            dc.setPenWidth(3);
             plotSGV = (70 - lowValue) + graphCorr;
             if( hoeheGraph < (plotSGV * (hoeheGraph*factorY))) {
                 dc.drawLine(
@@ -496,7 +480,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     // plotSGV = 300;
                     // Factor for stretching / compressing the values on the x-axis depending on the number of sgv values
                     var factorX = 1/(5 * (punkte.size() + 1)).toFloat(); // 1 / ( 5 minutes * x readings )
-                    var plotBreite = width*0.5 - 4 - 7 - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*0.5-7) * factorX) );
+                    var plotBreite = width*0.5 - 4 - 7 - 4 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*0.5-7) * factorX) );
                     var plotHoehe = hoeheGraph - ( plotSGV * ((hoeheGraph)*factorY)); // früher: + 10 / + 10
                     if( zielbereichLow <= punkte[i]["sgv"] && punkte[i]["sgv"] <= zielbereichHigh ) {
                         dc.setColor(Gfx.COLOR_DK_GREEN, Gfx.COLOR_TRANSPARENT);
@@ -552,8 +536,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
         }
 
         // Batteriestand
-        //Sys.println("Batteriestand");
-        var symbolAnzeige = View.findDrawableById("symbols"); // nötig für Rechteck
         var batteryLoad = Sys.getSystemStats().battery;
         if( batteryLoad < 20 ) {
             dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
@@ -597,44 +579,26 @@ class CGMWatchfaceView extends Ui.WatchFace {
         }
 
         // Schritte-Ziel
-        /*
         if( steps != null && stepGoal != null && stepGoal != 0 ) {
             var polygonPosition = height - ( (steps * height) / stepGoal);
-            if( polygonPosition > (height - 10) ) { polygonPosition = height - 10; }
-            if( polygonPosition < -10 ) { polygonPosition = -10; }
+            if( polygonPosition > (height - 12) ) { polygonPosition = height - 12; }
+            if( polygonPosition < -12 ) { polygonPosition = -12; }
             dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
             var polygon = [
-                [width*0.5, polygonPosition],
-                [width*0.5+4, polygonPosition+6],
-                [width*0.5+4, polygonPosition+20],
-                [width*0.5, polygonPosition+14],
-                [width*0.5-4, polygonPosition+20],
-                [width*0.5-4, polygonPosition+6]
+                [width/2-3, polygonPosition],
+                [width/2-3, polygonPosition+12],
+                [width/2+3, polygonPosition+8],
+                [width/2+3, polygonPosition-4]
             ];
             dc.fillPolygon(polygon);
         }
-        dc.setColor(Gfx.COLOR_BLUE, Gfx.COLOR_BLUE);
-        dc.setPenWidth(5);
-        dc.drawArc(
-            width/2,
-            height/2,
-            width/2,
-            Gfx.ARC_COUNTER_CLOCKWISE,
-            0,
-            180
-        );
-        dc.setPenWidth(1);
-         */
+
     }
 
     // Called when this View is removed from the screen. Save the
     // state of this View here. This includes freeing resources from
     // memory.
     function onHide() {
-        //BTL
-        //if( punkte!=null && punkte instanceof Lang.Array ) {
-            //App.Storage.setValue("punkteWatchface", punkte);
-        //}
     }
 
     // The user has just looked at their watch. Timers and animations may be started here.
