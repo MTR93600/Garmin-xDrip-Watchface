@@ -18,7 +18,7 @@ var wert, anzeigeDelta, anzeigeFehler;
 var heartAnzeige, stepsAnzeige, sgvAnzeige, verzAnzeige;
 var plotSGV;
 var noAAPS = 0;
-var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", verzoegerung;
+var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", anzeigeCOB = "", verzoegerung;
 
 // noAAPS nur einmal hinzurechnen (sgv, verz und delta), für die Uhr und den Strich durch den BZ ist
 // das dann nicht mehr nötig.
@@ -204,38 +204,37 @@ class CGMWatchfaceView extends Ui.WatchFace {
                             }
                             // IOB
                             if(index2 == null && index3 == null && index4 != null ) {
-                                anzeigeIOB = aaps.substring(0,index4-1);
+                                anzeigeIOB = aaps.substring(0,index4-1) + " U";
                             } else if( index1 != null ) {
-                                var aapsPart1 = aaps.substring(index1+1,aaps.length());
+                                var aapsPart1 = aaps.substring(index1+1,aaps.length()) + " U";
                                 index4 = aapsPart1.find("U");
                                 if( index4 != null ) {
-                                    anzeigeIOB = aapsPart1.substring(0,index4-1);
+                                    anzeigeIOB = aapsPart1.substring(0,index4-1) + " U";
                                 }
                             }
                             // COB
-                            if( basalorcob == 1 && aaps.find("g") != null ) {
+                            if( aaps.find("g") != null ) {
                                 var length = aaps.length();
                                 var aapsPart2 = aaps.substring(length-6, length);
                                 index5 = aapsPart2.find(" ");
                                 if( index5 != null ) {
                                     var cob = aapsPart2.substring((index5+1),(aapsPart2.length()-1));
-                                    if( cob.equals("0") == false ) {
-                                        anzeigeBasal = cob.toString() + "g";
-                                    }
+                                    anzeigeCOB = cob.toString() + " g";
                                 }
                             }
                         }
                     }
                 } else {
                     noAAPS = height / 6 - 20;
-                    anzeigeBasal = "";
-                    anzeigeIOB = "";
+                    anzeigeBasal = "data.";
+                    anzeigeIOB = "No";
+                    anzeigeCOB = "loop";
                 }
                 if( punkte[0]["aaps-ts"] != null) { // Meldung AAPS Status nicht aktuell
                     var verzoegerungAAPS = minutesFromTimestamp(Time.now().value(), punkte[0]["aaps-ts"]);
                     if( verzoegerungAAPS != null && verzoegerungAAPS > 20 ) {
                         anzeigeBasal = "--%";
-                        anzeigeIOB = "--";
+                        anzeigeIOB = "-- IOB";
                     }
                 }
                 anzeigeFehler = "";
@@ -273,68 +272,92 @@ class CGMWatchfaceView extends Ui.WatchFace {
         // Update the view
         var time = View.findDrawableById("TimeLabel");
         time.setText(timeString);
+        time.setLocation(
+            width/2-4-7,
+            height/2-7-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)
+        );
 
         var date = View.findDrawableById("DateLabel");
         date.setText(datum);
-
-        verzAnzeige = View.findDrawableById("verzLabel");
-        //if( energy == 2 ) { verzAnzeige.setColor(0x33ff33); }
-        verzAnzeige.setText(verzoegerung.toString()+"'");
-        if( energy == 1 ) {
-            verzAnzeige.setText(verzoegerung.toString()+"'");
-        } else {
-            verzAnzeige.setText(verzoegerung.toString()+"' eco");
-            //verzAnzeige.setColor(Gfx.COLOR_GREEN);
-        }
-        if( noAAPS != null && noAAPS > 0 ) {
-            verzAnzeige.setLocation(
-                verzAnzeige.locX,
-                verzAnzeige.locY + noAAPS
-            );
-        }
+        date.setLocation(
+            width/2-4-7,
+            height/2-7-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)
+        );
 
         sgvAnzeige = View.findDrawableById("sgvLabel");
         sgvAnzeige.setText(anzeigeSGV);
-        if( noAAPS != null && noAAPS > 0 ) {
-            sgvAnzeige.setLocation(
-                sgvAnzeige.locX,
-                sgvAnzeige.locY + noAAPS
-            );
-        }
+        sgvAnzeige.setLocation(
+            width/2+4+7,
+            height/2+7-dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)
+        );
+
+        Sys.println(dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM) + " - " + dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM) + " - " + dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM));
 
         var deltaAnzeige = View.findDrawableById("deltaLabel");
         deltaAnzeige.setText(anzeigeDelta);
-        if( noAAPS != null && noAAPS > 0 ) {
-            deltaAnzeige.setLocation(
-                deltaAnzeige.locX,
-                deltaAnzeige.locY + noAAPS
+        deltaAnzeige.setLocation(
+            width/2+4+7+dc.getTextWidthInPixels(anzeigeSGV, Gfx.FONT_NUMBER_MEDIUM)+5,
+            height/2+7+(dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM))*0.5
+        );
+
+
+
+        if( anzeigeIOB != null && anzeigeIOB.equals("") == false ) {
+            var iobAnzeige = View.findDrawableById("iobLabel");
+            iobAnzeige.setText(anzeigeIOB);
+            iobAnzeige.setLocation(
+                width/2+4+7,
+                height/2-7-dc.getFontAscent(Gfx.FONT_SMALL)-5-dc.getFontAscent(Gfx.FONT_SMALL)-5-dc.getFontAscent(Gfx.FONT_SMALL)
+            );
+        }
+
+        if( anzeigeCOB != null && anzeigeCOB.equals("") == false ) {
+            var cobAnzeige = View.findDrawableById("cobLabel");
+            cobAnzeige.setText(anzeigeCOB);
+            cobAnzeige.setLocation(
+                width/2+4+7,
+                height/2-7-dc.getFontAscent(Gfx.FONT_SMALL)-5-dc.getFontAscent(Gfx.FONT_SMALL)
             );
         }
 
         if( anzeigeBasal != null && anzeigeBasal.equals("") == false ) {
             var basalAnzeige = View.findDrawableById("basalLabel");
             basalAnzeige.setText(anzeigeBasal);
+            basalAnzeige.setLocation(
+                width/2+4+7,
+                height/2-7-dc.getFontAscent(Gfx.FONT_SMALL)
+            );
         }
 
-        if( anzeigeIOB != null && anzeigeIOB.equals("") == false ) {
-            var iobAnzeige = View.findDrawableById("iobLabel");
-            iobAnzeige.setText(anzeigeIOB);
+        verzAnzeige = View.findDrawableById("verzLabel");
+        //if( energy == 2 ) { verzAnzeige.setColor(0x33ff33); }
+        verzAnzeige.setText(verzoegerung.toString()+"'");
+        if( energy == 1 ) {
+            verzAnzeige.setText(verzoegerung.toString()+" min");
+        } else {
+            verzAnzeige.setText(verzoegerung.toString()+"' eco");
+            //verzAnzeige.setColor(Gfx.COLOR_GREEN);
         }
+        verzAnzeige.setLocation(
+            width/2+4+7,
+            height/2+7+dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)+5
+        );
 
-        stepsAnzeige = View.findDrawableById("stepsLabel");
+/*        stepsAnzeige = View.findDrawableById("stepsLabel");
         if( steps != null ) {
             stepsAnzeige.setText(steps.toString());
+            stepsAnzeige.setLocation(
+                width*0.5+5+15+8,
+                height*0.5-7-20-5
+            );
         }
-
+*/
         heartAnzeige = View.findDrawableById("heartrateLabel");
         if( heartrate != null ) {
-            // heartrate Anzeige nach oben schieben wenn keine Schritte
-            if( steps == null ) {
-                heartAnzeige.setLocation(
-                    stepsAnzeige.locX,
-                    stepsAnzeige.locY
-                );
-            }
+            heartAnzeige.setLocation(
+                width/2-4-7-21,
+                height/2+7+dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)+5+dc.getFontHeight(Gfx.FONT_SMALL)
+            );
             heartAnzeige.setText(heartrate.toString());
         } else {
             heartAnzeige.setText("");
@@ -348,14 +371,14 @@ class CGMWatchfaceView extends Ui.WatchFace {
         //! Ui without layout.xml
         // Balken
         if( punkte != null && punkte instanceof Lang.Array  && punkte[0]["sgv"] != null && zielbereichLow <= punkte[0]["sgv"] && punkte[0]["sgv"] <= zielbereichHigh ) {
-            dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT);
+            dc.setColor(Gfx.COLOR_DK_GREEN, Gfx.COLOR_TRANSPARENT);
         } else {
             dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
         }
         dc.fillRectangle(
-            width*2/3-22,
+            (width*0.5)-3,
             0,
-            13,
+            6,
             height
         );
 
@@ -363,31 +386,53 @@ class CGMWatchfaceView extends Ui.WatchFace {
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
         dc.drawLine(
             0,
-            height/3+10,
-            width*2/3-25,
-            height/3+10
+            height/2,
+            width/2-5-7,
+            height/2
         );
         dc.drawLine(
-            0,
-            height*2/3+10,
-            width*2/3-25,
-            height*2/3+10
+            width/2+5+7,
+            height/2,
+            width,
+            height/2
         );
 
         // Zu alter Blutzucker
         //outdatedSGV = true;
         if( outdatedSGV != null && outdatedSGV == true && anzeigeSGV != null ) {
             dc.fillRectangle(
-                sgvAnzeige.locX - 2,
-                sgvAnzeige.locY + dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM) / 2,
+                width/2 + 4 + 7 - 2,
+                height/2 + 7 + (dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM))/2,
                 dc.getTextWidthInPixels(anzeigeSGV, Gfx.FONT_NUMBER_MEDIUM)+4,
                 6
             );
         }
 
         // Graph
+        var hoeheGraph = dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)+5+dc.getFontHeight(Gfx.FONT_SMALL);
+        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_LT_GRAY);
+        dc.fillRectangle(
+            0,
+            height/2+7,
+            width/2-4-7,
+            hoeheGraph
+        );
+        /*dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_DK_GRAY);
+        dc.drawLine(
+            0,
+            height/2 + 7,
+            width/2-4-5,
+            height/2 + 5
+        );
+        dc.drawLine(
+             0,
+             height/2 + 7 + hoeheGraph,
+             width/2-4-5,
+             height/2 + 7 + hoeheGraph
+        );*/
+
         if( punkte != null && punkte instanceof Lang.Array ) {
-            dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);
+
             var now = Time.now().value();
             var lowValue = 1000, highValue = 0;
             var factorY = 0.0033; // Faktor: 1/300
@@ -406,24 +451,61 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 //Sys.println("Faktor: " + factorY + "\n");
                 //Sys.println("Differenz: " + difference + "\n");
             }
+            dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_BLACK);
+            dc.setPenWidth(2);
+            plotSGV = (70 - lowValue) + graphCorr;
+            if( hoeheGraph < (plotSGV * (hoeheGraph*factorY))) {
+                dc.drawLine(
+                    0,
+                    height/2 + 7 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY)),
+                    width/2-4-7,
+                    height/2 + 7 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY))
+                );
+            } else {
+                dc.drawLine(
+                    0,
+                    height/2 + 7 + hoeheGraph,
+                    width/2-4-7,
+                    height/2 + 7 + hoeheGraph
+                );
+            }
+            plotSGV = (180 - lowValue) + graphCorr;
 
+            if( hoeheGraph > (plotSGV * (hoeheGraph*factorY))) {
+                dc.drawLine(
+                    0,
+                    height/2 + 7 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY)),
+                    width/2-4-7,
+                    height/2 + 7 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY))
+                );
+            } else {
+                dc.drawLine(
+                    0,
+                    height/2 + 7,
+                    width/2-4-7,
+                    height/2 + 7
+                );
+            }
+            dc.setPenWidth(1);
+
+            dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);
             for( var i = 0; i < punkte.size(); i++ ) {
                 if(punkte[i]["sgv"] != null && punkte[i]["date"] != null ) {
                     plotSGV = (punkte[i]["sgv"] - lowValue) + graphCorr;
                     // plotSGV = 300;
                     // Factor for stretching / compressing the values on the x-axis depending on the number of sgv values
                     var factorX = 1/(5 * (punkte.size() + 1)).toFloat(); // 1 / ( 5 minutes * x readings )
-                    var plotBreite = width*2/3 - 27 - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*2/3-27) * factorX) );
-                    var plotHoehe = height/3+10 - ( plotSGV * ((height/3)*factorY) + 10); // früher: + 10 / + 10
+                    var plotBreite = width*0.5 - 4 - 7 - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*0.5-7) * factorX) );
+                    var plotHoehe = hoeheGraph - ( plotSGV * ((hoeheGraph)*factorY)); // früher: + 10 / + 10
                     if( zielbereichLow <= punkte[i]["sgv"] && punkte[i]["sgv"] <= zielbereichHigh ) {
-                        dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT);
+                        dc.setColor(Gfx.COLOR_DK_GREEN, Gfx.COLOR_TRANSPARENT);
                     } else {
                         dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
                     }
                     dc.fillCircle(
                         plotBreite,
-                        height/3+10 + plotHoehe, // vorher:  +10
-                        2
+                        height*0.5 + 7 + plotHoehe, // vorher:  +10
+                        3
                     );
                 }
             }
@@ -432,8 +514,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( anzeigeFehler != null ) {
             dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
             dc.drawText(
-                width*2/3-30,
-                height*2/3+10-dc.getFontHeight(Gfx.FONT_SMALL)-5,
+                width/2-4-7,
+                height/2-7,
                 Gfx.FONT_SMALL,
                 anzeigeFehler,
                 Gfx.TEXT_JUSTIFY_RIGHT
@@ -444,37 +526,28 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( adjustTime != null && adjustTime == true) {
             var bmp = Ui.loadResource(Rez.Drawables.stopwatch);
             dc.drawBitmap(
-                verzAnzeige.locX + dc.getTextWidthInPixels(verzoegerung.toString()+"'", Gfx.FONT_SMALL) + 5,
-                verzAnzeige.locY + 5,
+                width/2+4+7,
+                height/2+7+dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)+5+dc.getFontHeight(Gfx.FONT_SMALL)+5,
                 bmp
             );
         }
-
+/*
         if( steps != null) {
             var bmp = Ui.loadResource(Rez.Drawables.steps);
             dc.drawBitmap(
-                stepsAnzeige.locX + 5, //width*2/3-45,
-                stepsAnzeige.locY + 5, //height*2/3+10+8,
+                width*0.5+4+5, //width*2/3-45,
+                height*0.5-7-20, //height*2/3+10+8,
                 bmp
             );
         }
-
+*/
         if( heartrate != null ) {
             var bmp = Ui.loadResource(Rez.Drawables.heart);
-            if( steps != null ) {
-                dc.drawBitmap(
-                    heartAnzeige.locX + 5, //width*2/3-45,
-                    heartAnzeige.locY + 5, //height*2/3+10+8+dc.getFontAscent(Gfx.FONT_SMALL)+5,
-                    bmp
-                );
-            } else {
-                stepsAnzeige = View.findDrawableById("stepsLabel");
-                dc.drawBitmap(
-                    stepsAnzeige.locX + 5, //width*2/3-45,
-                    stepsAnzeige.locY + 5, //height*2/3+10+8,,
-                    bmp
-                );
-            }
+            dc.drawBitmap(
+                width/2-4-7-15,
+                height/2+7+dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)+5+dc.getFontHeight(Gfx.FONT_SMALL)+5,
+                bmp
+            );
         }
 
         // Batteriestand
@@ -488,16 +561,16 @@ class CGMWatchfaceView extends Ui.WatchFace {
         }
         // Battery body
         dc.fillRoundedRectangle(
-            symbolAnzeige.locX, //158 // width*2/3-2,
-            symbolAnzeige.locY, // 27 //height/3+12-dc.getFontHeight(Gfx.FONT_SMALL)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM),
+            width/2-4-7-14,
+            height/2-7-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)-5-22,
             14,
             22,
             2
         );
         // Battery contact
         dc.fillRectangle(
-            symbolAnzeige.locX + 4, //width*2/3-2+4,
-            symbolAnzeige.locY - 2, //height/3+12-dc.getFontHeight(Gfx.FONT_SMALL)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM)-2,
+            width/2-4-7-14+4,
+            height/2-7-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)-5-22-2,
             6,
             2
         );
@@ -505,8 +578,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
         var battery = batteryLoad * 18 / 100;
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
         dc.fillRoundedRectangle(
-            symbolAnzeige.locX + 2, //width*2/3,
-            symbolAnzeige.locY + 2, //height/3+14-dc.getFontHeight(Gfx.FONT_SMALL)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM),
+            width/2-4-7-14+2,
+            height/2-7-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)-5-22+2,
             10,
             18-battery,
             2
@@ -516,28 +589,41 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( System.getDeviceSettings().phoneConnected ) {
             var bmp = Ui.loadResource(Rez.Drawables.bluetooth);
             dc.drawBitmap(
-                symbolAnzeige.locX + 19, //width*2/3+17,
-                symbolAnzeige.locY - 2, //height/3+10-dc.getFontHeight(Gfx.FONT_SMALL)-dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM),
+                width/2-4-7-14-19,
+                height/2-7-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)-4-25,
                 bmp
             );
         }
 
         // Schritte-Ziel
+        /*
         if( steps != null && stepGoal != null && stepGoal != 0 ) {
             var polygonPosition = height - ( (steps * height) / stepGoal);
             if( polygonPosition > (height - 10) ) { polygonPosition = height - 10; }
             if( polygonPosition < -10 ) { polygonPosition = -10; }
             dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
             var polygon = [
-                [width*2/3-16, polygonPosition],
-                [width*2/3-15+8, polygonPosition+6],
-                [width*2/3-15+8, polygonPosition+20],
-                [width*2/3-16, polygonPosition+14],
-                [width*2/3-15-9, polygonPosition+20],
-                [width*2/3-15-9, polygonPosition+6]
+                [width*0.5, polygonPosition],
+                [width*0.5+4, polygonPosition+6],
+                [width*0.5+4, polygonPosition+20],
+                [width*0.5, polygonPosition+14],
+                [width*0.5-4, polygonPosition+20],
+                [width*0.5-4, polygonPosition+6]
             ];
             dc.fillPolygon(polygon);
         }
+        dc.setColor(Gfx.COLOR_BLUE, Gfx.COLOR_BLUE);
+        dc.setPenWidth(5);
+        dc.drawArc(
+            width/2,
+            height/2,
+            width/2,
+            Gfx.ARC_COUNTER_CLOCKWISE,
+            0,
+            180
+        );
+        dc.setPenWidth(1);
+         */
     }
 
     // Called when this View is removed from the screen. Save the
