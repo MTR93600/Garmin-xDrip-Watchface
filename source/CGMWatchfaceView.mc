@@ -288,7 +288,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         sgvAnzeige.setText(anzeigeSGV);
         sgvAnzeige.setLocation(
             width/2+4+7,
-            height/2+7-dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)
+            height/2-7-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)
         );
 
         Sys.println(dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM) + " - " + dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM) + " - " + dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM));
@@ -297,7 +297,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         deltaAnzeige.setText(anzeigeDelta);
         deltaAnzeige.setLocation(
             width/2+4+7+dc.getTextWidthInPixels(anzeigeSGV, Gfx.FONT_NUMBER_MEDIUM)+5,
-            height/2+7+(dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM))*0.5
+            height/2-7-(dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM))*0.5
         );
 
 
@@ -307,7 +307,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             iobAnzeige.setText(anzeigeIOB);
             iobAnzeige.setLocation(
                 width/2+4+7,
-                height/2-7-dc.getFontAscent(Gfx.FONT_SMALL)-5-dc.getFontAscent(Gfx.FONT_SMALL)-5-dc.getFontAscent(Gfx.FONT_SMALL)
+                height/2+7-dc.getFontDescent(Gfx.FONT_SMALL)
             );
         }
 
@@ -316,7 +316,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             cobAnzeige.setText(anzeigeCOB);
             cobAnzeige.setLocation(
                 width/2+4+7,
-                height/2-7-dc.getFontAscent(Gfx.FONT_SMALL)-5-dc.getFontAscent(Gfx.FONT_SMALL)
+                height/2+7-dc.getFontDescent(Gfx.FONT_SMALL)+dc.getFontAscent(Gfx.FONT_SMALL)+5
             );
         }
 
@@ -325,7 +325,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             basalAnzeige.setText(anzeigeBasal);
             basalAnzeige.setLocation(
                 width/2+4+7,
-                height/2-7-dc.getFontAscent(Gfx.FONT_SMALL)
+                height/2+7-dc.getFontDescent(Gfx.FONT_SMALL)+dc.getFontAscent(Gfx.FONT_SMALL)+5+dc.getFontAscent(Gfx.FONT_SMALL)+5
             );
         }
 
@@ -340,7 +340,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         }
         verzAnzeige.setLocation(
             width/2+4+7,
-            height/2+7+dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)+5
+            height/2-7-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)
         );
 
 /*        stepsAnzeige = View.findDrawableById("stepsLabel");
@@ -355,8 +355,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
         heartAnzeige = View.findDrawableById("heartrateLabel");
         if( heartrate != null ) {
             heartAnzeige.setLocation(
-                width/2-4-7-21,
-                height/2+7+dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)+5+dc.getFontHeight(Gfx.FONT_SMALL)
+                width/2-4-7,
+                height/2+7-dc.getFontDescent(Gfx.FONT_SMALL)+dc.getFontAscent(Gfx.FONT_SMALL)+5+dc.getFontAscent(Gfx.FONT_SMALL)+5+dc.getFontAscent(Gfx.FONT_SMALL)+5
             );
             heartAnzeige.setText(heartrate.toString());
         } else {
@@ -373,7 +373,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( punkte != null && punkte instanceof Lang.Array  && punkte[0]["sgv"] != null && zielbereichLow <= punkte[0]["sgv"] && punkte[0]["sgv"] <= zielbereichHigh ) {
             dc.setColor(Gfx.COLOR_DK_GREEN, Gfx.COLOR_TRANSPARENT);
         } else {
-            dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
+            dc.setColor(Gfx.COLOR_DK_RED, Gfx.COLOR_TRANSPARENT);
         }
         dc.fillRectangle(
             (width*0.5)-3,
@@ -383,7 +383,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         );
 
         // Trennlinien
-        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+        //dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
         dc.drawLine(
             0,
             height/2,
@@ -399,17 +399,18 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
         // Zu alter Blutzucker
         //outdatedSGV = true;
+        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
         if( outdatedSGV != null && outdatedSGV == true && anzeigeSGV != null ) {
             dc.fillRectangle(
                 width/2 + 4 + 7 - 2,
-                height/2 + 7 + (dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM))/2,
+                height/2 - 7 - (dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM))/2,
                 dc.getTextWidthInPixels(anzeigeSGV, Gfx.FONT_NUMBER_MEDIUM)+4,
                 6
             );
         }
 
         // Graph
-        var hoeheGraph = dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)+5+dc.getFontHeight(Gfx.FONT_SMALL);
+        var hoeheGraph = dc.getFontAscent(Gfx.FONT_SMALL)+5+dc.getFontAscent(Gfx.FONT_SMALL)+5+dc.getFontAscent(Gfx.FONT_SMALL)-dc.getFontDescent(Gfx.FONT_SMALL);
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_LT_GRAY);
         dc.fillRectangle(
             0,
@@ -500,7 +501,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     if( zielbereichLow <= punkte[i]["sgv"] && punkte[i]["sgv"] <= zielbereichHigh ) {
                         dc.setColor(Gfx.COLOR_DK_GREEN, Gfx.COLOR_TRANSPARENT);
                     } else {
-                        dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
+                        dc.setColor(Gfx.COLOR_DK_RED, Gfx.COLOR_TRANSPARENT);
                     }
                     dc.fillCircle(
                         plotBreite,
@@ -522,13 +523,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
             );
         }
 
-        //adjustTime = true;
+        adjustTime = true;
         if( adjustTime != null && adjustTime == true) {
             var bmp = Ui.loadResource(Rez.Drawables.stopwatch);
             dc.drawBitmap(
-                width/2+4+7,
-                height/2+7+dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)+5+dc.getFontHeight(Gfx.FONT_SMALL)+5,
-                bmp
+               width/2+4+7+15+5,
+               height/2-4-7-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)-22,
+               bmp
             );
         }
 /*
@@ -544,8 +545,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( heartrate != null ) {
             var bmp = Ui.loadResource(Rez.Drawables.heart);
             dc.drawBitmap(
-                width/2-4-7-15,
-                height/2+7+dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)+5+dc.getFontHeight(Gfx.FONT_SMALL)+5,
+                width/2+4+7,
+                height/2+7-dc.getFontDescent(Gfx.FONT_SMALL)+dc.getFontAscent(Gfx.FONT_SMALL)+5+dc.getFontAscent(Gfx.FONT_SMALL)+5+dc.getFontAscent(Gfx.FONT_SMALL)+5+5,
                 bmp
             );
         }
@@ -589,7 +590,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( System.getDeviceSettings().phoneConnected ) {
             var bmp = Ui.loadResource(Rez.Drawables.bluetooth);
             dc.drawBitmap(
-                width/2-4-7-14-19,
+                width/2+4+7,
                 height/2-7-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)-4-25,
                 bmp
             );
