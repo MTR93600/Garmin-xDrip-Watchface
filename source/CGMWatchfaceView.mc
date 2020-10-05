@@ -246,7 +246,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
         } else {
             //Sys.println("Keine CGM Daten");
-            anzeigeFehler = "Wait max. 5'";
+            anzeigeFehler = "Wait max. \n 5 min";
             verzoegerung = "--";
             anzeigeSGV = "---";
             anzeigeDelta = "--";
@@ -513,17 +513,17 @@ class CGMWatchfaceView extends Ui.WatchFace {
         }
 
         if( anzeigeFehler != null ) {
-            dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
+            dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
             dc.drawText(
-                width/2-4-7,
-                height/2-7,
-                Gfx.FONT_SMALL,
+                width/2-4-7-5,
+                height/2+7,
+                Gfx.FONT_TINY,
                 anzeigeFehler,
                 Gfx.TEXT_JUSTIFY_RIGHT
             );
         }
 
-        adjustTime = true;
+        //adjustTime = true;
         if( adjustTime != null && adjustTime == true) {
             var bmp = Ui.loadResource(Rez.Drawables.stopwatch);
             dc.drawBitmap(
