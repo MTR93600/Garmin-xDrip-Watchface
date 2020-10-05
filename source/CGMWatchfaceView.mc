@@ -382,16 +382,16 @@ class CGMWatchfaceView extends Ui.WatchFace {
             height
         );
 
-        // Trennlinien
+        // Horizontale Trennlinien
         //dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
         dc.drawLine(
             0,
             height/2,
-            width/2-5-7,
+            width/2-4-2,
             height/2
         );
         dc.drawLine(
-            width/2+5+7,
+            width/2+4+2,
             height/2,
             width,
             height/2
