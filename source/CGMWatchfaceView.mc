@@ -258,6 +258,12 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( fehler != null && fehler == true ) {
             anzeigeFehler = "Error: " + fehler_code;
         }
+        if( fehler != null && fehler == true && (fehler_code == -104 || fehler_code == -1 || fehler_code == -2) ) {
+            anzeigeFehler += "\nBluetooth?";
+        }
+        if( fehler != null && fehler == true && (fehler_code == -300) ) {
+            anzeigeFehler += "\nSettings?";
+        }
         if( anzeigeFehler.equals("") == false && System.getDeviceSettings().phoneConnected == false ) {
             anzeigeFehler = "Bluetooth!";
         }
@@ -503,7 +509,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             dc.drawText(
                 width/2-4-8-5,
                 height/2+8,
-                Gfx.FONT_TINY,
+                Gfx.FONT_XTINY,
                 anzeigeFehler,
                 Gfx.TEXT_JUSTIFY_RIGHT
             );
@@ -583,13 +589,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
         // Schritte-Ziel
         if( steps != null && stepGoal != null && stepGoal != 0 ) {
             var polygonPosition = height - ( (steps * height) / stepGoal);
-            if( polygonPosition < -4 ) { polygonPosition = -4; }
+            if( polygonPosition < -5 ) { polygonPosition = -5; }
             dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
             var polygon = [
-                [width/2-4, polygonPosition+12],
-                [width/2-4, polygonPosition],
-                [width/2+4, polygonPosition+4],
-                [width/2+4, polygonPosition+16]
+                [width/2+4, polygonPosition+12],
+                [width/2+4, polygonPosition],
+                [width/2-4, polygonPosition+4],
+                [width/2-4, polygonPosition+16]
             ];
             dc.fillPolygon(polygon);
         }
