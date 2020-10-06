@@ -273,22 +273,22 @@ class CGMWatchfaceView extends Ui.WatchFace {
         var time = View.findDrawableById("TimeLabel");
         time.setText(timeString);
         time.setLocation(
-            width/2-4-7,
-            height/2-7-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)
+            width/2-4-8,
+            height/2-8-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)
         );
 
         var date = View.findDrawableById("DateLabel");
         date.setText(datum);
         date.setLocation(
-            width/2-4-7,
-            height/2-7-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)
+            width/2-4-8,
+            height/2-8-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)
         );
 
         sgvAnzeige = View.findDrawableById("sgvLabel");
         sgvAnzeige.setText(anzeigeSGV);
         sgvAnzeige.setLocation(
-            width/2+4+7,
-            height/2-7-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)
+            width/2+4+8,
+            height/2-8-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)
         );
 
         Sys.println(dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM) + " - " + dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM) + " - " + dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM));
@@ -296,8 +296,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
         var deltaAnzeige = View.findDrawableById("deltaLabel");
         deltaAnzeige.setText(anzeigeDelta);
         deltaAnzeige.setLocation(
-            width/2+4+7+dc.getTextWidthInPixels(anzeigeSGV, Gfx.FONT_NUMBER_MEDIUM)+5,
-            height/2-7-(dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM))*0.5
+            width/2+4+8+dc.getTextWidthInPixels(anzeigeSGV, Gfx.FONT_NUMBER_MEDIUM)+5,
+            height/2-8-(dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)-dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM))*0.5
         );
 
 
@@ -306,8 +306,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
             var iobAnzeige = View.findDrawableById("iobLabel");
             iobAnzeige.setText(anzeigeIOB);
             iobAnzeige.setLocation(
-                width/2+4+7,
-                height/2+7-dc.getFontDescent(Gfx.FONT_SMALL)
+                width/2+4+8,
+                height/2+8-dc.getFontDescent(Gfx.FONT_SMALL)
             );
         }
 
@@ -315,8 +315,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
             var cobAnzeige = View.findDrawableById("cobLabel");
             cobAnzeige.setText(anzeigeCOB);
             cobAnzeige.setLocation(
-                width/2+4+7,
-                height/2+7-dc.getFontDescent(Gfx.FONT_SMALL)+dc.getFontAscent(Gfx.FONT_SMALL)+5
+                width/2+4+8,
+                height/2+8-dc.getFontDescent(Gfx.FONT_SMALL)+dc.getFontAscent(Gfx.FONT_SMALL)+5
             );
         }
 
@@ -324,8 +324,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
             var basalAnzeige = View.findDrawableById("basalLabel");
             basalAnzeige.setText(anzeigeBasal);
             basalAnzeige.setLocation(
-                width/2+4+7,
-                height/2+7-dc.getFontDescent(Gfx.FONT_SMALL)+dc.getFontAscent(Gfx.FONT_SMALL)+5+dc.getFontAscent(Gfx.FONT_SMALL)+5
+                width/2+4+8,
+                height/2+8-dc.getFontDescent(Gfx.FONT_SMALL)+dc.getFontAscent(Gfx.FONT_SMALL)+5+dc.getFontAscent(Gfx.FONT_SMALL)+5
             );
         }
 
@@ -339,8 +339,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
             //verzAnzeige.setColor(Gfx.COLOR_GREEN);
         }
         verzAnzeige.setLocation(
-            width/2+4+7,
-            height/2-7-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)
+            width/2+4+8,
+            height/2-8-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)
         );
 
 /*        stepsAnzeige = View.findDrawableById("stepsLabel");
@@ -348,15 +348,15 @@ class CGMWatchfaceView extends Ui.WatchFace {
             stepsAnzeige.setText(steps.toString());
             stepsAnzeige.setLocation(
                 width*0.5+5+15+8,
-                height*0.5-7-20-5
+                height*0.5-8-20-5
             );
         }
 */
         heartAnzeige = View.findDrawableById("heartrateLabel");
         if( heartrate != null ) {
             heartAnzeige.setLocation(
-                width/2-4-7,
-                height/2+7-dc.getFontDescent(Gfx.FONT_SMALL)+dc.getFontAscent(Gfx.FONT_SMALL)+5+dc.getFontAscent(Gfx.FONT_SMALL)+5+dc.getFontAscent(Gfx.FONT_SMALL)+5
+                width/2-4-8,
+                height/2+8-dc.getFontDescent(Gfx.FONT_SMALL)+dc.getFontAscent(Gfx.FONT_SMALL)+5+dc.getFontAscent(Gfx.FONT_SMALL)+5+dc.getFontAscent(Gfx.FONT_SMALL)+5
             );
             heartAnzeige.setText(heartrate.toString());
         } else {
@@ -375,13 +375,15 @@ class CGMWatchfaceView extends Ui.WatchFace {
         } else {
             dc.setColor(Gfx.COLOR_DK_RED, Gfx.COLOR_TRANSPARENT);
         }
-        dc.fillRectangle(
-            (width*0.5)-3,
+        dc.setPenWidth(8);
+        dc.drawLine(
+            width/2,
             0,
-            6,
+            width/2,
             height
         );
         // Horizontale Trennlinien
+        dc.setPenWidth(1);
         dc.drawLine(
             0,
             height/2,
@@ -412,8 +414,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_LT_GRAY);
         dc.fillRectangle(
             0,
-            height/2+7,
-            width/2-4-7,
+            height/2+8,
+            width/2-4-8,
             hoeheGraph
         );
 
@@ -439,35 +441,35 @@ class CGMWatchfaceView extends Ui.WatchFace {
             dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_BLACK);
             dc.setPenWidth(3);
             plotSGV = (70 - lowValue) + graphCorr;
-            if( hoeheGraph < (plotSGV * (hoeheGraph*factorY))) {
+            if( 0 < plotSGV * (hoeheGraph*factorY) ) {
                 dc.drawLine(
                     0,
                     height/2 + 7 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY)),
-                    width/2-4-7,
+                    width/2-4-8,
                     height/2 + 7 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY))
                 );
             } else {
                 dc.drawLine(
                     0,
                     height/2 + 7 + hoeheGraph,
-                    width/2-4-7,
+                    width/2-4-8,
                     height/2 + 7 + hoeheGraph
                 );
             }
             plotSGV = (180 - lowValue) + graphCorr;
 
-            if( hoeheGraph > (plotSGV * (hoeheGraph*factorY))) {
+            if( hoeheGraph > plotSGV * (hoeheGraph*factorY) ) {
                 dc.drawLine(
                     0,
                     height/2 + 7 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY)),
-                    width/2-4-7,
+                    width/2-4-8,
                     height/2 + 7 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY))
                 );
             } else {
                 dc.drawLine(
                     0,
                     height/2 + 7,
-                    width/2-4-7,
+                    width/2-4-8,
                     height/2 + 7
                 );
             }
@@ -480,7 +482,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     // plotSGV = 300;
                     // Factor for stretching / compressing the values on the x-axis depending on the number of sgv values
                     var factorX = 1/(5 * (punkte.size() + 1)).toFloat(); // 1 / ( 5 minutes * x readings )
-                    var plotBreite = width*0.5 - 4 - 7 - 4 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*0.5-7) * factorX) );
+                    var plotBreite = width*0.5 - 4 - 7 - 4 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*0.5-8) * factorX) );
                     var plotHoehe = hoeheGraph - ( plotSGV * ((hoeheGraph)*factorY)); // früher: + 10 / + 10
                     if( zielbereichLow <= punkte[i]["sgv"] && punkte[i]["sgv"] <= zielbereichHigh ) {
                         dc.setColor(Gfx.COLOR_DK_GREEN, Gfx.COLOR_TRANSPARENT);
@@ -499,8 +501,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( anzeigeFehler != null ) {
             dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
             dc.drawText(
-                width/2-4-7-5,
-                height/2+7,
+                width/2-4-8-5,
+                height/2+8,
                 Gfx.FONT_TINY,
                 anzeigeFehler,
                 Gfx.TEXT_JUSTIFY_RIGHT
@@ -511,8 +513,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( adjustTime != null && adjustTime == true) {
             var bmp = Ui.loadResource(Rez.Drawables.stopwatch);
             dc.drawBitmap(
-               width/2+4+7+15+5,
-               height/2-4-7-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)-22,
+               width/2+4+8+15+5,
+               height/2-4-8-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)-22,
                bmp
             );
         }
@@ -521,7 +523,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             var bmp = Ui.loadResource(Rez.Drawables.steps);
             dc.drawBitmap(
                 width*0.5+4+5, //width*2/3-45,
-                height*0.5-7-20, //height*2/3+10+8,
+                height*0.5-8-20, //height*2/3+10+8,
                 bmp
             );
         }
@@ -529,8 +531,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( heartrate != null ) {
             var bmp = Ui.loadResource(Rez.Drawables.heart);
             dc.drawBitmap(
-                width/2+4+7,
-                height/2+7-dc.getFontDescent(Gfx.FONT_SMALL)+dc.getFontAscent(Gfx.FONT_SMALL)+5+dc.getFontAscent(Gfx.FONT_SMALL)+5+dc.getFontAscent(Gfx.FONT_SMALL)+5+5,
+                width/2+4+8,
+                height/2+8-dc.getFontDescent(Gfx.FONT_SMALL)+dc.getFontAscent(Gfx.FONT_SMALL)+5+dc.getFontAscent(Gfx.FONT_SMALL)+5+dc.getFontAscent(Gfx.FONT_SMALL)+5+5,
                 bmp
             );
         }
@@ -544,16 +546,16 @@ class CGMWatchfaceView extends Ui.WatchFace {
         }
         // Battery body
         dc.fillRoundedRectangle(
-            width/2-4-7-14,
-            height/2-7-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)-5-22,
+            width/2-4-8-14,
+            height/2-8-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)-5-22,
             14,
             22,
             2
         );
         // Battery contact
         dc.fillRectangle(
-            width/2-4-7-14+4,
-            height/2-7-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)-5-22-2,
+            width/2-4-8-14+4,
+            height/2-8-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)-5-22-2,
             6,
             2
         );
@@ -561,8 +563,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
         var battery = batteryLoad * 18 / 100;
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
         dc.fillRoundedRectangle(
-            width/2-4-7-14+2,
-            height/2-7-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)-5-22+2,
+            width/2-4-8-14+2,
+            height/2-8-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)-5-22+2,
             10,
             18-battery,
             2
@@ -572,8 +574,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( System.getDeviceSettings().phoneConnected ) {
             var bmp = Ui.loadResource(Rez.Drawables.bluetooth);
             dc.drawBitmap(
-                width/2+4+7,
-                height/2-7-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)-4-25,
+                width/2+4+8,
+                height/2-8-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)-4-25,
                 bmp
             );
         }
@@ -581,14 +583,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
         // Schritte-Ziel
         if( steps != null && stepGoal != null && stepGoal != 0 ) {
             var polygonPosition = height - ( (steps * height) / stepGoal);
-            if( polygonPosition > (height - 12) ) { polygonPosition = height - 12; }
-            if( polygonPosition < -12 ) { polygonPosition = -12; }
+            if( polygonPosition < -4 ) { polygonPosition = -4; }
             dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
             var polygon = [
-                [width/2-3, polygonPosition],
-                [width/2-3, polygonPosition+12],
-                [width/2+3, polygonPosition+8],
-                [width/2+3, polygonPosition-4]
+                [width/2-4, polygonPosition+12],
+                [width/2-4, polygonPosition],
+                [width/2+4, polygonPosition+4],
+                [width/2+4, polygonPosition+16]
             ];
             dc.fillPolygon(polygon);
         }
