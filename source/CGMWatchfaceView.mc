@@ -17,7 +17,7 @@ var outdatedSGV = false;
 var wert, anzeigeDelta, anzeigeFehler;
 var heartAnzeige, stepsAnzeige, sgvAnzeige, verzAnzeige;
 var plotSGV;
-var noAAPS = 0;
+var noAAPS = true;
 var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", anzeigeCOB = "", verzoegerung;
 var showSteps = true, counterStepAnzeige = 0;
 
@@ -181,19 +181,17 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 //punkte[0]["aaps"] = "1,81U -1,35 11g";
                 //punkte[0]["aaps"] = "Loop deaktiviert\n0,46(0,46|0,00)";
                 //punkte[0]["aaps"] = null;
+                noAAPS = true;
                 if( punkte[0]["aaps"] != null ) {
                     aaps = punkte[0]["aaps"].toString();
-                    noAAPS = 0;
+                    noAAPS = false;
                     //Sys.println("AAPS: " + aaps + "\n");
                     var index1 = null, index2 = null, index3 = null, index4 = null, index5 = null;
                     if( aaps != null && aaps.equals("") == false ) {
-                        if( aaps.equals("No Status") ) {
-                            anzeigeBasal = "--%";
-                            anzeigeIOB = "--";
-                        } else if( aaps.find("oop") == true ) {
-                            anzeigeBasal = "--%";
-                            anzeigeIOB = "--";
-                        } else {
+                        anzeigeIOB = "-- U";
+                        anzeigeCOB = "-- g";
+                        anzeigeBasal = "--%";
+                        if( aaps.equals("No Status") == false && aaps.find("oop") == null ) {
                             index1 = aaps.find(" ");
                             index2 = aaps.find("%");
                             index3 = aaps.find("U/h");
@@ -229,16 +227,14 @@ class CGMWatchfaceView extends Ui.WatchFace {
                         }
                     }
                 } else {
-                    noAAPS = 0;
-                    anzeigeBasal = "data.";
-                    anzeigeIOB = "No";
-                    anzeigeCOB = "loop";
+                    noAAPS = true;
                 }
                 if( punkte[0]["aaps-ts"] != null) { // Meldung AAPS Status nicht aktuell
                     var verzoegerungAAPS = minutesFromTimestamp(Time.now().value(), punkte[0]["aaps-ts"]);
                     if( verzoegerungAAPS != null && verzoegerungAAPS > 20 ) {
+                        anzeigeIOB = "-- U";
+                        anzeigeCOB = "-- g";
                         anzeigeBasal = "--%";
-                        anzeigeIOB = "-- IOB";
                     }
                 }
                 anzeigeFehler = "";
@@ -383,6 +379,25 @@ class CGMWatchfaceView extends Ui.WatchFace {
             width,
             hHeight
         );
+        // Progress-Bar
+        if( steps != null && stepGoal != null && stepGoal != 0 ) {
+            var barHeight;
+            if( noAAPS == true ) {
+                barHeight = hHeight;
+            } else {
+                barHeight = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constAscentFontSmall;
+            }
+            var polygonPosition = barHeight - ( (steps * barHeight) / stepGoal);
+            if( polygonPosition < -5 ) { polygonPosition = -5; }
+            dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
+            var polygon = [
+                [hWidth+4, polygonPosition+12],
+                [hWidth+4, polygonPosition],
+                [hWidth-4, polygonPosition+4],
+                [hWidth-4, polygonPosition+16]
+            ];
+            dc.fillPolygon(polygon);
+        }
 
         // Zu alter Blutzucker
         //outdatedSGV = true;
@@ -398,11 +413,22 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
         // Graph
         var hoeheGraph = -dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constAscentFontSmall;
-        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_LT_GRAY);
+        var xGraph, breiteGraph;
+        if( noAAPS == true ) {
+            xGraph = width/6;
+            breiteGraph = width - 2*xGraph;
+            dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
+            dc.fillRectangle(0, hHeight+3, width, constSpaceBar+hoeheGraph+constSpace);
+
+        } else {
+            xGraph = 0;
+            breiteGraph = hWidth - constSpaceBar;
+        }
+        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_WHITE);
         dc.fillRectangle(
-            0,
+            xGraph,
             hHeight+8,
-            hWidth-constSpaceBar,
+            breiteGraph,
             hoeheGraph
         );
 
@@ -423,50 +449,50 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 factorY = 1/(difference+10).toFloat(); // 1/200
                 graphCorr = 5;
             }
-            dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_BLACK);
+            //In range lines
+            dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_DK_GRAY);
             dc.setPenWidth(3);
             plotSGV = (zielbereichLow - lowValue) + graphCorr;
             if( 0 < plotSGV * (hoeheGraph*factorY) ) {
                 dc.drawLine(
-                    0,
+                    xGraph,
                     hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY)),
-                    hWidth-constSpaceBar,
+                    breiteGraph + xGraph,
                     hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY))
                 );
             } else {
                 dc.drawLine(
-                    0,
+                    xGraph,
                     hHeight + 8 + hoeheGraph,
-                    hWidth-constSpaceBar,
+                    breiteGraph + xGraph,
                     hHeight + 8 + hoeheGraph
                 );
             }
             plotSGV = (zielbereichHigh - lowValue) + graphCorr;
             if( hoeheGraph > plotSGV * (hoeheGraph*factorY) ) {
                 dc.drawLine(
-                    0,
+                    xGraph,
                     hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY)),
-                    hWidth-constSpaceBar,
+                    breiteGraph + xGraph,
                     hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY))
                 );
-            } else {
+            } else if( 0 < plotSGV * (hoeheGraph*factorY) ) {
                 dc.drawLine(
-                    0,
+                    xGraph,
                     hHeight + 8,
-                    hWidth-constSpaceBar,
+                    breiteGraph + xGraph,
                     hHeight + 8
                 );
             }
             dc.setPenWidth(1);
-
-            dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);
+            // Plot bloodglucose
             for( var i = 0; i < punkte.size(); i++ ) {
                 if(punkte[i]["sgv"] != null && punkte[i]["date"] != null ) {
                     plotSGV = (punkte[i]["sgv"] - lowValue) + graphCorr;
                     // plotSGV = 300;
                     // Factor for stretching / compressing the values on the x-axis depending on the number of sgv values
                     var factorX = 1/(5 * (punkte.size() + 1)).toFloat(); // 1 / ( 5 minutes * x readings )
-                    var plotBreite = width*0.5 - constSpaceBar - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (width*0.5-constSpaceBar-3) * factorX) );
+                    var plotBreite = breiteGraph - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (breiteGraph-3) * factorX) );
                     var plotHoehe = hoeheGraph - ( plotSGV * ((hoeheGraph)*factorY));
                     if( zielbereichLow <= punkte[i]["sgv"] && punkte[i]["sgv"] <= zielbereichHigh ) {
                         dc.setColor(Gfx.COLOR_DK_GREEN, Gfx.COLOR_TRANSPARENT);
@@ -474,7 +500,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                         dc.setColor(Gfx.COLOR_DK_RED, Gfx.COLOR_TRANSPARENT);
                     }
                     dc.fillCircle(
-                        plotBreite,
+                        xGraph+plotBreite,
                         height*0.5 + 9 + plotHoehe,
                         3
                     );
@@ -544,21 +570,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 hHeight-8-dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM)+dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM)-5-dc.getFontHeight(Gfx.FONT_SMALL)-4-25,
                 bmp
             );
-        }
-
-        // Schritte-Ziel
-        if( steps != null && stepGoal != null && stepGoal != 0 ) {
-            var barHeight = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constAscentFontSmall;
-            var polygonPosition = barHeight - ( (steps * barHeight) / stepGoal);
-            if( polygonPosition < -5 ) { polygonPosition = -5; }
-            dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
-            var polygon = [
-                [hWidth+4, polygonPosition+12],
-                [hWidth+4, polygonPosition],
-                [hWidth-4, polygonPosition+4],
-                [hWidth-4, polygonPosition+16]
-            ];
-            dc.fillPolygon(polygon);
         }
 
         // heartrate and steps
