@@ -257,12 +257,11 @@ class CGMWatchfaceView extends Ui.WatchFace {
         //Sys.println("Fehler:" + fehler );
         if( fehler != null && fehler == true ) {
             anzeigeFehler = "Error: " + fehler_code;
-        }
-        if( fehler != null && fehler == true && (fehler_code == -104 || fehler_code == -1 || fehler_code == -2) ) {
-            anzeigeFehler += "\nBluetooth?";
-        }
-        if( fehler != null && fehler == true && (fehler_code == -300) ) {
-            anzeigeFehler += "\nSettings?";
+            if( fehler_code == -104 || fehler_code == -1 || fehler_code == -2 ) {
+                anzeigeFehler += "\nBluetooth?";
+            } else if( fehler_code == -300 ) {
+                anzeigeFehler += "\nSettings?";
+            }
         }
         if( anzeigeFehler.equals("") == false && System.getDeviceSettings().phoneConnected == false ) {
             anzeigeFehler = "Bluetooth!";
@@ -451,7 +450,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             }
             //In range lines
             dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_DK_GRAY);
-            dc.setPenWidth(3);
+            dc.setPenWidth(4);
             plotSGV = (zielbereichLow - lowValue) + graphCorr;
             if( 0 < plotSGV * (hoeheGraph*factorY) ) {
                 dc.drawLine(
@@ -488,10 +487,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
             // Plot bloodglucose
             for( var i = 0; i < punkte.size(); i++ ) {
                 if(punkte[i]["sgv"] != null && punkte[i]["date"] != null ) {
+                Sys.println(punkte[i]);
                     plotSGV = (punkte[i]["sgv"] - lowValue) + graphCorr;
-                    // plotSGV = 300;
                     // Factor for stretching / compressing the values on the x-axis depending on the number of sgv values
-                    var factorX = 1/(5 * (punkte.size() + 1)).toFloat(); // 1 / ( 5 minutes * x readings )
+                    var factorX = 1/(5 * punkte.size()).toFloat(); // 1 / ( 5 minutes * x readings )
                     var plotBreite = breiteGraph - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (breiteGraph-3) * factorX) );
                     var plotHoehe = hoeheGraph - ( plotSGV * ((hoeheGraph)*factorY));
                     if( zielbereichLow <= punkte[i]["sgv"] && punkte[i]["sgv"] <= zielbereichHigh ) {
@@ -499,19 +498,21 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     } else {
                         dc.setColor(Gfx.COLOR_DK_RED, Gfx.COLOR_TRANSPARENT);
                     }
-                    dc.fillCircle(
-                        xGraph+plotBreite,
-                        height*0.5 + 9 + plotHoehe,
-                        3
-                    );
+                    if( 0 < plotBreite - 3 ) {
+                        dc.fillCircle(
+                            xGraph+plotBreite,
+                            height*0.5 + 9 + plotHoehe,
+                            3
+                        );
+                    }
                 }
             }
         }
-
+        // Show communication errors
         if( anzeigeFehler != null ) {
             dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
             dc.drawText(
-                hWidth-constSpaceBar-constSpace,
+                breiteGraph + xGraph - 2,
                 hHeight+8,
                 Gfx.FONT_XTINY,
                 anzeigeFehler,
