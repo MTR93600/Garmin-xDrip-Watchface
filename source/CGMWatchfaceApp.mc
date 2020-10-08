@@ -4,7 +4,7 @@ using Toybox.Background;
 using Toybox.Time;
 
 var fehler, fehler_code = "";
-var delay = 0;
+var delay = 20;
 var adjustTime = true;
 var zielbereichLow, zielbereichHigh;
 var basalorcob;
