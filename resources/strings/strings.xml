@@ -1,10 +1,10 @@
 <strings>
 
-    <string id="AppName">xDrip+/Spike Watchface 2</string>
+    <string id="AppName">xDrip+/Spike Watchface</string>
     
-    <string id="AllgemeinPrompt">Choose from the list. / Wähle aus der Liste.</string>
+    <string id="AllgemeinPrompt">Choose from the list.</string>
     
-     <string id="xDripSpikeTitle">Choose your data source?</string>
+    <string id="xDripSpikeTitle">BG Data Source</string>
     <string id="opt_xDripSpike_1">xDrip+ (Android only)</string>
     <string id="opt_xDripSpike_2">Spike (iOS only)</string>
     <string id="opt_xDripSpike_3">Nightscout URL (mobile data connection required)</string>
@@ -12,7 +12,7 @@
     <string id="URLTitle">Nightscout URL (if previously selected)</string>
     <string id="URLPrompt">URL WITHOUT [https://] and [/api/v1] (subdomain.herokuapp.com)</string>
     
-    <string id="EinheitenTitle">mg/dl or/oder mmol/l?</string>
+    <string id="EinheitenTitle">mg/dl or mmol/l?</string>
     <string id="opt_einheit_2">Set by app</string>
     <string id="opt_einheit_0">mg/dl</string>
     <string id="opt_einheit_1">mmol/l</string>
@@ -34,10 +34,6 @@
     <string id="opt_zielbereich_14">180 mg/dl | 10,0 mmol</string>
     <string id="opt_zielbereich_15">190 mg/dl | 10,5 mmol</string>
     <string id="opt_zielbereich_16">200 mg/dl | 11,1 mmol</string>
-    
-    <string id="BasalorCOBTitel">Show Basal or COB (if COB > 0, AAPS only)</string>
-    <string id="opt_Basal">Show Basal always</string>
-    <string id="opt_COB">Show COB (if COB > 0) or Basal</string>
     
     <string id="DelayTitel">Adjustment of the request delay</string>
     <string id="opt_delay_3">-10 sec.</string>

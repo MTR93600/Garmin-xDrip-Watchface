@@ -44,12 +44,6 @@
                <listEntry value="200">@Rez.Strings.opt_zielbereich_16</listEntry>
            </settingConfig>
 	</setting>
-	<setting propertyKey="@Properties.BasalorCOB" title="@Strings.BasalorCOBTitel" prompt="@Strings.AllgemeinPrompt">
-           <settingConfig type="list">
-               <listEntry value="0">@Rez.Strings.opt_Basal</listEntry>
-               <listEntry value="1">@Rez.Strings.opt_COB</listEntry>
-           </settingConfig>
-	</setting>
 	<setting propertyKey="@Properties.Delay" title="@Strings.DelayTitel" prompt="@Strings.AllgemeinPrompt">
            <settingConfig type="list">
                <listEntry value="-10">@Rez.Strings.opt_delay_3</listEntry>
