@@ -7,11 +7,11 @@ var fehler, fehler_code = "";
 var delay = 20;
 var adjustTime = true;
 var zielbereichLow, zielbereichHigh;
-var basalorcob;
 var energy = 1;
 var eco = 0;
 var punkte;
 var calculation = true;
+var nextTime;
 
 //BTL
 var isBackground = false;
@@ -65,28 +65,23 @@ class CGMWatchfaceApp extends App.AppBase {
         //BTL
         //Indicate we are no longer in the background, so we can store data in the object store
         isBackground = false;
-
-        adjustTime = false;
         fehler = data.toString().substring(0,1).equals("[") ? false : true;
+        var lastTime = Background.getLastTemporalEventTime();
         if( fehler == false && data != null && data instanceof Toybox.Lang.Array && data.size() > 0 && data[0]["date"] != null ) {
             punkte = data;
             calculation = true;
             var differenz = Time.now().value() - data[0]["date"]/1000;
-            if( differenz != null && differenz > (30 + delay) && differenz < 300 ) {
-                duration = new Time.Duration(600 - differenz + 15 + delay);
+            if( differenz != null && differenz > (35 + delay) && differenz < 300 ) {
                 adjustTime = true;
-                energy = 1;
+                duration = new Time.Duration(600 - differenz + 15 + delay);
             } else {
+                adjustTime = false;
                 var delta_errechnet;
                 if( data.size() > 1 && data[0]["sgv"] != null && data[0]["date"] != null && data[1]["sgv"] != null && data[1]["date"] != null  && punkte[0]["date"] > punkte[1]["date"] ) {
                     delta_errechnet = ( data[0]["sgv"] - data[1]["sgv"] ) / ( (data[0]["date"] - data[1]["date"]) * 0.001 )  * 5 * 60;
                     //ecoMode
                     if( eco == 1 ) {
-                        if( (data[0]["sgv"] < 120 && delta_errechnet <= -5) || delta_errechnet <= -10 || data[0]["sgv"] < 90  ) {
-                            energy = 1;
-                        } else {
-                            energy = 2;
-                        }
+                        energy = (data[0]["sgv"] < 120 && delta_errechnet <= -5) || delta_errechnet <= -10 || data[0]["sgv"] < 90 ? 1 : 2;
                     } else {
                         energy = 1;
                     }
@@ -94,30 +89,14 @@ class CGMWatchfaceApp extends App.AppBase {
                     delta_errechnet = null;
                     energy = 1;
                 }
-                if( differenz != null && differenz < (10 + delay) ) {
-                    duration = new Time.Duration(energy * 5 * 60 + 15 + delay);
-                } else {
-                    duration = new Time.Duration(energy * 5 * 60);
-                }
+                duration = differenz != null && differenz < (10 + delay) ? new Time.Duration(energy * 5 * 60 + 15 + delay) : new Time.Duration(energy * 5 * 60);
             }
-            var lastTime = Background.getLastTemporalEventTime();
-            if (lastTime != null ) {
-                var nextTime = lastTime.add(duration);
-                Background.registerForTemporalEvent(nextTime);
-            } else {
-                Background.registerForTemporalEvent(Time.now());
-            }
+            nextTime = lastTime != null ? lastTime.add(duration) : Time.now();
         } else {
             fehler_code = data;
-            var lastTime = Background.getLastTemporalEventTime();
-            if (lastTime != null) {
-                var nextTime = lastTime.add(new Time.Duration(5 * 60));
-                Background.registerForTemporalEvent(nextTime);
-            } else {
-                Background.registerForTemporalEvent(Time.now());
-            }
-            energy = 1;
+            nextTime = lastTime != null ? lastTime.add(new Time.Duration(5 * 60)) : Time.now();
         }
+        Background.registerForTemporalEvent(nextTime);
     }
 
     function getServiceDelegate(){
@@ -129,13 +108,11 @@ class CGMWatchfaceApp extends App.AppBase {
         masseinheit = App.getApp().getProperty("Einheiten").toNumber();
         zielbereichLow = App.getApp().getProperty("Zielbereich1").toNumber();
         zielbereichHigh = App.getApp().getProperty("Zielbereich2").toNumber();
-        basalorcob = App.getApp().getProperty("BasalorCOB").toNumber();
         delay = App.getApp().getProperty("Delay").toNumber();
         eco = App.getApp().getProperty("eco").toNumber();
         if( masseinheit == null || masseinheit == 2 ) { masseinheit = 0; }
         if( zielbereichLow == null ) { zielbereichLow = 70; }
         if( zielbereichHigh == null ) { zielbereichHigh = 180; }
-        if( basalorcob == null ) { basalorcob = 0; }
         if( delay == null ) { delay = 0; }
         if( eco == null ) { eco = 0; }
     }

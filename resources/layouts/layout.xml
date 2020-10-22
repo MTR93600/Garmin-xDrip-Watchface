@@ -1,10 +1,10 @@
 <layout id="WatchFace">
     <drawable class="Background" />
     <label id="TimeLabel" font="Gfx.FONT_NUMBER_MEDIUM" justification="Gfx.TEXT_JUSTIFY_RIGHT" color="Gfx.COLOR_WHITE" />
-    <label id="DateLabel" font="Gfx.FONT_SMALL" justification="Gfx.TEXT_JUSTIFY_RIGHT" color="Gfx.COLOR_WHITE" />
+    <label id="DateLabel" font="Gfx.FONT_MEDIUM" justification="Gfx.TEXT_JUSTIFY_RIGHT" color="Gfx.COLOR_WHITE" />
     <label id="verzLabel" font="Gfx.FONT_SMALL" justification="Gfx.TEXT_JUSTIFY_LEFT" color="Gfx.COLOR_WHITE" />
     <label id="sgvLabel" font="Gfx.FONT_NUMBER_MEDIUM" justification="Gfx.TEXT_JUSTIFY_LEFT" color="Gfx.COLOR_WHITE" />
-    <label id="deltaLabel" font="Gfx.FONT_MEDIUM" justification="Gfx.TEXT_JUSTIFY_LEFT  | Gfx.TEXT_JUSTIFY_VCENTER" color="Gfx.COLOR_WHITE" />
+    <label id="deltaLabel" font="Gfx.FONT_MEDIUM" justification="Gfx.TEXT_JUSTIFY_LEFT" color="Gfx.COLOR_WHITE" />
     <label id="basalLabel" font="Gfx.FONT_SMALL" justification="Gfx.TEXT_JUSTIFY_LEFT" color="Gfx.COLOR_WHITE" />
     <label id="iobLabel" font="Gfx.FONT_SMALL" justification="Gfx.TEXT_JUSTIFY_LEFT" color="Gfx.COLOR_WHITE" />
     <label id="cobLabel" font="Gfx.FONT_SMALL" justification="Gfx.TEXT_JUSTIFY_LEFT" color="Gfx.COLOR_WHITE" />
