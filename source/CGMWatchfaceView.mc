@@ -340,9 +340,9 @@ class CGMWatchfaceView extends Ui.WatchFace {
         //! Ui without layout.xml
         // Balken
         if( punkte != null && punkte instanceof Lang.Array  && punkte[0]["sgv"] != null && zielbereichLow <= punkte[0]["sgv"] && punkte[0]["sgv"] <= zielbereichHigh ) {
-            dc.setColor(Gfx.COLOR_DK_GREEN, Gfx.COLOR_TRANSPARENT);
+            dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT);
         } else {
-            dc.setColor(Gfx.COLOR_DK_RED, Gfx.COLOR_TRANSPARENT);
+            dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
         }
         dc.setPenWidth(8);
         dc.drawLine(
@@ -410,13 +410,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
             xGraph = 0;
             breiteGraph = hWidth - constSpaceBar;
         }
-        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_WHITE);
+        /*dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_WHITE);
         dc.fillRectangle(
             xGraph,
             hHeight+8,
             breiteGraph,
             hoeheGraph
-        );
+        );*/
         if( punkte != null && punkte instanceof Lang.Array ) {
             var now = Time.now().value();
             var lowValue = 1000, highValue = 0;
@@ -434,6 +434,33 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 factorY = 1/(difference+10).toFloat(); // 1/200
                 graphCorr = 5;
             }
+            // Begrenzung
+            dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_LT_GRAY);
+            dc.setPenWidth(1);
+            dc.drawLine(
+                    xGraph,
+                    hHeight + 8 + hoeheGraph,
+                    breiteGraph + xGraph,
+                    hHeight + 8 + hoeheGraph
+                );
+            dc.drawLine(
+                    xGraph,
+                    hHeight + 8,
+                    breiteGraph + xGraph,
+                    hHeight + 8
+                );
+            dc.drawLine(
+                breiteGraph + xGraph,
+                hHeight + 8,
+                breiteGraph + xGraph,
+                hHeight + 8 + hoeheGraph
+            );
+            dc.drawLine(
+                xGraph,
+                hHeight + 8,
+                xGraph,
+                hHeight + 8 + hoeheGraph
+            );
             //In range lines
             dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_DK_GRAY);
             dc.setPenWidth(4);
@@ -445,13 +472,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     breiteGraph + xGraph,
                     hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY))
                 );
-            } else {
-                dc.drawLine(
-                    xGraph,
-                    hHeight + 8 + hoeheGraph,
-                    breiteGraph + xGraph,
-                    hHeight + 8 + hoeheGraph
-                );
             }
             plotSGV = (zielbereichHigh - lowValue) + graphCorr;
             if( hoeheGraph > plotSGV * (hoeheGraph*factorY) ) {
@@ -460,13 +480,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY)),
                     breiteGraph + xGraph,
                     hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY))
-                );
-            } else if( 0 < plotSGV * (hoeheGraph*factorY) ) {
-                dc.drawLine(
-                    xGraph,
-                    hHeight + 8,
-                    breiteGraph + xGraph,
-                    hHeight + 8
                 );
             }
             dc.setPenWidth(1);
@@ -479,9 +492,9 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     var plotBreite = breiteGraph - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (breiteGraph-3) * factorX) );
                     var plotHoehe = hoeheGraph - ( plotSGV * ((hoeheGraph)*factorY));
                     if( zielbereichLow <= punkte[i]["sgv"] && punkte[i]["sgv"] <= zielbereichHigh ) {
-                        dc.setColor(Gfx.COLOR_DK_GREEN, Gfx.COLOR_TRANSPARENT);
+                        dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT);
                     } else {
-                        dc.setColor(Gfx.COLOR_DK_RED, Gfx.COLOR_TRANSPARENT);
+                        dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
                     }
                     if( 0 < plotBreite - 3 ) {
                         dc.fillCircle(
