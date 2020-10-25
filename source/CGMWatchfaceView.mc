@@ -437,29 +437,11 @@ class CGMWatchfaceView extends Ui.WatchFace {
             // Begrenzung
             dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_LT_GRAY);
             dc.setPenWidth(1);
-            dc.drawLine(
-                    xGraph,
-                    hHeight + 8 + hoeheGraph,
-                    breiteGraph + xGraph,
-                    hHeight + 8 + hoeheGraph
-                );
-            dc.drawLine(
-                    xGraph,
-                    hHeight + 8,
-                    breiteGraph + xGraph,
-                    hHeight + 8
-                );
-            dc.drawLine(
-                breiteGraph + xGraph,
-                hHeight + 8,
-                breiteGraph + xGraph,
-                hHeight + 8 + hoeheGraph
-            );
-            dc.drawLine(
+            dc.drawRectangle(
                 xGraph,
                 hHeight + 8,
-                xGraph,
-                hHeight + 8 + hoeheGraph
+                breiteGraph,
+                hoeheGraph
             );
             //In range lines
             dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_DK_GRAY);
