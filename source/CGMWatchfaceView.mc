@@ -135,6 +135,16 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 } else {
                     delta_errechnet = null;
                 }
+                // Calculate Trend Arrow
+                if( delta_errechnet ) {
+                    if( delta_errechnet <= -17.5 ) { auswahlPfeil = "DoubleDown"; }
+                    else if( delta_errechnet <= -10 ) { auswahlPfeil = "SingleDown"; }
+                    else if( delta_errechnet <= -5 ) { auswahlPfeil = "FortyFiveDown"; }
+                    else if( delta_errechnet <= 5 ) { auswahlPfeil = "Flat"; }
+                    else if( delta_errechnet <= 10 ) { auswahlPfeil = "FortyFiveUp"; }
+                    else if( delta_errechnet <= 17.5 ) { auswahlPfeil = "SingleUp"; }
+                    else { auswahlPfeil = "DoubleUp"; }
+                }
                 if( masseinheit != null && masseinheit == 1 ) {
                     // mmol
                     anzeigeSGV =  punkte[0]["sgv"] ? (0.05556 * punkte[0]["sgv"]).format("%.1f").toString() : "--";
@@ -156,16 +166,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     } else {
                         anzeigeDelta = "--";
                     }
-                }
-                // Calculate Trend Arrow
-                if( delta_errechnet ) {
-                    if( delta_errechnet <= -17.5 ) { auswahlPfeil = "DoubleDown"; }
-                    else if( delta_errechnet <= -10 ) { auswahlPfeil = "SingleDown"; }
-                    else if( delta_errechnet <= -5 ) { auswahlPfeil = "FortyFiveDown"; }
-                    else if( delta_errechnet <= 5 ) { auswahlPfeil = "Flat"; }
-                    else if( delta_errechnet <= 10 ) { auswahlPfeil = "FortyFiveUp"; }
-                    else if( delta_errechnet <= 17.5 ) { auswahlPfeil = "SingleUp"; }
-                    else { auswahlPfeil = "DoubleUp"; }
                 }
 
                 // AAPS
@@ -434,7 +434,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 factorY = 1/(difference+10).toFloat(); // 1/200
                 graphCorr = 5;
             }
-            // Begrenzung
+            // Border Graph Area
             dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_LT_GRAY);
             dc.setPenWidth(1);
             dc.drawRectangle(
