@@ -174,7 +174,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 //punkte[0]["aaps"] = "240% 10,06U(8.27|8.34) -17,24 0g";
                 //punkte[0]["aaps"] = "0,85U/h -0,36U(8.27|8.34) -17,24 35g";
                 //punkte[0]["aaps"] = "1,81U -1,35 11g";
-                //punkte[0]["aaps"] = "Loop deaktiviert\n0,46(0,46|0,00)";
+                //punkte[0]["aaps"] = "Loop deaktiviert\n0,46U(0,46|0,00)";
                 //punkte[0]["aaps"] = null;
                 noAAPS = true;
                 if( punkte[0]["aaps"] != null ) {
@@ -185,7 +185,11 @@ class CGMWatchfaceView extends Ui.WatchFace {
                         anzeigeIOB = "-- U";
                         anzeigeCOB = "-- g";
                         anzeigeBasal = "--%";
-                        if( aaps.equals("No Status") == false && aaps.find("oop") == null ) {
+                        var deleteText = aaps.find("\n");
+                        if( deleteText != null ) {
+                            aaps = aaps.substring(deleteText+1,aaps.length());
+                        }
+                        if( aaps.equals("No Status") == false) {
                             index1 = aaps.find(" ");
                             index2 = aaps.find("%");
                             index3 = aaps.find("U/h");
