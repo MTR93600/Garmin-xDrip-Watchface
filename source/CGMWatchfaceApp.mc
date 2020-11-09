@@ -69,6 +69,7 @@ class CGMWatchfaceApp extends App.AppBase {
         var lastTime = Background.getLastTemporalEventTime();
         if( fehler == false && data != null && data instanceof Toybox.Lang.Array && data.size() > 0 && data[0]["date"] != null ) {
             punkte = data;
+            App.Storage.setValue("punkteWatchface", punkte);
             calculation = true;
             var differenz = Time.now().value() - data[0]["date"]/1000;
             if( differenz != null && differenz > (35 + delay) && differenz < 300 ) {
