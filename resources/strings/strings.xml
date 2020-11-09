@@ -44,6 +44,12 @@
     <string id="opt_delay_8">+40 sec.</string>
     <string id="opt_delay_9">+50 sec.</string>
     <string id="opt_delay_10">+60 sec.</string>
+    <string id="opt_delay_11">+70 sec.</string>
+    <string id="opt_delay_12">+80 sec.</string>
+    <string id="opt_delay_13">+90 sec.</string>
+    <string id="opt_delay_14">+100 sec.</string>
+    <string id="opt_delay_15">+110 sec.</string>
+    <string id="opt_delay_16">+120 sec.</string>
     
     <string id="ecoTitle">ecoMode (reduces queries if bg is stable)</string>
     <string id="opt_eco_1">Request usually after 5 min</string>

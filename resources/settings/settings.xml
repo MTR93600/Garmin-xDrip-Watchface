@@ -54,6 +54,12 @@
                <listEntry value="40">@Rez.Strings.opt_delay_8</listEntry>
                <listEntry value="50">@Rez.Strings.opt_delay_9</listEntry>
                <listEntry value="60">@Rez.Strings.opt_delay_10</listEntry>
+               <listEntry value="70">@Rez.Strings.opt_delay_11</listEntry>
+               <listEntry value="80">@Rez.Strings.opt_delay_12</listEntry>
+               <listEntry value="90">@Rez.Strings.opt_delay_13</listEntry>
+               <listEntry value="100">@Rez.Strings.opt_delay_14</listEntry>
+               <listEntry value="110">@Rez.Strings.opt_delay_15</listEntry>
+               <listEntry value="120">@Rez.Strings.opt_delay_16</listEntry>                            
            </settingConfig>
 	</setting>
 		<setting propertyKey="@Properties.eco" title="@Strings.ecoTitle" prompt="@Strings.AllgemeinPrompt">
