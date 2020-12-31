@@ -33,7 +33,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         height = dc.getHeight();
         width = dc.getWidth();
         hHeight = height/2;
-        hWidth = width/2;
+        hWidth = width/2 + 2;
         constSpace = 5;
         constSpaceBar = 4+8;
         constAscentFontSmall = dc.getFontAscent(Gfx.FONT_SMALL);
