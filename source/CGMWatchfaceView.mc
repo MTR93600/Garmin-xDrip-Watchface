@@ -84,7 +84,9 @@ class CGMWatchfaceView extends Ui.WatchFace {
         var datum = info.day_of_week.substring(0,3) + " " + info.day;
         var hours = clockTime.hour;
         if( !Sys.getDeviceSettings().is24Hour ) {
-            if (hours > 12) {
+            if (hours == 0) {
+                hours = 12;
+            } else if (hours > 12) {
                 hours = hours - 12;
             }
         }
