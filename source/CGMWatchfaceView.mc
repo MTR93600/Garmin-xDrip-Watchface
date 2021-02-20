@@ -637,28 +637,22 @@ class CGMWatchfaceView extends Ui.WatchFace {
             }
             if( showActivity == 1 && heartrate != null && stairs != null) {
                 dc.drawText(
-                    hWidth-constSpaceBar,
+                    hWidth-20-constSpace,
                     hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
                     Gfx.FONT_SMALL,
                     heartrate.toString(),
                     Gfx.TEXT_JUSTIFY_RIGHT
                 );
-                var bmp = Ui.loadResource(Rez.Drawables.heart);
-                dc.drawBitmap(
-                    hWidth-constSpaceBar-dc.getTextWidthInPixels(heartrate.toString(), Gfx.FONT_SMALL)-15-constSpace,
-                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+constSpace,
-                    bmp
-                );
                 dc.drawText(
-                    hWidth+constSpaceBar,
+                    hWidth+19+constSpace,
                     hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
                     Gfx.FONT_SMALL,
                     stairs.toString(),
                     Gfx.TEXT_JUSTIFY_LEFT
                 );
-                bmp = Ui.loadResource(Rez.Drawables.stairs);
+                var bmp = Ui.loadResource(Rez.Drawables.heart_stairs);
                 dc.drawBitmap(
-                    hWidth+constSpaceBar+dc.getTextWidthInPixels(stairs.toString(), Gfx.FONT_SMALL)+constSpace,
+                    hWidth-20,
                     hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+constSpace,
                     bmp
                 );
