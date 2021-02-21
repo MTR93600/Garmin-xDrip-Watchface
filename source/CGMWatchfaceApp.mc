@@ -8,6 +8,7 @@ var delay = 20;
 var adjustTime = true;
 var zielbereichLow, zielbereichHigh;
 var energy = 1;
+var pinfit = 0;
 var eco = 0;
 var punkte;
 var calculation = true;
@@ -110,12 +111,14 @@ class CGMWatchfaceApp extends App.AppBase {
         zielbereichLow = App.getApp().getProperty("Zielbereich1").toNumber();
         zielbereichHigh = App.getApp().getProperty("Zielbereich2").toNumber();
         delay = App.getApp().getProperty("Delay").toNumber();
+        pinfit = App.getApp().getProperty("pinfit").toNumber();
         eco = App.getApp().getProperty("eco").toNumber();
-        if( masseinheit == null || masseinheit == 2 ) { masseinheit = 0; }
+        if( masseinheit == null ) { masseinheit = 0; }
         if( zielbereichLow == null ) { zielbereichLow = 70; }
         if( zielbereichHigh == null ) { zielbereichHigh = 180; }
-        if( delay == null ) { delay = 0; }
+        if( delay == null ) { delay = 20; }
         if( eco == null ) { eco = 0; }
+        if( pinfit == null ) { pinfit = 0; }
     }
 
 }

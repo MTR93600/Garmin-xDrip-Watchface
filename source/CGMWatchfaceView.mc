@@ -44,12 +44,14 @@ class CGMWatchfaceView extends Ui.WatchFace {
         zielbereichLow = App.getApp().getProperty("Zielbereich1").toNumber();
         zielbereichHigh = App.getApp().getProperty("Zielbereich2").toNumber();
         delay = App.getApp().getProperty("Delay").toNumber();
+        pinfit = App.getApp().getProperty("pinfit").toNumber();
         eco = App.getApp().getProperty("eco").toNumber();
         if( masseinheit == null ) { masseinheit = 0; }
         if( zielbereichLow == null ) { zielbereichLow = 70; }
         if( zielbereichHigh == null ) { zielbereichHigh = 180; }
         if( delay == null ) { delay = 20; }
         if( eco == null ) { eco = 0; }
+        if( pinfit == null ) { pinfit = 0; }
     }
 
     // Called when this View is brought to the foreground. Restore
@@ -600,12 +602,19 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 Gfx.TEXT_JUSTIFY_CENTER
             );
         } else {
-            if( now.value() >= counterActivityAnzeige + 5 ) {
+            if( pinfit == 0 && now.value() >= counterActivityAnzeige + 5 ) {
                 counterActivityAnzeige = now.value();
                 showActivity += 1;
                 if( showActivity > 2 ) { showActivity = 1; }
                 if( heartrate == null && showActivity == 1) { showActivity = 2; }
                 if( steps == null && showActivity == 2) { showActivity = 1; }
+            } else if ( pinfit != 0 ) {
+                if ( pinfit == 1 ) {
+                    showActivity = 1;
+                    stairs = null;
+                } else {
+                    showActivity = 2;
+                }
             }
             if( showActivity == 1 && heartrate != null && stairs == null) {
                 dc.drawText(

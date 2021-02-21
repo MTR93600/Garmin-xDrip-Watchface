@@ -62,7 +62,14 @@
                <listEntry value="120">@Rez.Strings.opt_delay_16</listEntry>                            
            </settingConfig>
 	</setting>
-		<setting propertyKey="@Properties.eco" title="@Strings.ecoTitle" prompt="@Strings.AllgemeinPrompt">
+	<setting propertyKey="@Properties.pinfit" title="@Strings.pinfitTitle" prompt="@Strings.AllgemeinPrompt">
+           <settingConfig type="list">
+               <listEntry value="0">@Rez.Strings.opt_pinfit_1</listEntry>
+               <listEntry value="1">@Rez.Strings.opt_pinfit_2</listEntry> 
+               <listEntry value="2">@Rez.Strings.opt_pinfit_3</listEntry> 
+           </settingConfig>
+	</setting>
+	<setting propertyKey="@Properties.eco" title="@Strings.ecoTitle" prompt="@Strings.AllgemeinPrompt">
            <settingConfig type="list">
                <listEntry value="0">@Rez.Strings.opt_eco_1</listEntry>
                <listEntry value="1">@Rez.Strings.opt_eco_2</listEntry> 

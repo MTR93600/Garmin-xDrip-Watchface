@@ -51,6 +51,11 @@
     <string id="opt_delay_15">+110 sec.</string>
     <string id="opt_delay_16">+120 sec.</string>
     
+    <string id="pinfitTitle">AAPS only: Pin fit data and disable data rotation?</string>
+    <string id="opt_pinfit_1">Enable fit data rotation</string>
+    <string id="opt_pinfit_2">Pin heartrate</string>
+    <string id="opt_pinfit_3">Pin steps</string>
+    
     <string id="ecoTitle">ecoMode (reduces queries if bg is stable)</string>
     <string id="opt_eco_1">Request usually after 5 min</string>
     <string id="opt_eco_2">If bg is stable, a query is started every 10 min</string>
