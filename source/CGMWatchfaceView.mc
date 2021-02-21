@@ -361,11 +361,12 @@ class CGMWatchfaceView extends Ui.WatchFace {
             dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
         }
         dc.setPenWidth(8);
+        var hoeheBalken = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace);
         dc.drawLine(
             hWidth,
             0,
             hWidth,
-            hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)
+            hoeheBalken
         );
         // Horizontale Trennlinien
         dc.setPenWidth(1);
@@ -383,12 +384,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         );
         // Progress-Bar
         if( steps != null && stepGoal != null && stepGoal != 0 ) {
-            var barHeight;
-            if( noAAPS == true ) {
-                barHeight = hHeight;
-            } else {
-                barHeight = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constAscentFontSmall;
-            }
+            var barHeight = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constAscentFontSmall;
             var polygonPosition = barHeight - ( (steps * barHeight) / stepGoal);
             if( polygonPosition < -5 ) { polygonPosition = -5; }
             dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
@@ -420,13 +416,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
         xGraph = 0;
         breiteGraph = hWidth - constSpaceBar;
 
-        /*dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_WHITE);
-        dc.fillRectangle(
-            xGraph,
-            hHeight+8,
-            breiteGraph,
-            hoeheGraph
-        );*/
         if( punkte != null && punkte instanceof Lang.Array ) {
             var now = Time.now().value();
             var lowValue = 1000, highValue = 0;
@@ -603,7 +592,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constSpace+1,
                 bmp
             );
-
             dc.drawText(
                 hWidth,
                 hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,
@@ -618,7 +606,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 if( showActivity > 2 ) { showActivity = 1; }
                 if( heartrate == null && showActivity == 1) { showActivity = 2; }
                 if( steps == null && showActivity == 2) { showActivity = 1; }
-                //if( stairs == null && showActivity == 3) { showActivity = 1; }
             }
             if( showActivity == 1 && heartrate != null && stairs == null) {
                 dc.drawText(
@@ -637,32 +624,32 @@ class CGMWatchfaceView extends Ui.WatchFace {
             }
             if( showActivity == 1 && heartrate != null && stairs != null) {
                 dc.drawText(
-                    hWidth-20-constSpace,
-                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
-                    Gfx.FONT_SMALL,
+                    hWidth-16-5,
+                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)-1,
+                    Gfx.FONT_TINY,
                     heartrate.toString(),
                     Gfx.TEXT_JUSTIFY_RIGHT
                 );
                 dc.drawText(
-                    hWidth+19+constSpace,
-                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
-                    Gfx.FONT_SMALL,
+                    hWidth+16+5,
+                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)-1,
+                    Gfx.FONT_TINY,
                     stairs.toString(),
                     Gfx.TEXT_JUSTIFY_LEFT
                 );
                 var bmp = Ui.loadResource(Rez.Drawables.heart_stairs);
                 dc.drawBitmap(
-                    hWidth-20,
-                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+constSpace,
+                    hWidth-16,
+                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+constSpace-1,
                     bmp
                 );
             }
             if( showActivity == 2 && steps != null ) {
-                var kombiAnzeige = steps.toString(); // stairs != null ? steps.toString() + "~" + stairs.toString() : steps.toString();
+                var kombiAnzeige = steps.toString();
                 dc.drawText(
                     hWidth+(15+constSpace)/2,
                     hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
-                    Gfx.FONT_SMALL,
+                    Gfx.FONT_TINY,
                     kombiAnzeige,
                     Gfx.TEXT_JUSTIFY_CENTER
                 );
