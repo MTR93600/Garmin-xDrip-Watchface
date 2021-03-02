@@ -8,11 +8,11 @@ using Toybox.System as Sys;
 using Toybox.Lang as Lang;
 using Toybox.Application as App;
 using Toybox.Time.Gregorian as Gregorian;
-using Toybox.ActivityMonitor as Act;
 using Toybox.Background;
+using Toybox.ActivityMonitor;
 
 var sgv, aaps, timestamp, duration, masseinheit = 0, auswahlPfeil;
-var height, width, hHeight, hWidth;
+var height, width, hHeight, hWidth, hoeheBalken, hoeheGraph, breiteGraph;
 var constSpace, constSpaceBar, constAscentFontSmall, constAscentFontNumber, constDescentFontNumber;
 var outdatedSGV = false;
 var wert, anzeigeDelta, anzeigeFehler;
@@ -39,6 +39,9 @@ class CGMWatchfaceView extends Ui.WatchFace {
         constAscentFontSmall = dc.getFontAscent(Gfx.FONT_SMALL);
         constAscentFontNumber = dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM);
         constDescentFontNumber = dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM);
+        hoeheBalken = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace);
+        hoeheGraph = -dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constAscentFontSmall;
+        breiteGraph = hWidth - constSpaceBar;
 
         masseinheit = App.getApp().getProperty("Einheiten").toNumber();
         zielbereichLow = App.getApp().getProperty("Zielbereich1").toNumber();
@@ -105,14 +108,14 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
         // Heartrate & Steps
         // Schritte einlesen
-        var activity = Act.getInfo();
-        var steps = activity.steps;
-        var stepGoal = activity.stepGoal;
+        var activity = ActivityMonitor.getInfo();
+        var steps = activity has :steps ? activity.steps : null;
+        var stepGoal = activity has :stepGoal ? activity.stepGoal : null;
         var stairs = activity has :floorsClimbed ? activity.floorsClimbed : null;
         // Heartrate einlesen
         var heartrate;
-        if (Act has :getHeartRateHistory) {
-            var hrHistory =  Act.getHeartRateHistory(1, true);
+        if (ActivityMonitor has :getHeartRateHistory) {
+            var hrHistory =  ActivityMonitor.getHeartRateHistory(1, true);
             heartrate = hrHistory.next().heartRate;
             if( heartrate == ActivityMonitor.INVALID_HR_SAMPLE ) { // Plausibilität des Wertes prüfen
                 heartrate = null; // Wenn nicht plausibel, Variable leeren
@@ -124,6 +127,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         // CGM Daten verarbeiten
         if( punkte != null && punkte instanceof Lang.Array && punkte.size() > 0 ) {
             //Sys.println("CGM Daten");
+            anzeigeFehler = "";
             if( calculation == true ) {
                 calculation = false;
                 // Units: mmol/l or mg/dl
@@ -140,7 +144,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     delta_errechnet = null;
                 }
                 // Calculate Trend Arrow
-                if( delta_errechnet ) {
+                if( delta_errechnet != null ) {
                     if( delta_errechnet <= -17.5 ) { auswahlPfeil = "DoubleDown"; }
                     else if( delta_errechnet <= -10 ) { auswahlPfeil = "SingleDown"; }
                     else if( delta_errechnet <= -5 ) { auswahlPfeil = "FortyFiveDown"; }
@@ -149,27 +153,22 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     else if( delta_errechnet <= 17.5 ) { auswahlPfeil = "SingleUp"; }
                     else { auswahlPfeil = "DoubleUp"; }
                 }
-                if( masseinheit != null && masseinheit == 1 ) {
+                // SGV and Delta
+                if( masseinheit != null && masseinheit == 1 && delta_errechnet != null ) {
                     // mmol
                     anzeigeSGV =  punkte[0]["sgv"] ? (0.05556 * punkte[0]["sgv"]).format("%.1f").toString() : "--";
                     // Delta in mmol, in String umwandeln, bei positiven Werten + davor
-                    if( delta_errechnet != null ) {
-                        delta_errechnet = 0.05556 * delta_errechnet;
-                        anzeigeDelta = delta_errechnet > 0 ? "+" : "";
-                        anzeigeDelta += delta_errechnet.format("%.1f");
-                    } else {
-                        anzeigeDelta = "--";
-                    }
-                } else {
+                    delta_errechnet = 0.05556 * delta_errechnet;
+                    anzeigeDelta = delta_errechnet > 0 ? "+" : "";
+                    anzeigeDelta += delta_errechnet.format("%.1f");
+                } else if( delta_errechnet != null ) {
                     // mg
                     anzeigeSGV = punkte[0]["sgv"] != null ? punkte[0]["sgv"].toString() : "--";
                     // Delta in String umwandeln, bei positiven Werten + davor
-                    if( delta_errechnet != null ) {
-                        anzeigeDelta = delta_errechnet > 0 ? "+" : "";
-                        anzeigeDelta += delta_errechnet.format("%.0f");
-                    } else {
-                        anzeigeDelta = "--";
-                    }
+                    anzeigeDelta = delta_errechnet > 0 ? "+" : "";
+                    anzeigeDelta += delta_errechnet.format("%.0f");
+                } else {
+                    anzeigeDelta = "--";
                 }
 
                 // AAPS
@@ -228,18 +227,15 @@ class CGMWatchfaceView extends Ui.WatchFace {
                             }
                         }
                     }
-                } else {
-                    noAAPS = true;
-                }
-                if( punkte[0]["aaps-ts"] != null) { // Meldung AAPS Status nicht aktuell
-                    var verzoegerungAAPS = minutesFromTimestamp(Time.now().value(), punkte[0]["aaps-ts"]);
-                    if( verzoegerungAAPS != null && verzoegerungAAPS > 20 ) {
-                        anzeigeIOB = "-- U";
-                        anzeigeCOB = "-- g";
-                        anzeigeBasal = "--%";
+                    if( punkte[0]["aaps-ts"] != null) { // Meldung AAPS Status nicht aktuell
+                        var verzoegerungAAPS = minutesFromTimestamp(Time.now().value(), punkte[0]["aaps-ts"]);
+                        if( verzoegerungAAPS != null && verzoegerungAAPS > 20 ) {
+                            anzeigeIOB = "-- U";
+                            anzeigeCOB = "-- g";
+                            anzeigeBasal = "--%";
+                        }
                     }
                 }
-                anzeigeFehler = "";
             }
 
             // Delay in minutes, proof if SGV is outdated
@@ -363,7 +359,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
             dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
         }
         dc.setPenWidth(8);
-        var hoeheBalken = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace);
         dc.drawLine(
             hWidth,
             0,
@@ -412,12 +407,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
         }
 
         // Graph
-        var hoeheGraph = -dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constAscentFontSmall;
-        var xGraph, breiteGraph;
-
-        xGraph = 0;
-        breiteGraph = hWidth - constSpaceBar;
-
         if( punkte != null && punkte instanceof Lang.Array ) {
             var now = Time.now().value();
             var lowValue = 1000, highValue = 0;
@@ -439,7 +428,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_LT_GRAY);
             dc.setPenWidth(1);
             dc.drawRectangle(
-                xGraph,
+                0,
                 hHeight + 8,
                 breiteGraph,
                 hoeheGraph
@@ -450,18 +439,18 @@ class CGMWatchfaceView extends Ui.WatchFace {
             plotSGV = (zielbereichLow - lowValue) + graphCorr;
             if( 0 < plotSGV * (hoeheGraph*factorY) ) {
                 dc.drawLine(
-                    xGraph,
+                    0,
                     hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY)),
-                    breiteGraph + xGraph,
+                    breiteGraph,
                     hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY))
                 );
             }
             plotSGV = (zielbereichHigh - lowValue) + graphCorr;
             if( hoeheGraph > plotSGV * (hoeheGraph*factorY) ) {
                 dc.drawLine(
-                    xGraph,
+                    0,
                     hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY)),
-                    breiteGraph + xGraph,
+                    breiteGraph,
                     hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY))
                 );
             }
@@ -481,7 +470,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     }
                     if( 0 < plotBreite - 3 ) {
                         dc.fillCircle(
-                            xGraph+plotBreite,
+                            plotBreite,
                             height*0.5 + 9 + plotHoehe,
                             3
                         );
@@ -494,7 +483,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( anzeigeFehler != null ) {
             dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_WHITE);
             dc.drawText(
-                breiteGraph + xGraph - 2,
+                breiteGraph - 2,
                 hHeight+8,
                 Gfx.FONT_XTINY,
                 anzeigeFehler,
@@ -573,7 +562,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
         }
 
         // heartrate and steps
-        // change at least every 5 seconds
         dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
         if( noAAPS == true ) {
             var bmp = Ui.loadResource(Rez.Drawables.steps);
@@ -608,13 +596,11 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 if( showActivity > 2 ) { showActivity = 1; }
                 if( heartrate == null && showActivity == 1) { showActivity = 2; }
                 if( steps == null && showActivity == 2) { showActivity = 1; }
-            } else if ( pinfit != 0 ) {
-                if ( pinfit == 1 ) {
+            } else if ( pinfit == 1 ) {
                     showActivity = 1;
                     stairs = null;
-                } else {
+            } else if ( pinfit == 2 ) {
                     showActivity = 2;
-                }
             }
             if( showActivity == 1 && heartrate != null && stairs == null) {
                 dc.drawText(
@@ -627,21 +613,22 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 var bmp = Ui.loadResource(Rez.Drawables.heart);
                 dc.drawBitmap(
                     hWidth-(15+constSpace)/2-dc.getTextWidthInPixels(heartrate.toString(), Gfx.FONT_SMALL)/2,
-                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+constSpace,
+                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,
                     bmp
                 );
             }
             if( showActivity == 1 && heartrate != null && stairs != null) {
+                var heightHeartStairs = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace);
                 dc.drawText(
                     hWidth-16-5,
-                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)-1,
+                    heightHeartStairs,
                     Gfx.FONT_TINY,
                     heartrate.toString(),
                     Gfx.TEXT_JUSTIFY_RIGHT
                 );
                 dc.drawText(
                     hWidth+16+5,
-                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)-1,
+                    heightHeartStairs,
                     Gfx.FONT_TINY,
                     stairs.toString(),
                     Gfx.TEXT_JUSTIFY_LEFT
@@ -649,7 +636,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 var bmp = Ui.loadResource(Rez.Drawables.heart_stairs);
                 dc.drawBitmap(
                     hWidth-16,
-                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+constSpace-1,
+                    heightHeartStairs+4,
                     bmp
                 );
             }
@@ -665,7 +652,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 var bmp = Ui.loadResource(Rez.Drawables.steps);
                 dc.drawBitmap(
                     hWidth-(15+constSpace)/2-dc.getTextWidthInPixels(kombiAnzeige, Gfx.FONT_SMALL)/2,
-                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+constSpace,
+                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,
                     bmp
                 );
             }

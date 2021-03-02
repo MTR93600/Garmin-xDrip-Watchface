@@ -1,8 +1,8 @@
 using Toybox.Application as App;
 using Toybox.Background;
 using Toybox.System as Sys;
-using Toybox.Communications as Comm;
-using Toybox.ActivityMonitor as Act;
+using Toybox.Communications;
+using Toybox.ActivityMonitor;
 
 (:background)
 class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
@@ -15,10 +15,10 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
 
     function onTemporalEvent() {
          // Heartrate & Steps
-        var steps = Act.getInfo().steps;
+        var steps = ActivityMonitor.getInfo().steps;
         var heartrate;
-        if (Act has :getHeartRateHistory) {
-            var hrHistory =  Act.getHeartRateHistory(1, true);
+        if (ActivityMonitor has :getHeartRateHistory) {
+            var hrHistory =  ActivityMonitor.getHeartRateHistory(1, true);
             heartrate = hrHistory.next().heartRate;
             if( heartrate == ActivityMonitor.INVALID_HR_SAMPLE ) { // Plausibilität des Wertes prüfen
                 heartrate = null; // Wenn nicht plausibel, variable leeren
@@ -47,7 +47,7 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
             url = url + "&heart=" + heartrate;
         }
         //Sys.println(url);
-        Comm.makeWebRequest( url, {}, { :headers => { "Content-Type" => Comm.REQUEST_CONTENT_TYPE_URL_ENCODED }, :responseType => Comm.HTTP_RESPONSE_CONTENT_TYPE_JSON}, method(:verarbeiteWerte) );
+        Communications.makeWebRequest( url, {}, { :headers => { "Content-Type" => Communications.REQUEST_CONTENT_TYPE_URL_ENCODED }, :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON}, method(:verarbeiteWerte) );
     }
 
     function verarbeiteWerte( responseCode, data ) {
