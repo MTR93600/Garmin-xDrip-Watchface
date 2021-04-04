@@ -201,7 +201,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                             if( index2 != null ) {
                                 anzeigeBasal = aaps.substring(0,index2+1);
                             } else if( index3 != null ) {
-                                anzeigeBasal = "100%";
+                                anzeigeBasal =  aaps.substring(0,index3) + " U/h";
                             } else if( index3 == null && index4 != null ) {
                                 anzeigeBasal = "100%";
                             }
@@ -305,9 +305,9 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( noAAPS == true ) {
             anzeigeIOB = steps != null ? steps.toString() : "--";
             iobAnzeige.setColor(Gfx.COLOR_LT_GRAY);
-            anzeigeCOB = stairs != null ? stairs.toString() : "--";
+            anzeigeBasal = stairs != null ? stairs.toString() : "--";
             cobAnzeige.setColor(Gfx.COLOR_LT_GRAY);
-            anzeigeBasal = heartrate != null ? heartrate.toString() : "--";
+            anzeigeCOB = heartrate != null ? heartrate.toString() : "--";
             basalAnzeige.setColor(Gfx.COLOR_LT_GRAY);
         }
 
@@ -319,17 +319,17 @@ class CGMWatchfaceView extends Ui.WatchFace {
             );
         }
 
-        if( anzeigeCOB != null && anzeigeCOB.equals("") == false ) {
-            cobAnzeige.setText(anzeigeCOB);
-            cobAnzeige.setLocation(
+        if( anzeigeBasal != null && anzeigeBasal.equals("") == false ) {
+            basalAnzeige.setText(anzeigeBasal);
+            basalAnzeige.setLocation(
                 hWidth+constSpaceBar,
                 hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+constAscentFontSmall+constSpace
             );
         }
 
-        if( anzeigeBasal != null && anzeigeBasal.equals("") == false ) {
-            basalAnzeige.setText(anzeigeBasal);
-            basalAnzeige.setLocation(
+        if( anzeigeCOB != null && anzeigeCOB.equals("") == false ) {
+            cobAnzeige.setText(anzeigeCOB);
+            cobAnzeige.setLocation(
                 hWidth+constSpaceBar,
                 hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)
             );
@@ -572,13 +572,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
             );
             bmp = Ui.loadResource(Rez.Drawables.stairs);
             dc.drawBitmap(
-                hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeCOB, Gfx.FONT_SMALL)+5,
+                hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeBasal, Gfx.FONT_SMALL)+5,
                 hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+constAscentFontSmall+2*constSpace+1,
                 bmp
             );
             bmp = Ui.loadResource(Rez.Drawables.heart);
             dc.drawBitmap(
-                hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeBasal, Gfx.FONT_SMALL)+5,
+                hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeCOB, Gfx.FONT_SMALL)+5,
                 hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constSpace+1,
                 bmp
             );
