@@ -176,6 +176,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 //punkte[0]["aaps"] = "10,06U";
                 //punkte[0]["aaps"] = "240% 10,06U(8.27|8.34) -17,24 0g";
                 //punkte[0]["aaps"] = "0,85U/h -0,36U(8.27|8.34) -17,24 35g";
+                //punkte[0]["aaps"] = "0,85U/h -0,36U(8.27|8.34) -17,24 35(17)g";
                 //punkte[0]["aaps"] = "1,81U -1,35 11g";
                 //punkte[0]["aaps"] = "Loop deaktiviert\n0,46U(0,46|0,00)";
                 //punkte[0]["aaps"] = null;
@@ -218,7 +219,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                             // COB
                             if( aaps.find("g") != null ) {
                                 var length = aaps.length();
-                                var aapsPart2 = aaps.substring(length-6, length);
+                                var aapsPart2 = aaps.substring(length-8, length);
                                 index5 = aapsPart2.find(" ");
                                 if( index5 != null ) {
                                     var cob = aapsPart2.substring((index5+1),(aapsPart2.length()-1));
