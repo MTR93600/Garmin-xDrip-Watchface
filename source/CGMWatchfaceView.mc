@@ -409,7 +409,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
         // Graph
         if( punkte != null && punkte instanceof Lang.Array ) {
-            var now = Time.now().value();
+            now = Time.now().value();
             var lowValue = 1000, highValue = 0;
             var factorY = 0.0033; // Faktor: 1/300
             var graphCorr = 0;
@@ -447,7 +447,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 );
             }
             plotSGV = (zielbereichHigh - lowValue) + graphCorr;
-            if( hoeheGraph > plotSGV * (hoeheGraph*factorY) ) {
+            if( hoeheGraph > plotSGV * (hoeheGraph*factorY) > 0 ) {
                 dc.drawLine(
                     0,
                     hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY)),
