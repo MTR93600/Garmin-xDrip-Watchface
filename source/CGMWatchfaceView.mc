@@ -447,7 +447,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 );
             }
             plotSGV = (zielbereichHigh - lowValue) + graphCorr;
-            if( hoeheGraph > plotSGV * (hoeheGraph*factorY) > 0 ) {
+            if( hoeheGraph > plotSGV * (hoeheGraph*factorY) ) {
                 dc.drawLine(
                     0,
                     hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY)),
