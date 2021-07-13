@@ -84,8 +84,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         //Sys.println("onUpdate");
         var timeFormat = "$1$:$2$";
         var clockTime = Sys.getClockTime();
-        var now = Time.now();
-        var info = Gregorian.info(now, Time.FORMAT_MEDIUM);
+        var info = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
         var datum = info.day_of_week.substring(0,3) + " " + info.day;
         var hours = clockTime.hour;
         if( !Sys.getDeviceSettings().is24Hour ) {
@@ -100,7 +99,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         // Background-Prozess neu starten, falls gestoppt
         if( Sys has :ServiceDelegate && Sys.getDeviceSettings().phoneConnected ) {
             var lastTime = Background.getLastTemporalEventTime();
-            if (lastTime == null || ( lastTime != null && lastTime.value() < now.value() - 600) ) {
+            if (lastTime == null || ( lastTime != null && lastTime.value() < Time.now().value() - 600) ) {
                 Background.registerForTemporalEvent(Time.now());
                 adjustTime = false;
             }
@@ -409,7 +408,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
         // Graph
         if( punkte != null && punkte instanceof Lang.Array ) {
-            now = Time.now().value();
             var lowValue = 1000, highValue = 0;
             var factorY = 0.0033; // Faktor: 1/300
             var graphCorr = 0;
@@ -462,7 +460,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     plotSGV = (punkte[i]["sgv"] - lowValue) + graphCorr;
                     // Factor for stretching / compressing the values on the x-axis depending on the number of sgv values
                     var factorX = 1/(5 * punkte.size()).toFloat(); // 1 / ( 5 minutes * x readings )
-                    var plotBreite = breiteGraph - 3 - (minutesFromTimestamp(now, punkte[i]["date"]) * ( (breiteGraph-3) * factorX) );
+                    var plotBreite = breiteGraph - 3 - (minutesFromTimestamp(Time.now().value(), punkte[i]["date"]) * ( (breiteGraph-3) * factorX) );
                     var plotHoehe = hoeheGraph - ( plotSGV * ((hoeheGraph)*factorY));
                     if( zielbereichLow <= punkte[i]["sgv"] && punkte[i]["sgv"] <= zielbereichHigh ) {
                         dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT);
@@ -591,8 +589,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 Gfx.TEXT_JUSTIFY_CENTER
             );
         } else {
-            if( pinfit == 0 && now.value() >= counterActivityAnzeige + 5 ) {
-                counterActivityAnzeige = now.value();
+            if( pinfit == 0 && Time.now().value() >= counterActivityAnzeige + 5 ) {
+                counterActivityAnzeige = Time.now().value();
                 showActivity += 1;
                 if( showActivity > 2 ) { showActivity = 1; }
                 if( heartrate == null && showActivity == 1) { showActivity = 2; }
