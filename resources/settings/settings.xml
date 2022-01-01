@@ -75,4 +75,16 @@
                <listEntry value="1">@Rez.Strings.opt_eco_2</listEntry> 
            </settingConfig>
 	</setting>
+	<setting propertyKey="@Properties.FarbeZielbereich" title="@Strings.FarbeZielbereichTitle" prompt="@Strings.AllgemeinPrompt">
+           <settingConfig type="list">
+               <listEntry value="0">@Rez.Strings.opt_FarbeZielbereich_1</listEntry>
+               <listEntry value="1">@Rez.Strings.opt_FarbeZielbereich_2</listEntry> 
+           </settingConfig>
+	</setting>
+	<setting propertyKey="@Properties.FarbeAlarm" title="@Strings.FarbeAlarmTitle" prompt="@Strings.AllgemeinPrompt">
+           <settingConfig type="list">
+               <listEntry value="0">@Rez.Strings.opt_FarbeAlarm_1</listEntry>
+               <listEntry value="1">@Rez.Strings.opt_FarbeAlarm_2</listEntry> 
+           </settingConfig>
+	</setting>
 </settings>

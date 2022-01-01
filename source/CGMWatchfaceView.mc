@@ -10,6 +10,7 @@ using Toybox.Application as App;
 using Toybox.Time.Gregorian as Gregorian;
 using Toybox.Background;
 using Toybox.ActivityMonitor;
+using Toybox.Activity;
 
 var sgv, aaps, timestamp, duration, masseinheit = 0, auswahlPfeil;
 var height, width, hHeight, hWidth, hoeheBalken, hoeheGraph, breiteGraph;
@@ -21,6 +22,7 @@ var plotSGV;
 var noAAPS = true;
 var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", anzeigeCOB = "", verzoegerung;
 var showActivity = 0, counterActivityAnzeige = 0;
+var farbeZielbereich, farbeAlarm;
 
 class CGMWatchfaceView extends Ui.WatchFace {
 
@@ -80,6 +82,9 @@ class CGMWatchfaceView extends Ui.WatchFace {
         }
 
         setLayout(Rez.Layouts.WatchFace(dc));
+        farbeZielbereich = App.getApp().getProperty("FarbeZielbereich").toNumber() == 1 ? Gfx.COLOR_BLUE : Gfx.COLOR_GREEN;
+        farbeAlarm = App.getApp().getProperty("FarbeAlarm").toNumber() == 1 ? Gfx.COLOR_RED : Gfx.COLOR_YELLOW;
+
         // Get the current time and format it correctly
         //Sys.println("onUpdate");
         var timeFormat = "$1$:$2$";
@@ -113,7 +118,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         var stairs = activity has :floorsClimbed ? activity.floorsClimbed : null;
         // Heartrate einlesen
         var heartrate;
-        if (ActivityMonitor has :getHeartRateHistory) {
+        /*if (ActivityMonitor has :getHeartRateHistory) {
             var hrHistory =  ActivityMonitor.getHeartRateHistory(1, true);
             heartrate = hrHistory.next().heartRate;
             if( heartrate == ActivityMonitor.INVALID_HR_SAMPLE ) { // Plausibilität des Wertes prüfen
@@ -121,8 +126,15 @@ class CGMWatchfaceView extends Ui.WatchFace {
             }
         } else {
             heartrate = null;
+        }*/
+        heartrate = Activity.getActivityInfo().currentHeartRate;
+        if( heartrate == null && ActivityMonitor has :getHeartRateHistory) {
+            var hrIterator = ActivityMonitor.getHeartRateHistory(1, true);
+            heartrate = hrIterator.next().heartRate;
+            if ( heartrate != null && heartrate == ActivityMonitor.INVALID_HR_SAMPLE ) {   // check for invalid samples
+                heartrate = null;
+            }
         }
-
         // CGM Daten verarbeiten
         if( punkte != null && punkte instanceof Lang.Array && punkte.size() > 0 ) {
             //Sys.println("CGM Daten");
@@ -354,9 +366,9 @@ class CGMWatchfaceView extends Ui.WatchFace {
         //! Ui without layout.xml
         // Balken
         if( punkte != null && punkte instanceof Lang.Array  && punkte[0]["sgv"] != null && zielbereichLow <= punkte[0]["sgv"] && punkte[0]["sgv"] <= zielbereichHigh ) {
-            dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT);
+            dc.setColor(farbeZielbereich, Gfx.COLOR_TRANSPARENT);
         } else {
-            dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
+            dc.setColor(farbeAlarm, Gfx.COLOR_TRANSPARENT);
         }
         dc.setPenWidth(8);
         dc.drawLine(
@@ -366,7 +378,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             hoeheBalken
         );
         // Horizontale Trennlinien
-        dc.setPenWidth(1);
+        dc.setPenWidth(2);
         dc.drawLine(
             0,
             hHeight,
@@ -463,9 +475,9 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     var plotBreite = breiteGraph - 3 - (minutesFromTimestamp(Time.now().value(), punkte[i]["date"]) * ( (breiteGraph-3) * factorX) );
                     var plotHoehe = hoeheGraph - ( plotSGV * ((hoeheGraph)*factorY));
                     if( zielbereichLow <= punkte[i]["sgv"] && punkte[i]["sgv"] <= zielbereichHigh ) {
-                        dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT);
+                        dc.setColor(farbeZielbereich, Gfx.COLOR_TRANSPARENT);
                     } else {
-                        dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
+                        dc.setColor(farbeAlarm, Gfx.COLOR_TRANSPARENT);
                     }
                     if( 0 < plotBreite - 3 ) {
                         dc.fillCircle(
@@ -502,10 +514,12 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
         // Batteriestand
         var batteryLoad = Sys.getSystemStats().battery;
-        if( batteryLoad < 20 ) {
+        if( batteryLoad > 20 ) {
+            dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
+        } else if( batteryLoad > 10 ) {
             dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
         } else {
-            dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
+            dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
         }
         // Battery body
         dc.fillRoundedRectangle(

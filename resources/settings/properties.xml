@@ -7,4 +7,6 @@
     <property id="Delay" type="number">0</property>
     <property id="eco" type="number">0</property> 
     <property id="pinfit" type="number">0</property>
+    <property id="FarbeZielbereich" type="number">0</property>
+    <property id="FarbeAlarm" type="number">0</property>
 </properties>

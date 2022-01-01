@@ -60,4 +60,12 @@
     <string id="opt_eco_1">Request usually after 5 min</string>
     <string id="opt_eco_2">If bg is stable, a query is started every 10 min</string>
     
+    <string id="FarbeZielbereichTitle">Color when the blood glucose is in target range</string>
+    <string id="opt_FarbeZielbereich_1">Green</string>
+    <string id="opt_FarbeZielbereich_2">Blue</string>
+    
+    <string id="FarbeAlarmTitle">Color when the blood glucose is not in target range</string>
+    <string id="opt_FarbeAlarm_1">Yellow</string>
+    <string id="opt_FarbeAlarm_2">Red</string>    
+    
 </strings>
