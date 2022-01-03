@@ -66,6 +66,10 @@
     
     <string id="FarbeAlarmTitle">Color when the blood glucose is not in target range</string>
     <string id="opt_FarbeAlarm_1">Yellow</string>
-    <string id="opt_FarbeAlarm_2">Red</string>    
+    <string id="opt_FarbeAlarm_2">Red</string> 
+    
+    <string id="BGFarbeTitle">Colorize displayed BG?</string>
+    <string id="opt_BGFarbe_1">Yes</string>
+    <string id="opt_BGFarbe_2">No</string>      
     
 </strings>

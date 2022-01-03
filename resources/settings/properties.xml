@@ -9,4 +9,5 @@
     <property id="pinfit" type="number">0</property>
     <property id="FarbeZielbereich" type="number">0</property>
     <property id="FarbeAlarm" type="number">0</property>
+    <property id="BGFarbe" type="number">1</property>
 </properties>

@@ -22,7 +22,7 @@ var plotSGV;
 var noAAPS = true;
 var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", anzeigeCOB = "", verzoegerung;
 var showActivity = 0, counterActivityAnzeige = 0;
-var farbeZielbereich, farbeAlarm;
+var farbeZielbereich, farbeAlarm, BGFarbe;
 
 class CGMWatchfaceView extends Ui.WatchFace {
 
@@ -84,6 +84,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
         setLayout(Rez.Layouts.WatchFace(dc));
         farbeZielbereich = App.getApp().getProperty("FarbeZielbereich").toNumber() == 1 ? Gfx.COLOR_BLUE : Gfx.COLOR_GREEN;
         farbeAlarm = App.getApp().getProperty("FarbeAlarm").toNumber() == 1 ? Gfx.COLOR_RED : Gfx.COLOR_YELLOW;
+        BGFarbe = App.getApp().getProperty("BGFarbe").toNumber() == 0 ? true : false;
+
 
         // Get the current time and format it correctly
         //Sys.println("onUpdate");
@@ -302,6 +304,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
             hWidth+constSpaceBar,
             hHeight-8-constAscentFontNumber
         );
+        if( BGFarbe == true ) {
+            if( anzeigeSGV.toNumber() > zielbereichLow && anzeigeSGV.toNumber() < zielbereichHigh ) {
+                sgvAnzeige.setColor(farbeZielbereich);
+            } else {
+                sgvAnzeige.setColor(farbeAlarm);
+            }
+        }
 
         var deltaAnzeige = View.findDrawableById("deltaLabel");
         deltaAnzeige.setText(anzeigeDelta);
@@ -365,12 +374,14 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
         //! Ui without layout.xml
         // Balken
-        if( punkte != null && punkte instanceof Lang.Array  && punkte[0]["sgv"] != null && zielbereichLow <= punkte[0]["sgv"] && punkte[0]["sgv"] <= zielbereichHigh ) {
+        if( BGFarbe == true ) {
+            dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_TRANSPARENT);
+        } else if( punkte != null && punkte instanceof Lang.Array  && punkte[0]["sgv"] != null && zielbereichLow <= punkte[0]["sgv"] && punkte[0]["sgv"] <= zielbereichHigh ) {
             dc.setColor(farbeZielbereich, Gfx.COLOR_TRANSPARENT);
         } else {
             dc.setColor(farbeAlarm, Gfx.COLOR_TRANSPARENT);
         }
-        dc.setPenWidth(8);
+        dc.setPenWidth(6);
         dc.drawLine(
             hWidth,
             0,

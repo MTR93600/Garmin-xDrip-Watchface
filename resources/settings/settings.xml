@@ -87,4 +87,10 @@
                <listEntry value="1">@Rez.Strings.opt_FarbeAlarm_2</listEntry> 
            </settingConfig>
 	</setting>
+	<setting propertyKey="@Properties.BGFarbe" title="@Strings.BGFarbeTitle" prompt="@Strings.AllgemeinPrompt">
+           <settingConfig type="list">
+               <listEntry value="0">@Rez.Strings.opt_BGFarbe_1</listEntry>
+               <listEntry value="1">@Rez.Strings.opt_BGFarbe_2</listEntry> 
+           </settingConfig>
+	</setting>
 </settings>
