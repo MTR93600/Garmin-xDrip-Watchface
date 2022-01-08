@@ -93,4 +93,10 @@
                <listEntry value="1">@Rez.Strings.opt_BGFarbe_2</listEntry> 
            </settingConfig>
 	</setting>
+	<setting propertyKey="@Properties.BarsFarbe" title="@Strings.BarsFarbeTitle" prompt="@Strings.AllgemeinPrompt">
+           <settingConfig type="list">
+               <listEntry value="0">@Rez.Strings.opt_BarsFarbe_1</listEntry>
+               <listEntry value="1">@Rez.Strings.opt_BarsFarbe_2</listEntry> 
+           </settingConfig>
+	</setting>
 </settings>

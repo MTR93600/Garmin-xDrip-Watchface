@@ -72,4 +72,8 @@
     <string id="opt_BGFarbe_1">Yes</string>
     <string id="opt_BGFarbe_2">No</string>      
     
+    <string id="BarsFarbeTitle">Colorize progress bar?</string>
+    <string id="opt_BarsFarbe_1">Yes</string>
+    <string id="opt_BarsFarbe_2">No</string>
+    
 </strings>

@@ -22,7 +22,7 @@ var plotSGV;
 var noAAPS = true;
 var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", anzeigeCOB = "", verzoegerung;
 var showActivity = 0, counterActivityAnzeige = 0;
-var farbeZielbereich, farbeAlarm, BGFarbe;
+var farbeZielbereich, farbeAlarm, BGFarbe, BarsFarbe;
 
 class CGMWatchfaceView extends Ui.WatchFace {
 
@@ -85,6 +85,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         farbeZielbereich = App.getApp().getProperty("FarbeZielbereich").toNumber() == 1 ? Gfx.COLOR_BLUE : Gfx.COLOR_GREEN;
         farbeAlarm = App.getApp().getProperty("FarbeAlarm").toNumber() == 1 ? Gfx.COLOR_RED : Gfx.COLOR_YELLOW;
         BGFarbe = App.getApp().getProperty("BGFarbe").toNumber() == 0 ? true : false;
+        BarsFarbe = App.getApp().getProperty("BarsFarbe").toNumber() == 0 ? true : false;
 
 
         // Get the current time and format it correctly
@@ -374,7 +375,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
         //! Ui without layout.xml
         // Balken
-        if( BGFarbe == true ) {
+        if( BarsFarbe == false ) {
             dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_TRANSPARENT);
         } else if( punkte != null && punkte instanceof Lang.Array  && punkte[0]["sgv"] != null && zielbereichLow <= punkte[0]["sgv"] && punkte[0]["sgv"] <= zielbereichHigh ) {
             dc.setColor(farbeZielbereich, Gfx.COLOR_TRANSPARENT);

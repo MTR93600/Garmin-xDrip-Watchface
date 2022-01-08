@@ -10,4 +10,5 @@
     <property id="FarbeZielbereich" type="number">0</property>
     <property id="FarbeAlarm" type="number">0</property>
     <property id="BGFarbe" type="number">1</property>
+    <property id="BarsFarbe" type="number">0</property>
 </properties>
