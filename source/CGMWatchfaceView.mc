@@ -22,7 +22,9 @@ var plotSGV;
 var noAAPS = true;
 var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", anzeigeCOB = "", verzoegerung;
 var showActivity = 0, counterActivityAnzeige = 0;
+var showNotification = 0;
 var farbeZielbereich, farbeAlarm, BGFarbe, BarsFarbe;
+var bmp;
 
 class CGMWatchfaceView extends Ui.WatchFace {
 
@@ -50,6 +52,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         zielbereichHigh = App.getApp().getProperty("Zielbereich2").toNumber();
         delay = App.getApp().getProperty("Delay").toNumber();
         pinfit = App.getApp().getProperty("pinfit").toNumber();
+        showNotification = App.getApp().getProperty("Notification").toNumber();
         eco = App.getApp().getProperty("eco").toNumber();
         if( masseinheit == null ) { masseinheit = 0; }
         if( zielbereichLow == null ) { zielbereichLow = 70; }
@@ -57,6 +60,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( delay == null ) { delay = 20; }
         if( eco == null ) { eco = 0; }
         if( pinfit == null ) { pinfit = 0; }
+        if( showNotification == null ) { showNotification = 1; }
     }
 
     // Called when this View is brought to the foreground. Restore
@@ -188,7 +192,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 // AAPS
                 //punkte[0]["aaps"] = "No Status";
                 //punkte[0]["aaps"] = "10,06U";
-                //punkte[0]["aaps"] = "240% 10,06U(8.27|8.34) -17,24 0g";
+                punkte[0]["aaps"] = "240% 10,06U(8.27|8.34) -17,24 0g";
                 //punkte[0]["aaps"] = "0,85U/h -0,36U(8.27|8.34) -17,24 35g";
                 //punkte[0]["aaps"] = "0,85U/h -0,36U(8.27|8.34) -17,24 35(17)g";
                 //punkte[0]["aaps"] = "1,81U -1,35 11g";
@@ -560,7 +564,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
         );
 
         //Bluetooth connected
-        if( System.getDeviceSettings().phoneConnected ) {
+        var dev = Sys.getDeviceSettings();
+        if( dev.phoneConnected ) {
             var bmp = Ui.loadResource(Rez.Drawables.bluetooth);
             dc.drawBitmap(
                 hWidth-constSpaceBar-14-constSpace-15,
@@ -607,13 +612,29 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constSpace+1,
                 bmp
             );
-            dc.drawText(
-                hWidth,
-                hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,
-                Gfx.FONT_TINY,
-                ":-)",
-                Gfx.TEXT_JUSTIFY_CENTER
-            );
+            if( showNotification == 0 && dev.notificationCount > 0 ) {
+                dc.drawText(
+                    hWidth-constSpace+1,
+                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
+                    Gfx.FONT_SMALL,
+                    dev.notificationCount.toString(),
+                    Gfx.TEXT_JUSTIFY_RIGHT
+                );
+                bmp = Ui.loadResource(Rez.Drawables.notification);
+                dc.drawBitmap(
+                    hWidth+constSpace-1,
+                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+8,
+                    bmp
+                );
+            } else {
+                dc.drawText(
+                    hWidth,
+                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,
+                    Gfx.FONT_TINY,
+                    ":-)",
+                    Gfx.TEXT_JUSTIFY_CENTER
+                );
+            }
         } else {
             if( pinfit == 0 && Time.now().value() >= counterActivityAnzeige + 5 ) {
                 counterActivityAnzeige = Time.now().value();
@@ -627,7 +648,21 @@ class CGMWatchfaceView extends Ui.WatchFace {
             } else if ( pinfit == 2 ) {
                     showActivity = 2;
             }
-            if( showActivity == 1 && heartrate != null && stairs == null) {
+            if( showNotification == 0 && dev.notificationCount > 0 ) {
+                dc.drawText(
+                    hWidth-constSpace+1,
+                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
+                    Gfx.FONT_SMALL,
+                    dev.notificationCount.toString(),
+                    Gfx.TEXT_JUSTIFY_RIGHT
+                );
+                bmp = Ui.loadResource(Rez.Drawables.notification);
+                dc.drawBitmap(
+                    hWidth+constSpace-1,
+                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+8,
+                    bmp
+                );
+            } else if( showActivity == 1 && heartrate != null && stairs == null) {
                 dc.drawText(
                     hWidth+(15+constSpace)/2,
                     hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
@@ -635,14 +670,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     heartrate.toString(),
                     Gfx.TEXT_JUSTIFY_CENTER
                 );
-                var bmp = Ui.loadResource(Rez.Drawables.heart);
+                bmp = Ui.loadResource(Rez.Drawables.heart);
                 dc.drawBitmap(
                     hWidth-(15+constSpace)/2-dc.getTextWidthInPixels(heartrate.toString(), Gfx.FONT_SMALL)/2,
                     hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,
                     bmp
                 );
-            }
-            if( showActivity == 1 && heartrate != null && stairs != null) {
+            } else if( showActivity == 1 && heartrate != null && stairs != null) {
                 var heightHeartStairs = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace);
                 dc.drawText(
                     hWidth-16-5,
@@ -658,14 +692,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     stairs.toString(),
                     Gfx.TEXT_JUSTIFY_LEFT
                 );
-                var bmp = Ui.loadResource(Rez.Drawables.heart_stairs);
+                bmp = Ui.loadResource(Rez.Drawables.heart_stairs);
                 dc.drawBitmap(
                     hWidth-16,
                     heightHeartStairs+4,
                     bmp
                 );
-            }
-            if( showActivity == 2 && steps != null ) {
+            } else if( showActivity == 2 && steps != null ) {
                 var kombiAnzeige = steps.toString();
                 dc.drawText(
                     hWidth+(15+constSpace)/2,
@@ -674,7 +707,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     kombiAnzeige,
                     Gfx.TEXT_JUSTIFY_CENTER
                 );
-                var bmp = Ui.loadResource(Rez.Drawables.steps);
+                bmp = Ui.loadResource(Rez.Drawables.steps);
                 dc.drawBitmap(
                     hWidth-(15+constSpace)/2-dc.getTextWidthInPixels(kombiAnzeige, Gfx.FONT_SMALL)/2,
                     hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,

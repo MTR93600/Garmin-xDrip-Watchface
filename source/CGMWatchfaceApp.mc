@@ -112,6 +112,7 @@ class CGMWatchfaceApp extends App.AppBase {
         zielbereichHigh = App.getApp().getProperty("Zielbereich2").toNumber();
         delay = App.getApp().getProperty("Delay").toNumber();
         pinfit = App.getApp().getProperty("pinfit").toNumber();
+        showNotification = App.getApp().getProperty("Notification").toNumber();
         eco = App.getApp().getProperty("eco").toNumber();
         if( masseinheit == null ) { masseinheit = 0; }
         if( zielbereichLow == null ) { zielbereichLow = 70; }
@@ -119,6 +120,7 @@ class CGMWatchfaceApp extends App.AppBase {
         if( delay == null ) { delay = 20; }
         if( eco == null ) { eco = 0; }
         if( pinfit == null ) { pinfit = 0; }
+        if( showNotification == null ) { showNotification = 1; }
     }
 
 }

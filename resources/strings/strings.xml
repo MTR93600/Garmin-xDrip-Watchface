@@ -76,4 +76,8 @@
     <string id="opt_BarsFarbe_1">Yes</string>
     <string id="opt_BarsFarbe_2">No</string>
     
+    <string id="NotificationTitle">Show number of unread notifications, if any?</string>
+    <string id="opt_Notification_1">Yes</string>
+    <string id="opt_Notification_2">No</string>
+    
 </strings>

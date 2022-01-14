@@ -69,6 +69,12 @@
                <listEntry value="2">@Rez.Strings.opt_pinfit_3</listEntry> 
            </settingConfig>
 	</setting>
+	<setting propertyKey="@Properties.Notification" title="@Strings.NotificationTitle" prompt="@Strings.AllgemeinPrompt">
+           <settingConfig type="list">
+               <listEntry value="0">@Rez.Strings.opt_Notification_1</listEntry>
+               <listEntry value="1">@Rez.Strings.opt_Notification_2</listEntry> 
+           </settingConfig>
+	</setting>
 	<setting propertyKey="@Properties.eco" title="@Strings.ecoTitle" prompt="@Strings.AllgemeinPrompt">
            <settingConfig type="list">
                <listEntry value="0">@Rez.Strings.opt_eco_1</listEntry>
