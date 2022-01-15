@@ -23,7 +23,7 @@ var noAAPS = true;
 var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", anzeigeCOB = "", verzoegerung;
 var showActivity = 0, counterActivityAnzeige = 0;
 var showNotification = 0;
-var farbeZielbereich = 0, farbeAlarm = 0, BGFarbe = 1, BarsFarbe = 0;
+var BGFarbe = false, BarsFarbe = true;
 var bmp;
 
 class CGMWatchfaceView extends Ui.WatchFace {
@@ -84,13 +84,17 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if(isClosing){
             return;
         }
-
         setLayout(Rez.Layouts.WatchFace(dc));
+
+        var farbeZielbereich = Gfx.COLOR_GREEN, farbeAlarm = Gfx.COLOR_YELLOW;
         farbeZielbereich = App.getApp().getProperty("FarbeZielbereich").toNumber() == 1 ? Gfx.COLOR_BLUE : Gfx.COLOR_GREEN;
         farbeAlarm = App.getApp().getProperty("FarbeAlarm").toNumber() == 1 ? Gfx.COLOR_RED : Gfx.COLOR_YELLOW;
-        BGFarbe = App.getApp().getProperty("BGFarbe").toNumber() == 0 ? true : false;
-        BarsFarbe = App.getApp().getProperty("BarsFarbe").toNumber() == 0 ? true : false;
-
+        BGFarbe = App.getApp().getProperty("BGFarbe").toNumber();
+        BarsFarbe = App.getApp().getProperty("BarsFarbe").toNumber();
+        if( farbeZielbereich == null ) { farbeZielbereich = Gfx.COLOR_GREEN; }
+        if( farbeAlarm == null ) { farbeAlarm = Gfx.COLOR_YELLOW; }
+        if( BGFarbe == null ) { BGFarbe = 0; }
+        if( BarsFarbe == null ) { BarsFarbe = 0; }
 
         // Get the current time and format it correctly
         //Sys.println("onUpdate");
@@ -310,7 +314,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             hWidth+constSpaceBar,
             hHeight-8-constAscentFontNumber
         );
-        if( BGFarbe == true ) {
+        if( BGFarbe == 0 ) {
             if( anzeigeSGV.toNumber() > zielbereichLow && anzeigeSGV.toNumber() < zielbereichHigh ) {
                 sgvAnzeige.setColor(farbeZielbereich);
             } else {
@@ -380,7 +384,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
         //! Ui without layout.xml
         // Balken
-        if( BarsFarbe == false ) {
+        if( BarsFarbe == 1 ) {
             dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_TRANSPARENT);
         } else if( punkte != null && punkte instanceof Lang.Array  && punkte[0]["sgv"] != null && zielbereichLow <= punkte[0]["sgv"] && punkte[0]["sgv"] <= zielbereichHigh ) {
             dc.setColor(farbeZielbereich, Gfx.COLOR_TRANSPARENT);
