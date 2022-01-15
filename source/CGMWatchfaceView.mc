@@ -23,7 +23,7 @@ var noAAPS = true;
 var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", anzeigeCOB = "", verzoegerung;
 var showActivity = 0, counterActivityAnzeige = 0;
 var showNotification = 0;
-var farbeZielbereich, farbeAlarm, BGFarbe, BarsFarbe;
+var farbeZielbereich = 0, farbeAlarm = 0, BGFarbe = 1, BarsFarbe = 0;
 var bmp;
 
 class CGMWatchfaceView extends Ui.WatchFace {
@@ -99,7 +99,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
         var info = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
         var datum = info.day_of_week.substring(0,3) + " " + info.day;
         var hours = clockTime.hour;
-        if( !Sys.getDeviceSettings().is24Hour ) {
+        var dev = Sys.getDeviceSettings();
+        if( dev.is24Hour == false ) {
             if (hours == 0) {
                 hours = 12;
             } else if (hours > 12) {
@@ -564,7 +565,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
         );
 
         //Bluetooth connected
-        var dev = Sys.getDeviceSettings();
         if( dev.phoneConnected ) {
             var bmp = Ui.loadResource(Rez.Drawables.bluetooth);
             dc.drawBitmap(
