@@ -314,8 +314,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
             hWidth+constSpaceBar,
             hHeight-8-constAscentFontNumber
         );
-        if( BGFarbe == 0 ) {
-            if( anzeigeSGV.toNumber() > zielbereichLow && anzeigeSGV.toNumber() < zielbereichHigh ) {
+        if( BGFarbe == 0 && punkte != null && punkte instanceof Lang.Array && punkte[0]["sgv"] != null ) {
+            if( punkte[0]["sgv"] >= zielbereichLow && punkte[0]["sgv"] <= zielbereichHigh ) {
                 sgvAnzeige.setColor(farbeZielbereich);
             } else {
                 sgvAnzeige.setColor(farbeAlarm);
@@ -524,7 +524,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         }
 
         //adjustTime = true;
-        if( adjustTime != null && adjustTime == true) {
+        if( adjustTime != null && adjustTime == true && anzeigeSGV != null ) {
             var bmp = Ui.loadResource(Rez.Drawables.stopwatch);
             dc.drawBitmap(
                hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeSGV, Gfx.FONT_NUMBER_MEDIUM)+constSpace,
@@ -559,7 +559,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         );
         // Battery state
         var battery = batteryLoad * 18 / 100;
-        dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
+        dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT); // Füllung
         dc.fillRoundedRectangle(
             hWidth-constSpaceBar-14+2,
             hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-22+2,
