@@ -12,6 +12,7 @@
             <iq:product id="descentmk2"/>
             <iq:product id="descentmk2s"/>
             <iq:product id="enduro"/>
+            <iq:product id="epix2"/>
             <iq:product id="fenix5"/>
             <iq:product id="fenix5plus"/>
             <iq:product id="fenix5s"/>
@@ -23,6 +24,9 @@
             <iq:product id="fenix6s"/>
             <iq:product id="fenix6spro"/>
             <iq:product id="fenix6xpro"/>
+            <iq:product id="fenix7"/>
+            <iq:product id="fenix7s"/>
+            <iq:product id="fenix7x"/>
             <iq:product id="fenixchronos"/>
             <iq:product id="fr245"/>
             <iq:product id="fr245m"/>
@@ -46,6 +50,7 @@
             <iq:product id="marqgolfer"/>
             <iq:product id="venu"/>
             <iq:product id="venu2"/>
+            <iq:product id="venu2plus"/>
             <iq:product id="venu2s"/>
             <iq:product id="venud"/>
             <iq:product id="venusq"/>
@@ -62,6 +67,7 @@
             <iq:uses-permission id="Background"/>
             <iq:uses-permission id="Communications"/>
             <iq:uses-permission id="SensorHistory"/>
+            <iq:uses-permission id="UserProfile"/>
         </iq:permissions>
         <iq:languages/>
         <iq:barrels/>
