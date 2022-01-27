@@ -54,6 +54,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         pinfit = App.getApp().getProperty("pinfit").toNumber();
         showNotification = App.getApp().getProperty("Notification").toNumber();
         eco = App.getApp().getProperty("eco").toNumber();
+        lowPowerModeEnabled = App.getApp().getProperty("lowPowerMode").toNumber() == 0 ? true : false;
         if( masseinheit == null ) { masseinheit = 0; }
         if( zielbereichLow == null ) { zielbereichLow = 70; }
         if( zielbereichHigh == null ) { zielbereichHigh = 180; }
@@ -122,29 +123,23 @@ class CGMWatchfaceView extends Ui.WatchFace {
             }
         }
 
+
         // Heartrate & Steps
         // Schritte einlesen
-        var activity = ActivityMonitor.getInfo();
-        var steps = activity has :steps ? activity.steps : null;
-        var stepGoal = activity has :stepGoal ? activity.stepGoal : null;
-        var stairs = activity has :floorsClimbed ? activity.floorsClimbed : null;
-        // Heartrate einlesen
-        var heartrate;
-        /*if (ActivityMonitor has :getHeartRateHistory) {
-            var hrHistory =  ActivityMonitor.getHeartRateHistory(1, true);
-            heartrate = hrHistory.next().heartRate;
-            if( heartrate == ActivityMonitor.INVALID_HR_SAMPLE ) { // Plausibilität des Wertes prüfen
-                heartrate = null; // Wenn nicht plausibel, Variable leeren
-            }
-        } else {
-            heartrate = null;
-        }*/
-        heartrate = Activity.getActivityInfo().currentHeartRate;
-        if( heartrate == null && ActivityMonitor has :getHeartRateHistory) {
-            var hrIterator = ActivityMonitor.getHeartRateHistory(1, true);
-            heartrate = hrIterator.next().heartRate;
-            if ( heartrate != null && heartrate == ActivityMonitor.INVALID_HR_SAMPLE ) {   // check for invalid samples
-                heartrate = null;
+        var activity, steps, stepGoal, stairs, heartrate;
+        if( isHighPower == true || lowPowerModeEnabled == false) {
+            activity = ActivityMonitor.getInfo();
+            steps = activity has :steps ? activity.steps : null;
+            stepGoal = activity has :stepGoal ? activity.stepGoal : null;
+            stairs = activity has :floorsClimbed ? activity.floorsClimbed : null;
+            // Heartrate einlesen
+            heartrate = Activity.getActivityInfo().currentHeartRate;
+            if( heartrate == null && ActivityMonitor has :getHeartRateHistory) {
+                var hrIterator = ActivityMonitor.getHeartRateHistory(1, true);
+                heartrate = hrIterator.next().heartRate;
+                if ( heartrate != null && heartrate == ActivityMonitor.INVALID_HR_SAMPLE ) {   // check for invalid samples
+                    heartrate = null;
+                }
             }
         }
         // CGM Daten verarbeiten
@@ -176,6 +171,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     else if( delta_errechnet <= 17.5 ) { auswahlPfeil = "SingleUp"; }
                     else { auswahlPfeil = "DoubleUp"; }
                 }
+
                 // SGV and Delta
                 if( masseinheit != null && masseinheit == 1 && delta_errechnet != null ) {
                     // mmol
@@ -250,13 +246,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
                                 }
                             }
                         }
-                    }
-                    if( punkte[0]["aaps-ts"] != null) { // Meldung AAPS Status nicht aktuell
-                        var verzoegerungAAPS = minutesFromTimestamp(Time.now().value(), punkte[0]["aaps-ts"]);
-                        if( verzoegerungAAPS != null && verzoegerungAAPS > 20 ) {
-                            anzeigeIOB = "-- U";
-                            anzeigeCOB = "-- g";
-                            anzeigeBasal = "--%";
+                        if( punkte[0]["aaps-ts"] != null) { // Meldung AAPS Status nicht aktuell
+                            var verzoegerungAAPS = minutesFromTimestamp(Time.now().value(), punkte[0]["aaps-ts"]);
+                            if( verzoegerungAAPS != null && verzoegerungAAPS > 20 ) {
+                                anzeigeIOB = "-- U";
+                                anzeigeCOB = "-- g";
+                                anzeigeBasal = "--%";
+                            }
                         }
                     }
                 }
@@ -293,433 +289,454 @@ class CGMWatchfaceView extends Ui.WatchFace {
         //anzeigeBasal = "120%";
         //anzeigeIOB = "12,1";*/
 
-        // Update the view
-        var time = View.findDrawableById("TimeLabel");
-        time.setText(timeString);
-        time.setLocation(
-            hWidth-constSpaceBar,
-            hHeight-8-constAscentFontNumber
-        );
+//! HIGH POWER
+        if( isHighPower == true || lowPowerModeEnabled == false) {
+            // Update the view
+            var time = View.findDrawableById("TimeLabel");
+            time.setText(timeString);
+            time.setLocation(
+                hWidth-constSpaceBar,
+                hHeight-8-constAscentFontNumber
+            );
 
-        var date = View.findDrawableById("DateLabel");
-        date.setText(datum);
-        date.setLocation(
-            hWidth-constSpaceBar,
-            hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)
-        );
+            var date = View.findDrawableById("DateLabel");
+            date.setText(datum);
+            date.setLocation(
+                hWidth-constSpaceBar,
+                hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)
+            );
 
-        var sgvAnzeige = View.findDrawableById("sgvLabel");
-        sgvAnzeige.setText(anzeigeSGV);
-        sgvAnzeige.setLocation(
-            hWidth+constSpaceBar,
-            hHeight-8-constAscentFontNumber
-        );
-        if( BGFarbe == 0 && punkte != null && punkte instanceof Lang.Array && punkte[0]["sgv"] != null ) {
-            if( punkte[0]["sgv"] >= zielbereichLow && punkte[0]["sgv"] <= zielbereichHigh ) {
-                sgvAnzeige.setColor(farbeZielbereich);
+            var sgvAnzeige = View.findDrawableById("sgvLabel");
+            sgvAnzeige.setText(anzeigeSGV);
+            sgvAnzeige.setLocation(
+                hWidth+constSpaceBar,
+                hHeight-8-constAscentFontNumber
+            );
+            if( BGFarbe == 0 && punkte != null && punkte instanceof Lang.Array && punkte[0]["sgv"] != null ) {
+                if( punkte[0]["sgv"] >= zielbereichLow && punkte[0]["sgv"] <= zielbereichHigh ) {
+                    sgvAnzeige.setColor(farbeZielbereich);
+                } else {
+                    sgvAnzeige.setColor(farbeAlarm);
+                }
+            }
+
+            var deltaAnzeige = View.findDrawableById("deltaLabel");
+            deltaAnzeige.setText(anzeigeDelta);
+            deltaAnzeige.setLocation(
+                hWidth+constSpaceBar,
+                hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)
+            );
+
+            var iobAnzeige = View.findDrawableById("iobLabel");
+            var cobAnzeige = View.findDrawableById("cobLabel");
+            var basalAnzeige = View.findDrawableById("basalLabel");
+
+            if( noAAPS == true ) {
+                anzeigeIOB = steps != null ? steps.toString() : "--";
+                iobAnzeige.setColor(Gfx.COLOR_LT_GRAY);
+                anzeigeBasal = stairs != null ? stairs.toString() : "--";
+                cobAnzeige.setColor(Gfx.COLOR_LT_GRAY);
+                anzeigeCOB = heartrate != null ? heartrate.toString() : "--";
+                basalAnzeige.setColor(Gfx.COLOR_LT_GRAY);
+            }
+
+            if( anzeigeIOB != null && anzeigeIOB.equals("") == false ) {
+                iobAnzeige.setText(anzeigeIOB);
+                iobAnzeige.setLocation(
+                    hWidth+constSpaceBar,
+                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)
+                );
+            }
+
+            if( anzeigeBasal != null && anzeigeBasal.equals("") == false ) {
+                basalAnzeige.setText(anzeigeBasal);
+                basalAnzeige.setLocation(
+                    hWidth+constSpaceBar,
+                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+constAscentFontSmall+constSpace
+                );
+            }
+
+            if( anzeigeCOB != null && anzeigeCOB.equals("") == false ) {
+                cobAnzeige.setText(anzeigeCOB);
+                cobAnzeige.setLocation(
+                    hWidth+constSpaceBar,
+                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)
+                );
+            }
+
+            var verzAnzeige = View.findDrawableById("verzLabel");
+            verzAnzeige.setText(verzoegerung.toString()+"'");
+            if( energy == 1 ) {
+                verzAnzeige.setText(verzoegerung.toString()+" m");
             } else {
-                sgvAnzeige.setColor(farbeAlarm);
+                verzAnzeige.setText(verzoegerung.toString()+"' e");
             }
-        }
-
-        var deltaAnzeige = View.findDrawableById("deltaLabel");
-        deltaAnzeige.setText(anzeigeDelta);
-        deltaAnzeige.setLocation(
-            hWidth+constSpaceBar,
-            hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)
-        );
-
-        var iobAnzeige = View.findDrawableById("iobLabel");
-        var cobAnzeige = View.findDrawableById("cobLabel");
-        var basalAnzeige = View.findDrawableById("basalLabel");
-
-        if( noAAPS == true ) {
-            anzeigeIOB = steps != null ? steps.toString() : "--";
-            iobAnzeige.setColor(Gfx.COLOR_LT_GRAY);
-            anzeigeBasal = stairs != null ? stairs.toString() : "--";
-            cobAnzeige.setColor(Gfx.COLOR_LT_GRAY);
-            anzeigeCOB = heartrate != null ? heartrate.toString() : "--";
-            basalAnzeige.setColor(Gfx.COLOR_LT_GRAY);
-        }
-
-        if( anzeigeIOB != null && anzeigeIOB.equals("") == false ) {
-            iobAnzeige.setText(anzeigeIOB);
-            iobAnzeige.setLocation(
+            verzAnzeige.setLocation(
                 hWidth+constSpaceBar,
-                hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)
+                hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-dc.getFontHeight(Gfx.FONT_SMALL)
             );
-        }
 
-        if( anzeigeBasal != null && anzeigeBasal.equals("") == false ) {
-            basalAnzeige.setText(anzeigeBasal);
-            basalAnzeige.setLocation(
-                hWidth+constSpaceBar,
-                hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+constAscentFontSmall+constSpace
-            );
-        }
+            // Call the parent onUpdate function to redraw the layout
+            View.onUpdate(dc);
+            //Sys.println("View.onUpdate");
 
-        if( anzeigeCOB != null && anzeigeCOB.equals("") == false ) {
-            cobAnzeige.setText(anzeigeCOB);
-            cobAnzeige.setLocation(
-                hWidth+constSpaceBar,
-                hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)
-            );
-        }
-
-        var verzAnzeige = View.findDrawableById("verzLabel");
-        verzAnzeige.setText(verzoegerung.toString()+"'");
-        if( energy == 1 ) {
-            verzAnzeige.setText(verzoegerung.toString()+" m");
-        } else {
-            verzAnzeige.setText(verzoegerung.toString()+"' e");
-        }
-        verzAnzeige.setLocation(
-            hWidth+constSpaceBar,
-            hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-dc.getFontHeight(Gfx.FONT_SMALL)
-        );
-
-        // Call the parent onUpdate function to redraw the layout
-        View.onUpdate(dc);
-        //Sys.println("View.onUpdate");
-
-        //! Ui without layout.xml
-        // Balken
-        if( BarsFarbe == 1 ) {
-            dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_TRANSPARENT);
-        } else if( punkte != null && punkte instanceof Lang.Array  && punkte[0]["sgv"] != null && zielbereichLow <= punkte[0]["sgv"] && punkte[0]["sgv"] <= zielbereichHigh ) {
-            dc.setColor(farbeZielbereich, Gfx.COLOR_TRANSPARENT);
-        } else {
-            dc.setColor(farbeAlarm, Gfx.COLOR_TRANSPARENT);
-        }
-        dc.setPenWidth(6);
-        dc.drawLine(
-            hWidth,
-            0,
-            hWidth,
-            hoeheBalken
-        );
-        // Horizontale Trennlinien
-        dc.setPenWidth(2);
-        dc.drawLine(
-            0,
-            hHeight,
-            hWidth-4-2,
-            hHeight
-        );
-        dc.drawLine(
-            hWidth+4+2,
-            hHeight,
-            width,
-            hHeight
-        );
-        // Progress-Bar
-        if( steps != null && stepGoal != null && stepGoal != 0 ) {
-            var barHeight = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constAscentFontSmall;
-            var polygonPosition = barHeight - ( (steps * barHeight) / stepGoal);
-            if( polygonPosition < -5 ) { polygonPosition = -5; }
-            dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
-            var polygon = [
-                [hWidth+4, polygonPosition+12],
-                [hWidth+4, polygonPosition],
-                [hWidth-4, polygonPosition+4],
-                [hWidth-4, polygonPosition+16]
-            ];
-            dc.fillPolygon(polygon);
-        }
-
-        // Zu alter Blutzucker
-        //outdatedSGV = true;
-        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        if( outdatedSGV != null && outdatedSGV == true && anzeigeSGV != null ) {
-            dc.fillRectangle(
-                hWidth + 4 + 7 - 2,
-                hHeight - 7 - (constAscentFontNumber-constDescentFontNumber)/2,
-                dc.getTextWidthInPixels(anzeigeSGV, Gfx.FONT_NUMBER_MEDIUM)+4,
-                6
-            );
-        }
-
-        // Graph
-        if( punkte != null && punkte instanceof Lang.Array ) {
-            var lowValue = 1000, highValue = 0;
-            var factorY = 0.0033; // Faktor: 1/300
-            var graphCorr = 0;
-            for( var i = 0; i < punkte.size(); i++ ) {
-                if( lowValue > punkte[i]["sgv"] ) { lowValue = punkte[i]["sgv"]; }
-                if( highValue < punkte[i]["sgv"] ) { highValue = punkte[i]["sgv"]; }
-            }
-            var difference = highValue - lowValue;
-            if( difference != null && difference <= 90 ) {
-                factorY = 0.01; // 1/100
-                graphCorr = (100-difference)/2;
+            //! Ui without layout.xml
+            // Balken
+            if( BarsFarbe == 1 ) {
+                dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_TRANSPARENT);
+            } else if( punkte != null && punkte instanceof Lang.Array  && punkte[0]["sgv"] != null && zielbereichLow <= punkte[0]["sgv"] && punkte[0]["sgv"] <= zielbereichHigh ) {
+                dc.setColor(farbeZielbereich, Gfx.COLOR_TRANSPARENT);
             } else {
-                factorY = 1/(difference+10).toFloat(); // 1/200
-                graphCorr = 5;
+                dc.setColor(farbeAlarm, Gfx.COLOR_TRANSPARENT);
             }
-            // Border Graph Area
-            dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_LT_GRAY);
-            dc.setPenWidth(1);
-            dc.drawRectangle(
+            dc.setPenWidth(6);
+            dc.drawLine(
+                hWidth,
                 0,
-                hHeight + 8,
-                breiteGraph,
-                hoeheGraph
+                hWidth,
+                hoeheBalken
             );
-            //In range lines
-            dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_DK_GRAY);
-            dc.setPenWidth(4);
-            plotSGV = (zielbereichLow - lowValue) + graphCorr;
-            if( 0 < plotSGV * (hoeheGraph*factorY) ) {
-                dc.drawLine(
-                    0,
-                    hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY)),
-                    breiteGraph,
-                    hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY))
+            // Horizontale Trennlinien
+            dc.setPenWidth(2);
+            dc.drawLine(
+                0,
+                hHeight,
+                hWidth-4-2,
+                hHeight
+            );
+            dc.drawLine(
+                hWidth+4+2,
+                hHeight,
+                width,
+                hHeight
+            );
+            // Progress-Bar
+            if( steps != null && stepGoal != null && stepGoal != 0 ) {
+                var barHeight = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constAscentFontSmall;
+                var polygonPosition = barHeight - ( (steps * barHeight) / stepGoal);
+                if( polygonPosition < -5 ) { polygonPosition = -5; }
+                dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
+                var polygon = [
+                    [hWidth+4, polygonPosition+12],
+                    [hWidth+4, polygonPosition],
+                    [hWidth-4, polygonPosition+4],
+                    [hWidth-4, polygonPosition+16]
+                ];
+                dc.fillPolygon(polygon);
+            }
+
+            // Zu alter Blutzucker
+            //outdatedSGV = true;
+            dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+            if( outdatedSGV != null && outdatedSGV == true && anzeigeSGV != null ) {
+                dc.fillRectangle(
+                    hWidth + 4 + 7 - 2,
+                    hHeight - 7 - (constAscentFontNumber-constDescentFontNumber)/2,
+                    dc.getTextWidthInPixels(anzeigeSGV, Gfx.FONT_NUMBER_MEDIUM)+4,
+                    6
                 );
             }
-            plotSGV = (zielbereichHigh - lowValue) + graphCorr;
-            if( 0 < plotSGV * (hoeheGraph*factorY) && plotSGV * (hoeheGraph*factorY) < hoeheGraph ) {
-                dc.drawLine(
+
+            // Graph
+            if( punkte != null && punkte instanceof Lang.Array ) {
+                var lowValue = 1000, highValue = 0;
+                var factorY = 0.0033; // Faktor: 1/300
+                var graphCorr = 0;
+                for( var i = 0; i < punkte.size(); i++ ) {
+                    if( lowValue > punkte[i]["sgv"] ) { lowValue = punkte[i]["sgv"]; }
+                    if( highValue < punkte[i]["sgv"] ) { highValue = punkte[i]["sgv"]; }
+                }
+                var difference = highValue - lowValue;
+                if( difference != null && difference <= 90 ) {
+                    factorY = 0.01; // 1/100
+                    graphCorr = (100-difference)/2;
+                } else {
+                    factorY = 1/(difference+10).toFloat(); // 1/200
+                    graphCorr = 5;
+                }
+                // Border Graph Area
+                dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_LT_GRAY);
+                dc.setPenWidth(1);
+                dc.drawRectangle(
                     0,
-                    hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY)),
+                    hHeight + 8,
                     breiteGraph,
-                    hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY))
+                    hoeheGraph
                 );
-            }
-            dc.setPenWidth(1);
-            // Plot bloodglucose
-            for( var i = 0; i < punkte.size(); i++ ) {
-                if(punkte[i]["sgv"] != null && punkte[i]["date"] != null ) {
-                    plotSGV = (punkte[i]["sgv"] - lowValue) + graphCorr;
-                    // Factor for stretching / compressing the values on the x-axis depending on the number of sgv values
-                    var factorX = 1/(5 * punkte.size()).toFloat(); // 1 / ( 5 minutes * x readings )
-                    var plotBreite = breiteGraph - 3 - (minutesFromTimestamp(Time.now().value(), punkte[i]["date"]) * ( (breiteGraph-3) * factorX) );
-                    var plotHoehe = hoeheGraph - ( plotSGV * ((hoeheGraph)*factorY));
-                    if( zielbereichLow <= punkte[i]["sgv"] && punkte[i]["sgv"] <= zielbereichHigh ) {
-                        dc.setColor(farbeZielbereich, Gfx.COLOR_TRANSPARENT);
-                    } else {
-                        dc.setColor(farbeAlarm, Gfx.COLOR_TRANSPARENT);
-                    }
-                    if( 0 < plotBreite - 3 ) {
-                        dc.fillCircle(
-                            plotBreite,
-                            height*0.5 + 9 + plotHoehe,
-                            3
-                        );
+                //In range lines
+                dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_DK_GRAY);
+                dc.setPenWidth(4);
+                plotSGV = (zielbereichLow - lowValue) + graphCorr;
+                if( 0 < plotSGV * (hoeheGraph*factorY) ) {
+                    dc.drawLine(
+                        0,
+                        hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY)),
+                        breiteGraph,
+                        hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY))
+                    );
+                }
+                plotSGV = (zielbereichHigh - lowValue) + graphCorr;
+                if( 0 < plotSGV * (hoeheGraph*factorY) && plotSGV * (hoeheGraph*factorY) < hoeheGraph ) {
+                    dc.drawLine(
+                        0,
+                        hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY)),
+                        breiteGraph,
+                        hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY))
+                    );
+                }
+                dc.setPenWidth(1);
+                // Plot bloodglucose
+                for( var i = 0; i < punkte.size(); i++ ) {
+                    if(punkte[i]["sgv"] != null && punkte[i]["date"] != null ) {
+                        plotSGV = (punkte[i]["sgv"] - lowValue) + graphCorr;
+                        // Factor for stretching / compressing the values on the x-axis depending on the number of sgv values
+                        var factorX = 1/(5 * punkte.size()).toFloat(); // 1 / ( 5 minutes * x readings )
+                        var plotBreite = breiteGraph - 3 - (minutesFromTimestamp(Time.now().value(), punkte[i]["date"]) * ( (breiteGraph-3) * factorX) );
+                        var plotHoehe = hoeheGraph - ( plotSGV * ((hoeheGraph)*factorY));
+                        if( zielbereichLow <= punkte[i]["sgv"] && punkte[i]["sgv"] <= zielbereichHigh ) {
+                            dc.setColor(farbeZielbereich, Gfx.COLOR_TRANSPARENT);
+                        } else {
+                            dc.setColor(farbeAlarm, Gfx.COLOR_TRANSPARENT);
+                        }
+                        if( 0 < plotBreite - 3 ) {
+                            dc.fillCircle(
+                                plotBreite,
+                                height*0.5 + 9 + plotHoehe,
+                                3
+                            );
+                        }
                     }
                 }
             }
-        }
 
-        // Show communication errors
-        if( anzeigeFehler != null ) {
-            dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_WHITE);
-            dc.drawText(
-                breiteGraph - 2,
-                hHeight+8,
-                Gfx.FONT_XTINY,
-                anzeigeFehler,
-                Gfx.TEXT_JUSTIFY_RIGHT
-            );
-        }
-
-        //adjustTime = true;
-        if( adjustTime != null && adjustTime == true && anzeigeSGV != null ) {
-            var bmp = Ui.loadResource(Rez.Drawables.stopwatch);
-            dc.drawBitmap(
-               hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeSGV, Gfx.FONT_NUMBER_MEDIUM)+constSpace,
-               hHeight-8-0.5*(constAscentFontNumber-constDescentFontNumber)-10,
-               bmp
-            );
-        }
-
-        // Batteriestand
-        var batteryLoad = Sys.getSystemStats().battery;
-        if( batteryLoad > 20 ) {
-            dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
-        } else if( batteryLoad > 10 ) {
-            dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
-        } else {
-            dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
-        }
-        // Battery body
-        dc.fillRoundedRectangle(
-            hWidth-constSpaceBar-14,
-            hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-22,
-            14,
-            22,
-            2
-        );
-        // Battery contact
-        dc.fillRectangle(
-            hWidth-constSpaceBar-10,
-            hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-22-2,
-            6,
-            2
-        );
-        // Battery state
-        var battery = batteryLoad * 18 / 100;
-        dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT); // Füllung
-        dc.fillRoundedRectangle(
-            hWidth-constSpaceBar-14+2,
-            hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-22+2,
-            10,
-            18-battery,
-            2
-        );
-
-        //Bluetooth connected
-        if( dev.phoneConnected ) {
-            var bmp = Ui.loadResource(Rez.Drawables.bluetooth);
-            dc.drawBitmap(
-                hWidth-constSpaceBar-14-constSpace-15,
-                hHeight-8-constAscentFontNumber+constDescentFontNumber-5-dc.getFontHeight(Gfx.FONT_MEDIUM)-4-25,
-                bmp
-            );
-        }
-
-        // Draw Trend Arrow
-        if (auswahlPfeil != null ) {
-            var bmp;
-            if (auswahlPfeil.equals("DoubleDown")) { bmp = Ui.loadResource(Rez.Drawables.id_1); }
-            else if (auswahlPfeil.equals("SingleDown")) { bmp = Ui.loadResource(Rez.Drawables.id_2); }
-            else if (auswahlPfeil.equals("FortyFiveDown")) { bmp = Ui.loadResource(Rez.Drawables.id_3); }
-            else if (auswahlPfeil.equals("Flat")) { bmp = Ui.loadResource(Rez.Drawables.id_4); }
-            else if (auswahlPfeil.equals("FortyFiveUp")) { bmp = Ui.loadResource(Rez.Drawables.id_5); }
-            else if (auswahlPfeil.equals("SingleUp")) { bmp = Ui.loadResource(Rez.Drawables.id_6); }
-            else if (auswahlPfeil.equals("DoubleUp")) { bmp = Ui.loadResource(Rez.Drawables.id_7); }
-            dc.drawBitmap(
-                hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeDelta, Gfx.FONT_MEDIUM)+constSpace,
-                hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-0.5*dc.getFontHeight(Gfx.FONT_MEDIUM)-12,
-                bmp
-            );
-        }
-
-        // heartrate and steps
-        dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
-        if( noAAPS == true ) {
-            var bmp = Ui.loadResource(Rez.Drawables.steps);
-            dc.drawBitmap(
-                hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeIOB, Gfx.FONT_SMALL)+5,
-                hHeight+8+1,
-                bmp
-            );
-            bmp = Ui.loadResource(Rez.Drawables.stairs);
-            dc.drawBitmap(
-                hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeBasal, Gfx.FONT_SMALL)+5,
-                hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+constAscentFontSmall+2*constSpace+1,
-                bmp
-            );
-            bmp = Ui.loadResource(Rez.Drawables.heart);
-            dc.drawBitmap(
-                hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeCOB, Gfx.FONT_SMALL)+5,
-                hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constSpace+1,
-                bmp
-            );
-            if( showNotification == 0 && dev.notificationCount > 0 ) {
+            // Show communication errors
+            if( anzeigeFehler != null ) {
+                dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_WHITE);
                 dc.drawText(
-                    hWidth-constSpace+1,
-                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
-                    Gfx.FONT_SMALL,
-                    dev.notificationCount.toString(),
+                    breiteGraph - 2,
+                    hHeight+8,
+                    Gfx.FONT_XTINY,
+                    anzeigeFehler,
                     Gfx.TEXT_JUSTIFY_RIGHT
                 );
-                bmp = Ui.loadResource(Rez.Drawables.notification);
+            }
+
+            //adjustTime = true;
+            if( adjustTime != null && adjustTime == true && anzeigeSGV != null ) {
+                var bmp = Ui.loadResource(Rez.Drawables.stopwatch);
                 dc.drawBitmap(
-                    hWidth+constSpace-1,
-                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+8,
-                    bmp
+                   hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeSGV, Gfx.FONT_NUMBER_MEDIUM)+constSpace,
+                   hHeight-8-0.5*(constAscentFontNumber-constDescentFontNumber)-10,
+                   bmp
                 );
+            }
+
+            // Batteriestand
+            var batteryLoad = Sys.getSystemStats().battery;
+            if( batteryLoad > 20 ) {
+                dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
+            } else if( batteryLoad > 10 ) {
+                dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
             } else {
-                dc.drawText(
-                    hWidth,
-                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,
-                    Gfx.FONT_TINY,
-                    ":-)",
-                    Gfx.TEXT_JUSTIFY_CENTER
-                );
+                dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
             }
-        } else {
-            if( pinfit == 0 && Time.now().value() >= counterActivityAnzeige + 5 ) {
-                counterActivityAnzeige = Time.now().value();
-                showActivity += 1;
-                if( showActivity > 2 ) { showActivity = 1; }
-                if( heartrate == null && showActivity == 1) { showActivity = 2; }
-                if( steps == null && showActivity == 2) { showActivity = 1; }
-            } else if ( pinfit == 1 ) {
-                    showActivity = 1;
-                    stairs = null;
-            } else if ( pinfit == 2 ) {
-                    showActivity = 2;
-            }
-            if( showNotification == 0 && dev.notificationCount > 0 ) {
-                dc.drawText(
-                    hWidth-constSpace+1,
-                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
-                    Gfx.FONT_SMALL,
-                    dev.notificationCount.toString(),
-                    Gfx.TEXT_JUSTIFY_RIGHT
-                );
-                bmp = Ui.loadResource(Rez.Drawables.notification);
+            // Battery body
+            dc.fillRoundedRectangle(
+                hWidth-constSpaceBar-14,
+                hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-22,
+                14,
+                22,
+                2
+            );
+            // Battery contact
+            dc.fillRectangle(
+                hWidth-constSpaceBar-10,
+                hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-22-2,
+                6,
+                2
+            );
+            // Battery state
+            var battery = batteryLoad * 18 / 100;
+            dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT); // Füllung
+            dc.fillRoundedRectangle(
+                hWidth-constSpaceBar-14+2,
+                hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-22+2,
+                10,
+                18-battery,
+                2
+            );
+
+            //Bluetooth connected
+            if( dev.phoneConnected ) {
+                var bmp = Ui.loadResource(Rez.Drawables.bluetooth);
                 dc.drawBitmap(
-                    hWidth+constSpace-1,
-                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+8,
+                    hWidth-constSpaceBar-14-constSpace-15,
+                    hHeight-8-constAscentFontNumber+constDescentFontNumber-5-dc.getFontHeight(Gfx.FONT_MEDIUM)-4-25,
                     bmp
                 );
-            } else if( showActivity == 1 && heartrate != null && stairs == null) {
-                dc.drawText(
-                    hWidth+(15+constSpace)/2,
-                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
-                    Gfx.FONT_SMALL,
-                    heartrate.toString(),
-                    Gfx.TEXT_JUSTIFY_CENTER
+            }
+
+            // Draw Trend Arrow
+            if (auswahlPfeil != null ) {
+                var bmp;
+                if (auswahlPfeil.equals("DoubleDown")) { bmp = Ui.loadResource(Rez.Drawables.id_1); }
+                else if (auswahlPfeil.equals("SingleDown")) { bmp = Ui.loadResource(Rez.Drawables.id_2); }
+                else if (auswahlPfeil.equals("FortyFiveDown")) { bmp = Ui.loadResource(Rez.Drawables.id_3); }
+                else if (auswahlPfeil.equals("Flat")) { bmp = Ui.loadResource(Rez.Drawables.id_4); }
+                else if (auswahlPfeil.equals("FortyFiveUp")) { bmp = Ui.loadResource(Rez.Drawables.id_5); }
+                else if (auswahlPfeil.equals("SingleUp")) { bmp = Ui.loadResource(Rez.Drawables.id_6); }
+                else if (auswahlPfeil.equals("DoubleUp")) { bmp = Ui.loadResource(Rez.Drawables.id_7); }
+                dc.drawBitmap(
+                    hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeDelta, Gfx.FONT_MEDIUM)+constSpace,
+                    hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-0.5*dc.getFontHeight(Gfx.FONT_MEDIUM)-12,
+                    bmp
+                );
+            }
+
+            // heartrate and steps
+            dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
+            if( noAAPS == true ) {
+                var bmp = Ui.loadResource(Rez.Drawables.steps);
+                dc.drawBitmap(
+                    hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeIOB, Gfx.FONT_SMALL)+5,
+                    hHeight+8+1,
+                    bmp
+                );
+                bmp = Ui.loadResource(Rez.Drawables.stairs);
+                dc.drawBitmap(
+                    hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeBasal, Gfx.FONT_SMALL)+5,
+                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+constAscentFontSmall+2*constSpace+1,
+                    bmp
                 );
                 bmp = Ui.loadResource(Rez.Drawables.heart);
                 dc.drawBitmap(
-                    hWidth-(15+constSpace)/2-dc.getTextWidthInPixels(heartrate.toString(), Gfx.FONT_SMALL)/2,
-                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,
+                    hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeCOB, Gfx.FONT_SMALL)+5,
+                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constSpace+1,
                     bmp
                 );
-            } else if( showActivity == 1 && heartrate != null && stairs != null) {
-                var heightHeartStairs = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace);
-                dc.drawText(
-                    hWidth-16-5,
-                    heightHeartStairs,
-                    Gfx.FONT_TINY,
-                    heartrate.toString(),
-                    Gfx.TEXT_JUSTIFY_RIGHT
-                );
-                dc.drawText(
-                    hWidth+16+5,
-                    heightHeartStairs,
-                    Gfx.FONT_TINY,
-                    stairs.toString(),
-                    Gfx.TEXT_JUSTIFY_LEFT
-                );
-                bmp = Ui.loadResource(Rez.Drawables.heart_stairs);
-                dc.drawBitmap(
-                    hWidth-16,
-                    heightHeartStairs+4,
-                    bmp
-                );
-            } else if( showActivity == 2 && steps != null ) {
-                var kombiAnzeige = steps.toString();
-                dc.drawText(
-                    hWidth+(15+constSpace)/2,
-                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
-                    Gfx.FONT_TINY,
-                    kombiAnzeige,
-                    Gfx.TEXT_JUSTIFY_CENTER
-                );
-                bmp = Ui.loadResource(Rez.Drawables.steps);
-                dc.drawBitmap(
-                    hWidth-(15+constSpace)/2-dc.getTextWidthInPixels(kombiAnzeige, Gfx.FONT_SMALL)/2,
-                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,
-                    bmp
-                );
+                if( showNotification == 0 && dev.notificationCount > 0 ) {
+                    dc.drawText(
+                        hWidth-constSpace+1,
+                        hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
+                        Gfx.FONT_SMALL,
+                        dev.notificationCount.toString(),
+                        Gfx.TEXT_JUSTIFY_RIGHT
+                    );
+                    bmp = Ui.loadResource(Rez.Drawables.notification);
+                    dc.drawBitmap(
+                        hWidth+constSpace-1,
+                        hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+8,
+                        bmp
+                    );
+                } else {
+                    dc.drawText(
+                        hWidth,
+                        hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,
+                        Gfx.FONT_TINY,
+                        ":-)",
+                        Gfx.TEXT_JUSTIFY_CENTER
+                    );
+                }
+            } else {
+                if( pinfit == 0 && Time.now().value() >= counterActivityAnzeige + 5 ) {
+                    counterActivityAnzeige = Time.now().value();
+                    showActivity += 1;
+                    if( showActivity > 2 ) { showActivity = 1; }
+                    if( heartrate == null && showActivity == 1) { showActivity = 2; }
+                    if( steps == null && showActivity == 2) { showActivity = 1; }
+                } else if ( pinfit == 1 ) {
+                        showActivity = 1;
+                        stairs = null;
+                } else if ( pinfit == 2 ) {
+                        showActivity = 2;
+                }
+                if( showNotification == 0 && dev.notificationCount > 0 ) {
+                    dc.drawText(
+                        hWidth-constSpace+1,
+                        hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
+                        Gfx.FONT_SMALL,
+                        dev.notificationCount.toString(),
+                        Gfx.TEXT_JUSTIFY_RIGHT
+                    );
+                    bmp = Ui.loadResource(Rez.Drawables.notification);
+                    dc.drawBitmap(
+                        hWidth+constSpace-1,
+                        hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+8,
+                        bmp
+                    );
+                } else if( showActivity == 1 && heartrate != null && stairs == null) {
+                    dc.drawText(
+                        hWidth+(15+constSpace)/2,
+                        hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
+                        Gfx.FONT_SMALL,
+                        heartrate.toString(),
+                        Gfx.TEXT_JUSTIFY_CENTER
+                    );
+                    bmp = Ui.loadResource(Rez.Drawables.heart);
+                    dc.drawBitmap(
+                        hWidth-(15+constSpace)/2-dc.getTextWidthInPixels(heartrate.toString(), Gfx.FONT_SMALL)/2,
+                        hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,
+                        bmp
+                    );
+                } else if( showActivity == 1 && heartrate != null && stairs != null) {
+                    var heightHeartStairs = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace);
+                    dc.drawText(
+                        hWidth-16-5,
+                        heightHeartStairs,
+                        Gfx.FONT_TINY,
+                        heartrate.toString(),
+                        Gfx.TEXT_JUSTIFY_RIGHT
+                    );
+                    dc.drawText(
+                        hWidth+16+5,
+                        heightHeartStairs,
+                        Gfx.FONT_TINY,
+                        stairs.toString(),
+                        Gfx.TEXT_JUSTIFY_LEFT
+                    );
+                    bmp = Ui.loadResource(Rez.Drawables.heart_stairs);
+                    dc.drawBitmap(
+                        hWidth-16,
+                        heightHeartStairs+4,
+                        bmp
+                    );
+                } else if( showActivity == 2 && steps != null ) {
+                    var kombiAnzeige = steps.toString();
+                    dc.drawText(
+                        hWidth+(15+constSpace)/2,
+                        hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
+                        Gfx.FONT_TINY,
+                        kombiAnzeige,
+                        Gfx.TEXT_JUSTIFY_CENTER
+                    );
+                    bmp = Ui.loadResource(Rez.Drawables.steps);
+                    dc.drawBitmap(
+                        hWidth-(15+constSpace)/2-dc.getTextWidthInPixels(kombiAnzeige, Gfx.FONT_SMALL)/2,
+                        hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,
+                        bmp
+                    );
+                }
             }
+        } else {
+//! LOW POWER
+            dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
+            dc.clear();
+            dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_BLACK);
+            dc.drawText(
+                hWidth,
+                hHeight - dc.getFontAscent(Gfx.FONT_NUMBER_HOT) - 5,
+                Gfx.FONT_NUMBER_HOT,
+                timeString,
+                Gfx.TEXT_JUSTIFY_CENTER
+            );
+            dc.drawText(
+                hWidth,
+                hHeight + 20,
+                Gfx.FONT_LARGE,
+                anzeigeSGV + " " + anzeigeDelta + " @ " + verzoegerung.toString() + " m",
+                Gfx.TEXT_JUSTIFY_CENTER
+            );
         }
-
     }
 
     // Called when this View is removed from the screen. Save the
@@ -731,13 +748,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
     // The user has just looked at their watch. Timers and animations may be started here.
     function onExitSleep() {
         //BTL
-        //isHighPower = true;
+        isHighPower = true;
     }
 
     // Terminate any active timers and prepare for slow updates.
     function onEnterSleep() {
         //BTL
-        //isHighPower = false;
+        isHighPower = false;
     }
     // Verzoegerung ermitteln
     function minutesFromTimestamp(now, timestamp) {

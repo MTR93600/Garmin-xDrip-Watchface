@@ -17,7 +17,9 @@ var nextTime;
 //BTL
 var isBackground = false;
 var isClosing = false;
-//var isHighPower = false;
+var isHighPower = true;
+
+var lowPowerModeEnabled = false;
 
 class CGMWatchfaceApp extends App.AppBase {
 
@@ -114,6 +116,7 @@ class CGMWatchfaceApp extends App.AppBase {
         pinfit = App.getApp().getProperty("pinfit").toNumber();
         showNotification = App.getApp().getProperty("Notification").toNumber();
         eco = App.getApp().getProperty("eco").toNumber();
+        lowPowerModeEnabled = App.getApp().getProperty("lowPowerMode").toNumber() == 0 ? true : false;
         if( masseinheit == null ) { masseinheit = 0; }
         if( zielbereichLow == null ) { zielbereichLow = 70; }
         if( zielbereichHigh == null ) { zielbereichHigh = 180; }

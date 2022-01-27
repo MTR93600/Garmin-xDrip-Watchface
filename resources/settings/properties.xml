@@ -5,7 +5,8 @@
 	<property id="Zielbereich1" type="number">70</property>
     <property id="Zielbereich2" type="number">180</property>
     <property id="Delay" type="number">0</property>
-    <property id="eco" type="number">0</property> 
+    <property id="eco" type="number">0</property>
+    <property id="lowPowerMode" type="number">1</property> 
     <property id="pinfit" type="number">0</property>
     <property id="FarbeZielbereich" type="number">0</property>
     <property id="FarbeAlarm" type="number">0</property>

@@ -60,6 +60,10 @@
     <string id="opt_eco_1">Request usually after 5 min</string>
     <string id="opt_eco_2">If bg is stable, a query is started every 10 min</string>
     
+    <string id="lowPowerModeTitle">Enable Low Power Mode (for amoled Displays f. e.)?</string>
+    <string id="opt_lowPowerMode_1">Yes</string>
+    <string id="opt_lowPowerMode_2">No</string> 
+    
     <string id="FarbeZielbereichTitle">Color when the blood glucose is in target range</string>
     <string id="opt_FarbeZielbereich_1">Green</string>
     <string id="opt_FarbeZielbereich_2">Blue</string>
