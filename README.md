@@ -160,8 +160,13 @@ V2.00 - Support for Spike app (iOS) </br>
 [...] </br>
 V1.00 - Initial release
 
-## About
+## **Contributing**
+Please report bugs, errors and feature requests. Before doing so, please read the [Troubleshooting Q&A](troubleshoot-q&a).
+
+You can also [__Buy me a coffee! :coffee:__](https://buymeacoffee.com) 
+## **About**
 This Watchface uses the
 <a target="_blank" href="https://icons8.com/icon/97965/bluetooth">Bluetooth</a>,
 <a target="_blank" href="https://icons8.com/icon/86196/alarm-clock">Alarm Clock</a>
 icons by <a target="_blank" href="https://icons8.com">Icons8</a>
+
