@@ -90,6 +90,7 @@ Some of the codes are handled explicitely:
 | `Error: -104`<br/>`Bluetooth?` | `BLE_CONNECTION_UNAVAILABLE`: No BLE connection is available. | Check the bluetooth connection settings |
 | `Error: -300`<br/>`Settings?` | `NETWORK_REQUEST_TIMED_OUT`: Request timed out before a response was received | Check the settings of the watchface and your companion app. See [Setup](#setup) |
 | `Error: -400` | `INVALID_HTTP_BODY_IN_NETWORK_RESPONSE`: Response body data is invalid for the request type. | Check the settings of the watchface and your companion app. See [Setup](#setup) |
+| `Error: -401` | `INVALID_HTTP_HEADER_FIELDS_IN_NETWORK_RESPONSE`:  Response contained invalid http header fields. | Most likely connected to Nightscout integration. Check the URL, the access token if the token has `readable` role. |
 | `Error: -403`<br/>`Memory!` | `NETWORK_RESPONSE_OUT_OF_MEMORY`: Ran out of memory processing network response. | We messed something up. Please contact us! | 
 
 ------------------------
