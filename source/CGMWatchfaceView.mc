@@ -282,6 +282,9 @@ class CGMWatchfaceView extends Ui.WatchFace {
             } else if( fehler_code == -403) {
                 // NETWORK_RESPONSE_OUT_OF_MEMORY
                 anzeigeFehler += "\nMemory?";
+            } else if( fehler_code == -404) {
+                // PAGE_NOT_FOUND
+                anzeigeFehler += "\nURL Settings?"
             }
         }
         if( anzeigeFehler.equals("") == false && System.getDeviceSettings().phoneConnected == false ) {
