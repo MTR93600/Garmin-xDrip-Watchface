@@ -79,6 +79,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
     // Update the view
     function onUpdate(dc) {
+        var dev = Sys.getDeviceSettings();
         //BTL
         // Don't draw an update if we are closing or it will cause sluggish
         // peformance as the screen has to redraw before switching pages
@@ -99,12 +100,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
         // Get the current time and format it correctly
         //Sys.println("onUpdate");
-        var timeFormat = "$1$:$2$";
         var clockTime = Sys.getClockTime();
         var info = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
         var datum = info.day_of_week.substring(0,3) + " " + info.day;
         var hours = clockTime.hour;
-        var dev = Sys.getDeviceSettings();
         if( dev.is24Hour == false ) {
             if (hours == 0) {
                 hours = 12;
@@ -112,10 +111,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 hours = hours - 12;
             }
         }
-        var timeString = Lang.format(timeFormat, [hours, clockTime.min.format("%02d")]);
+        var timeString = Lang.format("$1$:$2$", [hours, clockTime.min.format("%02d")]);
 
         // Background-Prozess neu starten, falls gestoppt
-        if( Sys has :ServiceDelegate && Sys.getDeviceSettings().phoneConnected ) {
+        if( Sys has :ServiceDelegate && dev.phoneConnected ) {
             var lastTime = Background.getLastTemporalEventTime();
             if (lastTime == null || ( lastTime != null && lastTime.value() < Time.now().value() - 600) ) {
                 Background.registerForTemporalEvent(Time.now());
@@ -272,7 +271,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         // Fehleranzeige
         if( fehler != null && fehler == true ) {
             anzeigeFehler = "Error: " + fehler_code;
-            if( fehler_code == -104 || fehler_code == -1 || fehler_code == -2 ) {
+            if( fehler_code == -104 || fehler_code == -1 || fehler_code == -2 ) { 
                 anzeigeFehler += "\nBluetooth?";
             } else if( fehler_code == -300 ) {
                 anzeigeFehler += "\nSettings?";
@@ -289,7 +288,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         //anzeigeBasal = "120%";
         //anzeigeIOB = "12,1";*/
 
-//! HIGH POWER
+        //! HIGH POWER
         if( isHighPower == true || lowPowerModeEnabled == false) {
             // Update the view
             var time = View.findDrawableById("TimeLabel");
@@ -330,7 +329,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             var iobAnzeige = View.findDrawableById("iobLabel");
             var cobAnzeige = View.findDrawableById("cobLabel");
             var basalAnzeige = View.findDrawableById("basalLabel");
-
+            
             if( noAAPS == true ) {
                 anzeigeIOB = steps != null ? steps.toString() : "--";
                 iobAnzeige.setColor(Gfx.COLOR_LT_GRAY);
@@ -415,7 +414,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 var barHeight = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constAscentFontSmall;
                 var polygonPosition = barHeight - ( (steps * barHeight) / stepGoal);
                 if( polygonPosition < -5 ) { polygonPosition = -5; }
-                dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
+                dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Fï¿½llung
                 var polygon = [
                     [hWidth+4, polygonPosition+12],
                     [hWidth+4, polygonPosition],
@@ -523,11 +522,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
             //adjustTime = true;
             if( adjustTime != null && adjustTime == true && anzeigeSGV != null ) {
-                var bmp = Ui.loadResource(Rez.Drawables.stopwatch);
                 dc.drawBitmap(
                    hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeSGV, Gfx.FONT_NUMBER_MEDIUM)+constSpace,
                    hHeight-8-0.5*(constAscentFontNumber-constDescentFontNumber)-10,
-                   bmp
+                   Ui.loadResource(Rez.Drawables.stopwatch)
                 );
             }
 
@@ -557,7 +555,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             );
             // Battery state
             var battery = batteryLoad * 18 / 100;
-            dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT); // Füllung
+            dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT); // Fï¿½llung
             dc.fillRoundedRectangle(
                 hWidth-constSpaceBar-14+2,
                 hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-22+2,
@@ -567,12 +565,22 @@ class CGMWatchfaceView extends Ui.WatchFace {
             );
 
             //Bluetooth connected
-            if( dev.phoneConnected ) {
-                var bmp = Ui.loadResource(Rez.Drawables.bluetooth);
+            var btSymbolOffset = 0;
+            if ( dev.phoneConnected ) {
                 dc.drawBitmap(
-                    hWidth-constSpaceBar-14-constSpace-15,
+                    hWidth-constSpaceBar-14-constSpace-17,
                     hHeight-8-constAscentFontNumber+constDescentFontNumber-5-dc.getFontHeight(Gfx.FONT_MEDIUM)-4-25,
-                    bmp
+                    Ui.loadResource(Rez.Drawables.bluetooth)
+                );
+                btSymbolOffset = 15;
+            } 
+
+            // Alarm clock
+            if ( dev.alarmCount > 0 ) {
+                dc.drawBitmap(
+                    hWidth-constSpaceBar-14-constSpace-btSymbolOffset-22,
+                    hHeight-8-constAscentFontNumber+constDescentFontNumber-5-dc.getFontHeight(Gfx.FONT_MEDIUM)-4-25,
+                    Ui.loadResource(Rez.Drawables.alarmclock)
                 );
             }
 
@@ -596,23 +604,20 @@ class CGMWatchfaceView extends Ui.WatchFace {
             // heartrate and steps
             dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
             if( noAAPS == true ) {
-                var bmp = Ui.loadResource(Rez.Drawables.steps);
                 dc.drawBitmap(
                     hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeIOB, Gfx.FONT_SMALL)+5,
                     hHeight+8+1,
-                    bmp
+                    Ui.loadResource(Rez.Drawables.steps)
                 );
-                bmp = Ui.loadResource(Rez.Drawables.stairs);
                 dc.drawBitmap(
                     hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeBasal, Gfx.FONT_SMALL)+5,
                     hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+constAscentFontSmall+2*constSpace+1,
-                    bmp
+                    Ui.loadResource(Rez.Drawables.stairs)
                 );
-                bmp = Ui.loadResource(Rez.Drawables.heart);
                 dc.drawBitmap(
                     hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeCOB, Gfx.FONT_SMALL)+5,
                     hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constSpace+1,
-                    bmp
+                    Ui.loadResource(Rez.Drawables.heart)
                 );
                 if( showNotification == 0 && dev.notificationCount > 0 ) {
                     dc.drawText(
@@ -622,11 +627,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
                         dev.notificationCount.toString(),
                         Gfx.TEXT_JUSTIFY_RIGHT
                     );
-                    bmp = Ui.loadResource(Rez.Drawables.notification);
                     dc.drawBitmap(
                         hWidth+constSpace-1,
                         hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+8,
-                        bmp
+                        Ui.loadResource(Rez.Drawables.notification)
                     );
                 } else {
                     dc.drawText(
@@ -658,11 +662,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
                         dev.notificationCount.toString(),
                         Gfx.TEXT_JUSTIFY_RIGHT
                     );
-                    bmp = Ui.loadResource(Rez.Drawables.notification);
                     dc.drawBitmap(
                         hWidth+constSpace-1,
                         hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+8,
-                        bmp
+                        Ui.loadResource(Rez.Drawables.notification)
                     );
                 } else if( showActivity == 1 && heartrate != null && stairs == null) {
                     dc.drawText(
@@ -672,11 +675,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
                         heartrate.toString(),
                         Gfx.TEXT_JUSTIFY_CENTER
                     );
-                    bmp = Ui.loadResource(Rez.Drawables.heart);
                     dc.drawBitmap(
                         hWidth-(15+constSpace)/2-dc.getTextWidthInPixels(heartrate.toString(), Gfx.FONT_SMALL)/2,
                         hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,
-                        bmp
+                        Ui.loadResource(Rez.Drawables.heart)
                     );
                 } else if( showActivity == 1 && heartrate != null && stairs != null) {
                     var heightHeartStairs = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace);
@@ -694,11 +696,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
                         stairs.toString(),
                         Gfx.TEXT_JUSTIFY_LEFT
                     );
-                    bmp = Ui.loadResource(Rez.Drawables.heart_stairs);
                     dc.drawBitmap(
                         hWidth-16,
                         heightHeartStairs+4,
-                        bmp
+                        Ui.loadResource(Rez.Drawables.heart_stairs)
                     );
                 } else if( showActivity == 2 && steps != null ) {
                     var kombiAnzeige = steps.toString();
@@ -709,11 +710,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
                         kombiAnzeige,
                         Gfx.TEXT_JUSTIFY_CENTER
                     );
-                    bmp = Ui.loadResource(Rez.Drawables.steps);
                     dc.drawBitmap(
                         hWidth-(15+constSpace)/2-dc.getTextWidthInPixels(kombiAnzeige, Gfx.FONT_SMALL)/2,
                         hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,
-                        bmp
+                        Ui.loadResource(Rez.Drawables.steps)
                     );
                 }
             }
