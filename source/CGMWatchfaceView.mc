@@ -271,11 +271,17 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
         // Fehleranzeige
         if( fehler != null && fehler == true ) {
+            // https://developer.garmin.com/connect-iq/api-docs/Toybox/Communications.html
             anzeigeFehler = "Error: " + fehler_code;
-            if( fehler_code == -104 || fehler_code == -1 || fehler_code == -2 ) {
+            if( fehler_code == -104 || fehler_code == -1 || fehler_code == -2 ) { 
+                // BLE_CONNECTION_UNAVAILABLE, BLE_ERROR, BLE_HOST_TIMEOUT
                 anzeigeFehler += "\nBluetooth?";
             } else if( fehler_code == -300 ) {
+                // NETWORK_REQUEST_TIMED_OUT
                 anzeigeFehler += "\nSettings?";
+            } else if( fehler_code == -403) {
+                // NETWORK_RESPONSE_OUT_OF_MEMORY
+                anzeigeFehler += "\nMemory?";
             }
         }
         if( anzeigeFehler.equals("") == false && System.getDeviceSettings().phoneConnected == false ) {
@@ -415,7 +421,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 var barHeight = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constAscentFontSmall;
                 var polygonPosition = barHeight - ( (steps * barHeight) / stepGoal);
                 if( polygonPosition < -5 ) { polygonPosition = -5; }
-                dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Füllung
+                dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Fï¿½llung
                 var polygon = [
                     [hWidth+4, polygonPosition+12],
                     [hWidth+4, polygonPosition],
@@ -557,7 +563,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             );
             // Battery state
             var battery = batteryLoad * 18 / 100;
-            dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT); // Füllung
+            dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT); // Fï¿½llung
             dc.fillRoundedRectangle(
                 hWidth-constSpaceBar-14+2,
                 hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-22+2,
