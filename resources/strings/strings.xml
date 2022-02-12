@@ -11,8 +11,8 @@
     
     <string id="URLTitle">Nightscout URL (if previously selected)</string>
     <string id="URLPrompt">URL WITHOUT [https://] and [/api/v1] (subdomain.herokuapp.com)</string>
-    <string id="NsTokenTitle">Nightscout Access-Token with readable role (if previously selected)</string>
-    <string id="NsTokenPrompt">Raw Nightscout token, like "garmin-xxxxxxxxxx"</string>
+    <string id="NsTokenTitle">(optional) Nightscout Access-Token with readable role (if previously selected)</string>
+    <string id="NsTokenPrompt">Nightscout token, like "garmin-xxxxxxxxxx"</string>
 
     <string id="EinheitenTitle">mg/dl or mmol/l?</string>
     <string id="opt_einheit_2">Set by app</string>
