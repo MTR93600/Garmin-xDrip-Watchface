@@ -285,6 +285,9 @@ class CGMWatchfaceView extends Ui.WatchFace {
             } else if( fehler_code == -404) {
                 // PAGE_NOT_FOUND
                 anzeigeFehler += "\nURL Settings?"
+            } else if( fehler_code == -401) {
+                // UNAUTHORIZED (nightscout token missing / wrong?)
+                anzeigeFehler += "\nNS TOKEN?";
             }
         }
         if( anzeigeFehler.equals("") == false && System.getDeviceSettings().phoneConnected == false ) {
