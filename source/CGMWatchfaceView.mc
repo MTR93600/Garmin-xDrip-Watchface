@@ -414,7 +414,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 var barHeight = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constAscentFontSmall;
                 var polygonPosition = barHeight - ( (steps * barHeight) / stepGoal);
                 if( polygonPosition < -5 ) { polygonPosition = -5; }
-                dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // F�llung
+                dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Fuellung
                 var polygon = [
                     [hWidth+4, polygonPosition+12],
                     [hWidth+4, polygonPosition],
