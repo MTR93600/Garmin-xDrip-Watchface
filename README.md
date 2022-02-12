@@ -1,4 +1,4 @@
-# Garmin xDrip Watchface
+# **Garmin xDrip Watchface**
 xDrip+ Watchface gets your CGM bloodglucose readings directly to your wrist! 
 
 This watchface displays the time and date, your last blood glucose reading including a graph, the trend and age of the last reading, your daily steps including a step related progress bar, your actual heartrate (if enabled in the settings of your device), a notification count and alarm count..
@@ -12,11 +12,12 @@ There are four phone synchronization possibilities:
 1. Nightscout (cross-platform, internet connection required). 
 
 ------------------------
-## PLEASE READ THIS ADVISORY FIRST
+## **PLEASE READ THIS ADVISORY FIRST**
 Never make a medical decision based on a reading that you see on this app e.g. your watch. Always perform a fingerstick blood glucose check first.
 
 ------------------------
-## Watchface Settings in Garmin Connect Mobile or Garmin Express
+## **Watchface Settings**
+You can change the settings in the Garmin Connect Mobile App or Garmin Express on a Windows/Mac. Available settings:
 
 1. Choose your companion app: xDrip+, Spike or Nightscout
 1. Adjust the lower and upper target of your bloodglucose readings (standard: 70-180 mg/dl / 3,9 mmol/l - 180 mg/dl / 10,0 mmol/l).
@@ -26,26 +27,42 @@ Never make a medical decision based on a reading that you see on this app e.g. y
 1. Additional settings: Colorize bars and bg value, show notification count if any
 
 ------------------------
-## Setup
-### Install Companion App
+## **Setup**
+### **Install Companion App**
+This watchface can receive data from either xDrip+, Diabox or Spike (which are all apps on your phone) or from a Nightscout instance.
+
 You need to install the xDrip+ (Android only) or Spike app (iOS only):
 
-- Android: https://github.com/NightscoutFoundation/xDrip/releases or https://jamorham.github.io/#xdrip-plus
+- Android: xDrip+ https://github.com/NightscoutFoundation/xDrip/releases or https://jamorham.github.io/#xdrip-plus
+- Android: Diabox https://www.bubblan.org/
 - iOS: https://spike-app.com
+- Nightscout: https://github.com/nightscout/cgm-remote-monitor/releases or http://www.nightscout.info/
 
 **You can not find these apps in app stores!**
 
-Enable the sharing from your companion to the watch:
-### xDrip+
+See the following section on how to setup the individual applications.
+### **xDrip+**
 1. In xDrip+, enable the xDrip Web-Server (Settings -> Inter-App Settings -> enable "xDrip Web-Server", but *not* the "Open Web Server")
 1. in the watchface settings select "xDrip+ (Android only)"
-### Spike
+
+#### *Test xDrip+*
+If you'd like to see, if xDrip+ is configured correctly, query the URL `http://127.0.0.1:17580/sgv.json?count=12` in your phone's webbrowser. If there is some text output with time stamps and glucose values, xDrip is set up correctly.
+
+### **Spike**
 1. In Spike, enable the Internal HTTP Server (Settings -> Integration -> Internal HTTP Server).
 1. In the watchface settings select "Spike (iOS only)".
-### Diabox
+
+#### *Test Spike*
+See [Testing xDrip+](#testing-xdrip), but change the URL to `http://127.0.0.1:1979/sgv.json?count=2`.
+
+### **Diabox**
 1. In Diabox, enable "Share data with smartwatches" (Diabox: Settings -> Integrations) 
 1. In the watchface settings select "xDrip+ (Android only)".
-### Nightscout
+
+#### *Test Diabox*
+See [Testing xDrip+](#testing-xdrip).
+
+### **Nightscout**
 1. In the watchface settings select "Nightscout URL (mobile data connection required)"
 1. Enter your nightscout URL, but without `https` or `/api/v1/...`, e.g. `yourapp.heroku.com`.
 
@@ -55,11 +72,17 @@ If your nightscout requires an api-password (i.e. is not readable to the whole i
 
 3. To generate an access token, open your nightscout website, navigate to "Admin Tools" and click "Add new Subject". Supply a name (like `garmin`) and a role (the role must be at least `readable`!) and hit Save.
 4. copy the access token (looks like `garmin-XXXXXXXXXXXX`) to the corresponding field inside the watchface settings of the Garmin Connect Mobile App or Garmin Express.
-### AndroidAPS
+
+#### *Testing Nightscout*
+See [Testing xDrip+](#testing-xdrip), but change the URL to
+- `https://<YOURAPP.HEROKU.COM>/api/v1/entries/sgv.json?count=12` in case, you need no access token
+- or `https://<YOURAPP.HEROKU.COM>/api/v1/entries/sgv.json?count=12&token=<ACCESS-TOKEN>` in case, you need an access token.
+
+### **AndroidAPS**
 If you like to see your loop status enable “xDrip+ Statusline (Watch)” in AndroidAPS.
 
 ------------------------
-## Troubleshooting Q/A
+## **Troubleshooting Q/A**
 *Q:* My watch does not display the glucose data instantly. What can I do? 
 <br/>
 *A:* Check the settings via the Garmin Connect Mobile App and wait at least 5 minutes. The Garmin SDK only allows data polling every 5 minutes, faster update rates are not possible.
@@ -78,7 +101,7 @@ https://forums.garmin.com/developer/connect-iq/i/bug-reports/fenix-6-with-backgr
 <br/>
 *A:* There is a communication error between the companion app (xDrip+, INVALID_HTTP_BODY_IN_NETWORK_RESPONSE Response body data is invalid for the request type. https://developer.garmin.com/connect-iq/api-docs/Toybox/Communications.html 
 
-## Error Codes:
+## **Documented Error Codes**
 See the error code table from the [Garin SDK Documentation](https://developer.garmin.com/connect-iq/api-docs/Toybox/Communications.html).
 
 Some of the codes are handled explicitely:
@@ -92,9 +115,10 @@ Some of the codes are handled explicitely:
 | `Error: -400` | `INVALID_HTTP_BODY_IN_NETWORK_RESPONSE`: Response body data is invalid for the request type. | Check the settings of the watchface and your companion app. See [Setup](#setup) |
 | `Error: -401` | `INVALID_HTTP_HEADER_FIELDS_IN_NETWORK_RESPONSE`:  Response contained invalid http header fields. | Most likely connected to Nightscout integration. Check the URL, the access token if the token has `readable` role. |
 | `Error: -403`<br/>`Memory!` | `NETWORK_RESPONSE_OUT_OF_MEMORY`: Ran out of memory processing network response. | We messed something up. Please contact us! | 
+| `Error: -404`<br/>`URL Settings?` | `PAGE_NOT_FOUND`: Check, if xDrip/Spike/Diabox are configured correctly, or if the nightscout URL and token are provided. | 
 
 ------------------------
-## Changelog
+## **Changelog**
 
 V3.56 - Fix for display error with double trend arrows (Thanks to Trenar!) </br>
 V3.55 - New function and setting: Low power mode (recommended for devices with amoled display) </br>
