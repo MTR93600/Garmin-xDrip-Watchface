@@ -34,13 +34,13 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
         }
         if( xDripSpike == 1 ) {
             url = "http://127.0.0.1:1979/sgv.json?brief_mode=Y&count=18&all_data=Y"; // Spike-URL
-        } else if ( xDripSpike == 2 ) {
+        } else if ( xDripSpike >= 2 ) {
             var nightscoutURL = App.getApp().getProperty("URL").toString();
             if( nightscoutURL != null ) {
                 url = "https://" + nightscoutURL + "/api/v1/entries/sgv.json?count=12"; // Nightscout-URL
             }
             var nightscoutToken = App.getApp().getProperty("NsToken").toString();
-            if( nightscoutToken != null) {
+            if( xDripSpike == 3 && nightscoutToken != null ) {
                 url = url + "&token=" + nightscoutToken; // add Nightscout Token
             }
         }
@@ -51,9 +51,9 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
             url = url + "&heart=" + heartrate;
         }
         //Sys.println(url);
-        Communications.makeWebRequest( url, {}, 
-            { :headers => { "Content-Type" => Communications.REQUEST_CONTENT_TYPE_URL_ENCODED }, 
-            :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON}, 
+        Communications.makeWebRequest( url, {},
+            { :headers => { "Content-Type" => Communications.REQUEST_CONTENT_TYPE_URL_ENCODED },
+            :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON},
             method(:verarbeiteWerte) );
     }
 

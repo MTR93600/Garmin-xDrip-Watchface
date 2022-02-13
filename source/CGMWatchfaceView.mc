@@ -273,7 +273,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( fehler != null && fehler == true ) {
             // https://developer.garmin.com/connect-iq/api-docs/Toybox/Communications.html
             anzeigeFehler = "Error: " + fehler_code;
-            if( fehler_code == -104 || fehler_code == -1 || fehler_code == -2 ) { 
+            if( fehler_code == -104 || fehler_code == -1 || fehler_code == -2 ) {
                 // BLE_CONNECTION_UNAVAILABLE, BLE_ERROR, BLE_HOST_TIMEOUT
                 anzeigeFehler += "\nBluetooth?";
             } else if( fehler_code == -300 ) {
@@ -281,10 +281,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 anzeigeFehler += "\nSettings?";
             } else if( fehler_code == -403) {
                 // NETWORK_RESPONSE_OUT_OF_MEMORY
-                anzeigeFehler += "\nMemory?";
+                anzeigeFehler += "\nDevice Memory!";
             } else if( fehler_code == -404) {
                 // PAGE_NOT_FOUND
-                anzeigeFehler += "\nURL Settings?"
+                anzeigeFehler += "\nURL Settings?";
             } else if( fehler_code == -401) {
                 // UNAUTHORIZED (nightscout token missing / wrong?)
                 anzeigeFehler += "\nNS TOKEN?";
