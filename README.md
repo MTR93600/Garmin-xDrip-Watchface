@@ -15,6 +15,11 @@ There are four phone synchronization possibilities:
 ## **PLEASE READ THIS ADVISORY FIRST**
 Never make a medical decision based on a reading that you see on this app e.g. your watch. Always perform a fingerstick blood glucose check first.
 
+## **Contributing**
+Please report bugs, errors and feature requests. Before doing so, please read the [Troubleshooting Q&A](troubleshoot-q&a).
+
+You can also [__Buy me a coffee! :coffee:__](https://buymeacoffee.com) 
+
 ------------------------
 ## **Watchface Settings**
 You can change the settings in the Garmin Connect Mobile App or Garmin Express on a Windows/Mac. Available settings:
@@ -53,14 +58,14 @@ If you'd like to see, if xDrip+ is configured correctly, query the URL `http://1
 1. In the watchface settings select "Spike (iOS only)".
 
 #### *Test Spike*
-See [Testing xDrip+](#testing-xdrip), but change the URL to `http://127.0.0.1:1979/sgv.json?count=2`.
+See [Text xDrip+](#test-xdrip), but change the URL to `http://127.0.0.1:1979/sgv.json?count=2`.
 
 ### **Diabox**
 1. In Diabox, enable "Share data with smartwatches" (Diabox: Settings -> Integrations) 
 1. In the watchface settings select "xDrip+ (Android only)".
 
 #### *Test Diabox*
-See [Testing xDrip+](#testing-xdrip).
+See [Test xDrip+](#test-xdrip).
 
 ### **Nightscout**
 1. In the watchface settings select "Nightscout URL (mobile data connection required)"
@@ -74,7 +79,7 @@ If your nightscout requires an api-password (i.e. is not readable to the whole i
 4. copy the access token (looks like `garmin-XXXXXXXXXXXX`) to the corresponding field inside the watchface settings of the Garmin Connect Mobile App or Garmin Express.
 
 #### *Testing Nightscout*
-See [Testing xDrip+](#testing-xdrip), but change the URL to
+See [Test xDrip+](#test-xdrip), but change the URL to
 - `https://<YOURAPP.HEROKU.COM>/api/v1/entries/sgv.json?count=12` in case, you need no access token
 - or `https://<YOURAPP.HEROKU.COM>/api/v1/entries/sgv.json?count=12&token=<ACCESS-TOKEN>` in case, you need an access token.
 
@@ -114,7 +119,7 @@ Some of the codes are handled explicitely:
 | `Error: -300`<br/>`Settings?` | `NETWORK_REQUEST_TIMED_OUT`: Request timed out before a response was received | Check the settings of the watchface and your companion app. See [Setup](#setup) |
 | `Error: -400` | `INVALID_HTTP_BODY_IN_NETWORK_RESPONSE`: Response body data is invalid for the request type. | Check the settings of the watchface and your companion app. See [Setup](#setup) |
 | `Error: -401` | `UNAUTHORIZED`:  Unauthorized web access. | Most likely connected to Nightscout integration. Check the URL, the access token if the token has `readable` role. |
-| `Error: -403`<br/>`Memory!` | `NETWORK_RESPONSE_OUT_OF_MEMORY`: Ran out of memory processing network response. | We messed something up. Please contact us! | 
+| `Error: -403`<br/>`Device Memory!` | `NETWORK_RESPONSE_OUT_OF_MEMORY`: Ran out of memory processing network response. | We messed something up. Please contact us! | 
 | `Error: -404`<br/>`URL Settings?` | `PAGE_NOT_FOUND`: Check, if xDrip/Spike/Diabox are configured correctly, or if the nightscout URL and token are provided. | 
 
 ------------------------
@@ -160,10 +165,6 @@ V2.00 - Support for Spike app (iOS) </br>
 [...] </br>
 V1.00 - Initial release
 
-## **Contributing**
-Please report bugs, errors and feature requests. Before doing so, please read the [Troubleshooting Q&A](troubleshoot-q&a).
-
-You can also [__Buy me a coffee! :coffee:__](https://buymeacoffee.com) 
 ## **About**
 This Watchface uses the
 <a target="_blank" href="https://icons8.com/icon/97965/bluetooth">Bluetooth</a>,
