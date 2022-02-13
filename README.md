@@ -16,7 +16,7 @@ There are four phone synchronization possibilities:
 Never make a medical decision based on a reading that you see on this app e.g. your watch. Always perform a fingerstick blood glucose check first.
 
 ## **Contributing**
-Please report bugs, errors and feature requests. Before doing so, please read the [Troubleshooting Q&A](troubleshoot-q&a).
+Please report bugs, errors and feature requests. Before doing so, please read the [Troubleshooting Q&A](#troubleshooting-qa).
 
 You can also [__Buy me a coffee! :coffee:__](https://buymeacoffee.com) 
 
