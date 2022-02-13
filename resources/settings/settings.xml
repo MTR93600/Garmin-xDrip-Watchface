@@ -9,6 +9,9 @@
     <setting propertyKey="@Properties.URL" title="@Strings.URLTitle"  prompt="@Strings.URLPrompt">
        	<settingConfig type="alphaNumeric" />
     </setting>
+    <setting propertyKey="@Properties.NsToken" title="@Strings.NsTokenTitle" prompt="@Strings.NsTokenPrompt">
+        <settingConfig type="alphaNumeric" />
+    </setting>
     <setting propertyKey="@Properties.Einheiten" title="@Strings.EinheitenTitle">
         <settingConfig type="list">
            <listEntry value="2">@Rez.Strings.opt_einheit_2</listEntry>
