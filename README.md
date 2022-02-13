@@ -18,8 +18,6 @@ Never make a medical decision based on a reading that you see on this app e.g. y
 ## **Contributing**
 Please report bugs, errors and feature requests. Before doing so, please read the [Troubleshooting Q&A](#troubleshooting-qa).
 
-You can also [__Buy me a coffee! :coffee:__](https://buymeacoffee.com) 
-
 ------------------------
 ## **Watchface Settings**
 You can change the settings in the Garmin Connect Mobile App or Garmin Express on a Windows/Mac. Available settings:
