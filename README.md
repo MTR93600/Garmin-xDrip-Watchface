@@ -8,7 +8,7 @@ Additionally if you have closed the loop with AndroidAPS it shows your loop stat
 There are four phone synchronization possibilities: 
 1. xDrip+ (Android only, no internet connection required)
 1. Spike (iOS only, no internet connection required) 
-1. Diabox (Android, iOS)
+1. Diabox (Android, iOS, no internet connection required)
 1. Nightscout (cross-platform, internet connection required). 
 
 ------------------------
@@ -19,7 +19,7 @@ Never make a medical decision based on a reading that you see on this app e.g. y
 ## **Watchface Settings**
 You can change the settings in the Garmin Connect Mobile App or Garmin Express on a Windows/Mac. Available settings:
 
-1. Choose your companion app: xDrip+, Spike or Nightscout
+1. Choose your companion app: xDrip+, Spike or Nightscout (optional secured with an access-token) 
 1. Adjust the lower and upper target of your bloodglucose readings (standard: 70-180 mg/dl / 3,9 mmol/l - 180 mg/dl / 10,0 mmol/l).
 1. Change the delay of the request (standard: 15-30 seconds after the last reading) by adding or substracting some seconds if the timing does not work.
 1. Eco Mode: If blood sugar is stable reduce value queries to at least 10 minutes. The word "eco" after the display of the delay indicates that the next value will not be read for about 10 minutes.
