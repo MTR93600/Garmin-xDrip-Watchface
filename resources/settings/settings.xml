@@ -4,10 +4,14 @@
         	<listEntry value="0">@Rez.Strings.opt_xDripSpike_1</listEntry>
             <listEntry value="1">@Rez.Strings.opt_xDripSpike_2</listEntry>
             <listEntry value="2">@Rez.Strings.opt_xDripSpike_3</listEntry>
+            <listEntry value="3">@Rez.Strings.opt_xDripSpike_4</listEntry>
         </settingConfig>   
     </setting>
     <setting propertyKey="@Properties.URL" title="@Strings.URLTitle"  prompt="@Strings.URLPrompt">
        	<settingConfig type="alphaNumeric" />
+    </setting>
+    <setting propertyKey="@Properties.NsToken" title="@Strings.NsTokenTitle" prompt="@Strings.NsTokenPrompt">
+        <settingConfig type="alphaNumeric" />
     </setting>
     <setting propertyKey="@Properties.Einheiten" title="@Strings.EinheitenTitle">
         <settingConfig type="list">

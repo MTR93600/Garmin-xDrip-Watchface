@@ -270,11 +270,24 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
         // Fehleranzeige
         if( fehler != null && fehler == true ) {
+            // https://developer.garmin.com/connect-iq/api-docs/Toybox/Communications.html
             anzeigeFehler = "Error: " + fehler_code;
-            if( fehler_code == -104 || fehler_code == -1 || fehler_code == -2 ) { 
+
+            if( fehler_code == -104 || fehler_code == -1 || fehler_code == -2 ) {
+                // BLE_CONNECTION_UNAVAILABLE, BLE_ERROR, BLE_HOST_TIMEOUT
                 anzeigeFehler += "\nBluetooth?";
             } else if( fehler_code == -300 ) {
+                // NETWORK_REQUEST_TIMED_OUT
                 anzeigeFehler += "\nSettings?";
+            } else if( fehler_code == -403) {
+                // NETWORK_RESPONSE_OUT_OF_MEMORY
+                anzeigeFehler += "\nDevice Memory!";
+            } else if( fehler_code == -404) {
+                // PAGE_NOT_FOUND
+                anzeigeFehler += "\nURL Settings?";
+            } else if( fehler_code == -401) {
+                // UNAUTHORIZED (nightscout token missing / wrong?)
+                anzeigeFehler += "\nNS TOKEN?";
             }
         }
         if( anzeigeFehler.equals("") == false && System.getDeviceSettings().phoneConnected == false ) {
@@ -414,6 +427,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 var barHeight = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constAscentFontSmall;
                 var polygonPosition = barHeight - ( (steps * barHeight) / stepGoal);
                 if( polygonPosition < -5 ) { polygonPosition = -5; }
+
                 dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK); // Fuellung
                 var polygon = [
                     [hWidth+4, polygonPosition+12],
