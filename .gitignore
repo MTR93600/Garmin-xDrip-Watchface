@@ -6,3 +6,4 @@ bin/
 
 # settings for sideloading
 *.SET 
+/.project
