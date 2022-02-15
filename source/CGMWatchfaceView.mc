@@ -24,7 +24,6 @@ var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", anzeigeCOB = "", verzoe
 var showActivity = 0, counterActivityAnzeige = 0;
 var showNotification = 0;
 var BGFarbe = false, BarsFarbe = true;
-var bmpStopwatch, bmpBluetooth, bmpAlarmclock, bmpSteps, bmpStairs, bmpHeart, bmpNotification, bmpHeartStairs;
 
 class CGMWatchfaceView extends Ui.WatchFace {
 
