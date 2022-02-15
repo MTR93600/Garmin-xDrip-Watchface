@@ -79,13 +79,15 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
     // Update the view
     function onUpdate(dc) {
-        var dev = Sys.getDeviceSettings();
         //BTL
         // Don't draw an update if we are closing or it will cause sluggish
         // peformance as the screen has to redraw before switching pages
         if(isClosing){
             return;
         }
+
+        var dev = Sys.getDeviceSettings();
+
         setLayout(Rez.Layouts.WatchFace(dc));
 
         var farbeZielbereich = Gfx.COLOR_GREEN, farbeAlarm = Gfx.COLOR_YELLOW;
@@ -301,7 +303,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         //anzeigeBasal = "120%";
         //anzeigeIOB = "12,1";*/
 
-        //! HIGH POWER
+//! HIGH POWER
         if( isHighPower == true || lowPowerModeEnabled == false) {
             // Update the view
             var time = View.findDrawableById("TimeLabel");
@@ -554,27 +556,27 @@ class CGMWatchfaceView extends Ui.WatchFace {
             }
             // Battery body
             dc.fillRoundedRectangle(
-                hWidth-constSpaceBar-10,
-                hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-16-2,
-                10,
-                18,
+                hWidth-constSpaceBar-14,
+                hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-22,
+                14,
+                22,
                 2
             );
             // Battery contact
             dc.fillRectangle(
-                hWidth-constSpaceBar-7,
-                hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-16-4,
-                4,
+                hWidth-constSpaceBar-10,
+                hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-22-2,
+                6,
                 2
             );
             // Battery state
-            var battery = batteryLoad * 13 / 100;
+            var battery = batteryLoad * 18 / 100;
             dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT); // Fuellung
             dc.fillRoundedRectangle(
-                hWidth-constSpaceBar-10+2,
-                hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-16+1,
-                6,
-                13-battery,
+                hWidth-constSpaceBar-14+2,
+                hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-22+2,
+                10,
+                18-battery,
                 2
             );
 
@@ -582,18 +584,18 @@ class CGMWatchfaceView extends Ui.WatchFace {
             var btSymbolOffset = 0;
             if ( dev.phoneConnected ) {
                 dc.drawBitmap(
-                    hWidth-constSpaceBar-12-constSpace-16,
-                    hHeight-8-constAscentFontNumber+constDescentFontNumber-5-dc.getFontHeight(Gfx.FONT_MEDIUM)-2-25,
+                    hWidth-constSpaceBar-14-constSpace-15,
+                    hHeight-8-constAscentFontNumber+constDescentFontNumber-5-dc.getFontHeight(Gfx.FONT_MEDIUM)-4-25,
                     Ui.loadResource(Rez.Drawables.bluetooth)
                 );
-                btSymbolOffset = 15;
+                btSymbolOffset = 21;
             }
 
             // Alarm clock
             if ( dev.alarmCount > 0 ) {
                 dc.drawBitmap(
-                    hWidth-constSpaceBar-12-constSpace-btSymbolOffset-20,
-                    hHeight-8-constAscentFontNumber+constDescentFontNumber-5-dc.getFontHeight(Gfx.FONT_MEDIUM)-2-25,
+                    hWidth-constSpaceBar-12-constSpace-btSymbolOffset-17,
+                    hHeight-8-constAscentFontNumber+constDescentFontNumber-5-dc.getFontHeight(Gfx.FONT_MEDIUM)-0-25,
                     Ui.loadResource(Rez.Drawables.alarmclock)
                 );
             }
