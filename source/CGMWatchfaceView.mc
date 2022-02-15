@@ -24,7 +24,7 @@ var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", anzeigeCOB = "", verzoe
 var showActivity = 0, counterActivityAnzeige = 0;
 var showNotification = 0;
 var BGFarbe = false, BarsFarbe = true;
-var bmp;
+var bmpStopwatch, bmpBluetooth, bmpAlarmclock, bmpSteps, bmpStairs, bmpHeart, bmpNotification, bmpHeartStairs;
 
 class CGMWatchfaceView extends Ui.WatchFace {
 
@@ -537,11 +537,14 @@ class CGMWatchfaceView extends Ui.WatchFace {
             }
 
             //adjustTime = true;
+            if( bmpStopwatch == null ) {
+                bmpStopwatch = Ui.loadResource(Rez.Drawables.stopwatch);
+            }
             if( adjustTime != null && adjustTime == true && anzeigeSGV != null ) {
                 dc.drawBitmap(
                    hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeSGV, Gfx.FONT_NUMBER_MEDIUM)+constSpace,
                    hHeight-8-0.5*(constAscentFontNumber-constDescentFontNumber)-10,
-                   Ui.loadResource(Rez.Drawables.stopwatch)
+                   bmpStopwatch
                 );
             }
 
@@ -583,20 +586,26 @@ class CGMWatchfaceView extends Ui.WatchFace {
             //Bluetooth connected
             var btSymbolOffset = 0;
             if ( dev.phoneConnected ) {
+                if( bmpBluetooth == null ) {
+                    bmpBluetooth = Ui.loadResource(Rez.Drawables.bluetooth);
+                }
                 dc.drawBitmap(
                     hWidth-constSpaceBar-14-constSpace-15,
                     hHeight-8-constAscentFontNumber+constDescentFontNumber-5-dc.getFontHeight(Gfx.FONT_MEDIUM)-4-25,
-                    Ui.loadResource(Rez.Drawables.bluetooth)
+                    bmpBluetooth
                 );
                 btSymbolOffset = 21;
             }
 
             // Alarm clock
             if ( dev.alarmCount > 0 ) {
+                if( bmpAlarmclock == null ) {
+                    bmpAlarmclock = Ui.loadResource(Rez.Drawables.alarmclock);
+                }
                 dc.drawBitmap(
-                    hWidth-constSpaceBar-12-constSpace-btSymbolOffset-17,
+                    hWidth-constSpaceBar-12-constSpace-btSymbolOffset-16,
                     hHeight-8-constAscentFontNumber+constDescentFontNumber-5-dc.getFontHeight(Gfx.FONT_MEDIUM)-0-25,
-                    Ui.loadResource(Rez.Drawables.alarmclock)
+                    bmpAlarmclock
                 );
             }
 
@@ -620,20 +629,29 @@ class CGMWatchfaceView extends Ui.WatchFace {
             // heartrate and steps
             dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
             if( noAAPS == true ) {
+                if( bmpSteps == null ) {
+                    bmpSteps = Ui.loadResource(Rez.Drawables.steps);
+                }
                 dc.drawBitmap(
                     hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeIOB, Gfx.FONT_SMALL)+5,
                     hHeight+8+1,
-                    Ui.loadResource(Rez.Drawables.steps)
+                    bmpSteps
                 );
+                if( bmpStairs == null ) {
+                    bmpStairs = Ui.loadResource(Rez.Drawables.stairs);
+                }
                 dc.drawBitmap(
                     hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeBasal, Gfx.FONT_SMALL)+5,
                     hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+constAscentFontSmall+2*constSpace+1,
-                    Ui.loadResource(Rez.Drawables.stairs)
+                    bmpStairs
                 );
+                if( bmpHeart == null ) {
+                    bmpHeart = Ui.loadResource(Rez.Drawables.heart);
+                }
                 dc.drawBitmap(
                     hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeCOB, Gfx.FONT_SMALL)+5,
                     hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constSpace+1,
-                    Ui.loadResource(Rez.Drawables.heart)
+                    bmpHeart
                 );
                 if( showNotification == 0 && dev.notificationCount > 0 ) {
                     dc.drawText(
@@ -643,10 +661,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
                         dev.notificationCount.toString(),
                         Gfx.TEXT_JUSTIFY_RIGHT
                     );
+                    if( bmpNotification == null ) {
+                        bmpNotification = Ui.loadResource(Rez.Drawables.notification);
+                    }
                     dc.drawBitmap(
                         hWidth+constSpace-1,
                         hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+8,
-                        Ui.loadResource(Rez.Drawables.notification)
+                        bmpNotification
                     );
                 } else {
                     dc.drawText(
@@ -678,10 +699,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
                         dev.notificationCount.toString(),
                         Gfx.TEXT_JUSTIFY_RIGHT
                     );
+                    if( bmpNotification == null ) {
+                        bmpNotification = Ui.loadResource(Rez.Drawables.notification);
+                    }
                     dc.drawBitmap(
                         hWidth+constSpace-1,
                         hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+8,
-                        Ui.loadResource(Rez.Drawables.notification)
+                        bmpNotification
                     );
                 } else if( showActivity == 1 && heartrate != null && stairs == null) {
                     dc.drawText(
@@ -691,10 +715,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
                         heartrate.toString(),
                         Gfx.TEXT_JUSTIFY_CENTER
                     );
+                    if( bmpHeart == null ) {
+                        bmpHeart = Ui.loadResource(Rez.Drawables.heart);
+                    }
                     dc.drawBitmap(
                         hWidth-(15+constSpace)/2-dc.getTextWidthInPixels(heartrate.toString(), Gfx.FONT_SMALL)/2,
                         hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,
-                        Ui.loadResource(Rez.Drawables.heart)
+                        bmpHeart
                     );
                 } else if( showActivity == 1 && heartrate != null && stairs != null) {
                     var heightHeartStairs = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace);
@@ -712,10 +739,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
                         stairs.toString(),
                         Gfx.TEXT_JUSTIFY_LEFT
                     );
+                    if( bmpHeartStairs == null ) {
+                        bmpHeartStairs = Ui.loadResource(Rez.Drawables.heart_stairs);
+                    }
                     dc.drawBitmap(
                         hWidth-16,
                         heightHeartStairs+4,
-                        Ui.loadResource(Rez.Drawables.heart_stairs)
+                        bmpHeartStairs
                     );
                 } else if( showActivity == 2 && steps != null ) {
                     var kombiAnzeige = steps.toString();
@@ -726,10 +756,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
                         kombiAnzeige,
                         Gfx.TEXT_JUSTIFY_CENTER
                     );
+                    if( bmpSteps == null ) {
+                        bmpSteps = Ui.loadResource(Rez.Drawables.steps);
+                    }
                     dc.drawBitmap(
                         hWidth-(15+constSpace)/2-dc.getTextWidthInPixels(kombiAnzeige, Gfx.FONT_SMALL)/2,
                         hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,
-                        Ui.loadResource(Rez.Drawables.steps)
+                        bmpSteps
                     );
                 }
             }
