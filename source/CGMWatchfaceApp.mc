@@ -22,6 +22,7 @@ var isHighPower = true;
 
 var lowPowerModeEnabled = false;
 
+(:background)
 class CGMWatchfaceApp extends App.AppBase {
 
     function initialize() {
