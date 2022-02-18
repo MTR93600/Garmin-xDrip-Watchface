@@ -1,8 +1,11 @@
 <drawables>
     <bitmap id="LauncherIcon" filename="launcher_icon.png" />
-    <bitmap id="steps" filename="schritte-20x15.png" />
-    <bitmap id="stairs" filename="stairs-20x20.png" />
-    <bitmap id="heart" filename="heartrate3-21x15.png" />
+    <bitmap id="steps" filename="footsteps-20.png" />
+    <bitmap id="stairs" filename="stairs-up-20.png" />
+    <bitmap id="heart" filename="heart-20.png" />
+    <bitmap id="iob" filename="iob-20.png"/>
+    <bitmap id="cob" filename="carbs-20.png"/>
+    <bitmap id="tbr" filename="tbr-20.png"/>
     <bitmap id="heart_stairs" filename="heart-stairs.png"/>
     <bitmap id="bluetooth" filename="bluetooth-25.png" />
     <bitmap id="stopwatch" filename="stoppuhr-20.png" />
