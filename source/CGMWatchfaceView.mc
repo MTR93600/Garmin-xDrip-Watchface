@@ -347,11 +347,11 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
             if( isAAPS == false ) {
                 anzeigeIOB = steps != null ? steps.toString() : "--";
-                iobAnzeige.setColor(Gfx.COLOR_LT_GRAY);
+                iobAnzeige.setColor(Gfx.COLOR_WHITE);
                 anzeigeBasal = stairs != null ? stairs.toString() : "--";
-                cobAnzeige.setColor(Gfx.COLOR_LT_GRAY);
+                cobAnzeige.setColor(Gfx.COLOR_WHITE);
                 anzeigeCOB = heartrate != null ? heartrate.toString() : "--";
-                basalAnzeige.setColor(Gfx.COLOR_LT_GRAY);
+                basalAnzeige.setColor(Gfx.COLOR_WHITE);
             }
 
             if( anzeigeIOB != null && anzeigeIOB.equals("") == false ) {
@@ -635,7 +635,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             }
 
             // steps, stairs and heartrate OR iob, tbr and cob
-            dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
+            dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
             if( bmpSteps == null || changedAAPS == true ) {
                 bmpSteps = isAAPS == false ? Ui.loadResource(Rez.Drawables.steps) : Ui.loadResource(Rez.Drawables.iob);
             }
