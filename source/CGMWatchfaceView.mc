@@ -442,8 +442,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
             // Zu alter Blutzucker
             //outdatedSGV = true;
-            dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
             if( outdatedSGV != null && outdatedSGV == true && anzeigeSGV != null ) {
+                dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
                 dc.fillRectangle(
                     hWidth + 4 + 7 - 2,
                     hHeight - 7 - (constAscentFontNumber-constDescentFontNumber)/2,
@@ -451,7 +451,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     6
                 );
             }
-
             // Graph
             if( punkte != null && punkte instanceof Lang.Array ) {
                 var lowValue = 1000, highValue = 0;
@@ -752,7 +751,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     }
                     dc.drawBitmap(
                         hWidth-16,
-                        heightHeartStairs+4,
+                        heightHeartStairs+5,
                         bmpHeartStairs
                     );
                 } else if( showActivity == 2 && steps != null ) {
