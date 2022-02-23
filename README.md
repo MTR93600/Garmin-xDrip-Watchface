@@ -124,6 +124,7 @@ Some of the codes are handled explicitely:
 ## **Changelog**
 
 V3.70 - Swap Icons and Text for steps / stairs Up / heartrate, exchange some icons (@Trenar) and introduce icons for AAPS status (@swissalpine)</br>
+V3.60 - Possibility to secure Nightscout with a readable token; alarm clock icon to show active alarms (all credits for these extensions to Trenar!) </br>
 V3.56 - Fix for display error with double trend arrows (Thanks to Trenar!) </br>
 V3.55 - New function and setting: Low power mode (recommended for devices with amoled display) </br>
 V3.52 - Support for new devices </br>
