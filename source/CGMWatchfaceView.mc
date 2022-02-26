@@ -799,6 +799,9 @@ class CGMWatchfaceView extends Ui.WatchFace {
     // state of this View here. This includes freeing resources from
     // memory.
     function onHide() {
+        if( isBackground != null && false == isBackground && punkte != null && punkte instanceof Lang.Array ) {
+            App.Storage.setValue("punkteWatchface", punkte);
+        }
     }
 
     // The user has just looked at their watch. Timers and animations may be started here.
@@ -812,6 +815,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         //BTL
         isHighPower = false;
     }
+
     // Verzoegerung ermitteln
     function minutesFromTimestamp(now, timestamp) {
         return( (now - timestamp/1000) / 60 );

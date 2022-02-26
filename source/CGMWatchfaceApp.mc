@@ -43,9 +43,10 @@ class CGMWatchfaceApp extends App.AppBase {
         //widgets, settings menu, activity, etc. This will always be called in a watch
         //face when the face is hidden.
         isClosing = true;
+        Background.deleteTemporalEvent();
         //Make sure we are not currently in the background thread, since you cannot use
         //the object store in the background context
-        if( false == isBackground ) {
+        if( isBackground != null && false == isBackground && punkte != null && punkte instanceof Lang.Array ) {
             App.Storage.setValue("punkteWatchface", punkte);
         }
         // Free resources
