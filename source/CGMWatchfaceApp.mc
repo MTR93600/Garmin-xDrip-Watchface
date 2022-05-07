@@ -87,7 +87,7 @@ class CGMWatchfaceApp extends App.AppBase {
             App.Storage.setValue("punkteWatchface", punkte);
             calculation = true;
             var differenz = Time.now().value() - data[0]["date"]/1000;
-            if( differenz != null && differenz > (35 + delay) && differenz < 300 ) {
+            if( differenz != null && differenz > (40 + delay) && differenz < 300 ) {
                 adjustTime = true;
                 duration = new Time.Duration(600 - differenz + 15 + delay);
             } else {
