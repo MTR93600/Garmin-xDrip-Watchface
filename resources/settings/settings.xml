@@ -20,34 +20,6 @@
            <listEntry value="1">@Rez.Strings.opt_einheit_1</listEntry>
         </settingConfig>
     </setting>
-    <setting propertyKey="@Properties.Zielbereich1" title="@Strings.ZielbereichTitel1" prompt="@Strings.AllgemeinPrompt">
-           <settingConfig type="list">
-               <listEntry value="60">@Rez.Strings.opt_zielbereich_2</listEntry>
-               <listEntry value="70">@Rez.Strings.opt_zielbereich_3</listEntry>
-               <listEntry value="80">@Rez.Strings.opt_zielbereich_4</listEntry>
-               <listEntry value="90">@Rez.Strings.opt_zielbereich_5</listEntry>
-               <listEntry value="100">@Rez.Strings.opt_zielbereich_6</listEntry>
-               <listEntry value="110">@Rez.Strings.opt_zielbereich_7</listEntry>
-               <listEntry value="120">@Rez.Strings.opt_zielbereich_8</listEntry>
-               <listEntry value="130">@Rez.Strings.opt_zielbereich_9</listEntry>
-               <listEntry value="140">@Rez.Strings.opt_zielbereich_10</listEntry>
-           </settingConfig>
-	</setting>
-	<setting propertyKey="@Properties.Zielbereich2" title="@Strings.ZielbereichTitel2" prompt="@Strings.AllgemeinPrompt">
-           <settingConfig type="list">
-               <listEntry value="100">@Rez.Strings.opt_zielbereich_6</listEntry>
-               <listEntry value="110">@Rez.Strings.opt_zielbereich_7</listEntry>
-               <listEntry value="120">@Rez.Strings.opt_zielbereich_8</listEntry>
-               <listEntry value="130">@Rez.Strings.opt_zielbereich_9</listEntry>
-               <listEntry value="140">@Rez.Strings.opt_zielbereich_10</listEntry>
-               <listEntry value="150">@Rez.Strings.opt_zielbereich_11</listEntry>
-               <listEntry value="160">@Rez.Strings.opt_zielbereich_12</listEntry>
-               <listEntry value="170">@Rez.Strings.opt_zielbereich_13</listEntry>
-               <listEntry value="180">@Rez.Strings.opt_zielbereich_14</listEntry>
-               <listEntry value="190">@Rez.Strings.opt_zielbereich_15</listEntry>
-               <listEntry value="200">@Rez.Strings.opt_zielbereich_16</listEntry>
-           </settingConfig>
-	</setting>
 	<setting propertyKey="@Properties.Delay" title="@Strings.DelayTitel" prompt="@Strings.AllgemeinPrompt">
            <settingConfig type="list">
                <listEntry value="-10">@Rez.Strings.opt_delay_3</listEntry>
@@ -66,13 +38,6 @@
                <listEntry value="120">@Rez.Strings.opt_delay_16</listEntry>                            
            </settingConfig>
 	</setting>
-	<setting propertyKey="@Properties.pinfit" title="@Strings.pinfitTitle" prompt="@Strings.AllgemeinPrompt">
-           <settingConfig type="list">
-               <listEntry value="0">@Rez.Strings.opt_pinfit_1</listEntry>
-               <listEntry value="1">@Rez.Strings.opt_pinfit_2</listEntry> 
-               <listEntry value="2">@Rez.Strings.opt_pinfit_3</listEntry> 
-           </settingConfig>
-	</setting>
 	<setting propertyKey="@Properties.Notification" title="@Strings.NotificationTitle" prompt="@Strings.AllgemeinPrompt">
            <settingConfig type="list">
                <listEntry value="0">@Rez.Strings.opt_Notification_1</listEntry>
@@ -89,30 +54,6 @@
            <settingConfig type="list">
                <listEntry value="0">@Rez.Strings.opt_lowPowerMode_1</listEntry>
                <listEntry value="1">@Rez.Strings.opt_lowPowerMode_2</listEntry> 
-           </settingConfig>
-	</setting>
-	<setting propertyKey="@Properties.FarbeZielbereich" title="@Strings.FarbeZielbereichTitle" prompt="@Strings.AllgemeinPrompt">
-           <settingConfig type="list">
-               <listEntry value="0">@Rez.Strings.opt_FarbeZielbereich_1</listEntry>
-               <listEntry value="1">@Rez.Strings.opt_FarbeZielbereich_2</listEntry> 
-           </settingConfig>
-	</setting>
-	<setting propertyKey="@Properties.FarbeAlarm" title="@Strings.FarbeAlarmTitle" prompt="@Strings.AllgemeinPrompt">
-           <settingConfig type="list">
-               <listEntry value="0">@Rez.Strings.opt_FarbeAlarm_1</listEntry>
-               <listEntry value="1">@Rez.Strings.opt_FarbeAlarm_2</listEntry> 
-           </settingConfig>
-	</setting>
-	<setting propertyKey="@Properties.BGFarbe" title="@Strings.BGFarbeTitle" prompt="@Strings.AllgemeinPrompt">
-           <settingConfig type="list">
-               <listEntry value="0">@Rez.Strings.opt_BGFarbe_1</listEntry>
-               <listEntry value="1">@Rez.Strings.opt_BGFarbe_2</listEntry> 
-           </settingConfig>
-	</setting>
-	<setting propertyKey="@Properties.BarsFarbe" title="@Strings.BarsFarbeTitle" prompt="@Strings.AllgemeinPrompt">
-           <settingConfig type="list">
-               <listEntry value="0">@Rez.Strings.opt_BarsFarbe_1</listEntry>
-               <listEntry value="1">@Rez.Strings.opt_BarsFarbe_2</listEntry> 
            </settingConfig>
 	</setting>
 </settings>

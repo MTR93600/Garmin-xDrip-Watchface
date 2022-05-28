@@ -20,24 +20,6 @@
     <string id="opt_einheit_0">mg/dl</string>
     <string id="opt_einheit_1">mmol/l</string>
     
-    <string id="ZielbereichTitel1">Target BG range: Low</string>
-    <string id="ZielbereichTitel2">Target BG range: High</string>
-    <string id="opt_zielbereich_2">60 mg/dl | 3,3 mmol</string>
-    <string id="opt_zielbereich_3">70 mg/dl | 3,9 mmol</string>
-    <string id="opt_zielbereich_4">80 mg/dl | 4,4 mmol</string>
-    <string id="opt_zielbereich_5">90 mg/dl | 5,0 mmol</string>
-    <string id="opt_zielbereich_6">100 mg/dl | 5,6 mmol</string>
-    <string id="opt_zielbereich_7">110 mg/dl | 6,2 mmol</string>
-    <string id="opt_zielbereich_8">120 mg/dl | 6,7 mmol</string>
-    <string id="opt_zielbereich_9">130 mg/dl | 7,2 mmol</string>
-    <string id="opt_zielbereich_10">140 mg/dl | 7,8 mmol</string>
-    <string id="opt_zielbereich_11">150 mg/dl | 8,3 mmol</string>
-    <string id="opt_zielbereich_12">160 mg/dl | 8,9 mmol</string>
-    <string id="opt_zielbereich_13">170 mg/dl | 9,4 mmol</string>
-    <string id="opt_zielbereich_14">180 mg/dl | 10,0 mmol</string>
-    <string id="opt_zielbereich_15">190 mg/dl | 10,5 mmol</string>
-    <string id="opt_zielbereich_16">200 mg/dl | 11,1 mmol</string>
-    
     <string id="DelayTitel">Adjustment of the request delay</string>
     <string id="opt_delay_3">-10 sec.</string>
     <string id="opt_delay_4">No adjustment</string>
@@ -54,11 +36,6 @@
     <string id="opt_delay_15">+110 sec.</string>
     <string id="opt_delay_16">+120 sec.</string>
     
-    <string id="pinfitTitle">AAPS only: Pin fit data and disable data rotation?</string>
-    <string id="opt_pinfit_1">Enable fit data rotation</string>
-    <string id="opt_pinfit_2">Pin heartrate</string>
-    <string id="opt_pinfit_3">Pin steps</string>
-    
     <string id="ecoTitle">ecoMode (reduces queries if bg is stable)</string>
     <string id="opt_eco_1">Request usually after 5 min</string>
     <string id="opt_eco_2">If bg is stable, a query is started every 10 min</string>
@@ -66,23 +43,7 @@
     <string id="lowPowerModeTitle">Enable Low Power Mode (for amoled Displays f. e.)?</string>
     <string id="opt_lowPowerMode_1">Yes</string>
     <string id="opt_lowPowerMode_2">No</string> 
-    
-    <string id="FarbeZielbereichTitle">Color when the blood glucose is in target range</string>
-    <string id="opt_FarbeZielbereich_1">Green</string>
-    <string id="opt_FarbeZielbereich_2">Blue</string>
-    
-    <string id="FarbeAlarmTitle">Color when the blood glucose is not in target range</string>
-    <string id="opt_FarbeAlarm_1">Yellow</string>
-    <string id="opt_FarbeAlarm_2">Red</string> 
-    
-    <string id="BGFarbeTitle">Colorize displayed BG?</string>
-    <string id="opt_BGFarbe_1">Yes</string>
-    <string id="opt_BGFarbe_2">No</string>      
-    
-    <string id="BarsFarbeTitle">Colorize progress bar?</string>
-    <string id="opt_BarsFarbe_1">Yes</string>
-    <string id="opt_BarsFarbe_2">No</string>
-    
+       
     <string id="NotificationTitle">Show number of unread notifications, if any?</string>
     <string id="opt_Notification_1">Yes</string>
     <string id="opt_Notification_2">No</string>

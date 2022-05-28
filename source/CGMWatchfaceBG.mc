@@ -27,17 +27,17 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
             heartrate = null;
         }
         // Build URL & WebRequest
-        var url = "http://127.0.0.1:17580/sgv.json?brief_mode=Y&count=18&all_data=Y"; // xDrip+-URL
+        var url = "http://127.0.0.1:17580/sgv.json?brief_mode=Y&count=2&all_data=Y"; // xDrip+-URL
         var xDripSpike = App.getApp().getProperty("xDripSpike").toNumber();
         if( xDripSpike == null ) {
             xDripSpike = 0;
         }
         if( xDripSpike == 1 ) {
-            url = "http://127.0.0.1:1979/sgv.json?brief_mode=Y&count=18&all_data=Y"; // Spike-URL
+            url = "http://127.0.0.1:1979/sgv.json?brief_mode=Y&count=2&all_data=Y"; // Spike-URL
         } else if ( xDripSpike >= 2 ) {
             var nightscoutURL = App.getApp().getProperty("URL").toString();
             if( nightscoutURL != null ) {
-                url = "https://" + nightscoutURL + "/api/v1/entries/sgv.json?count=12"; // Nightscout-URL
+                url = "https://" + nightscoutURL + "/api/v1/entries/sgv.json?count=2"; // Nightscout-URL
             }
             var nightscoutToken = App.getApp().getProperty("NsToken").toString();
             if( xDripSpike == 3 && nightscoutToken != null ) {
