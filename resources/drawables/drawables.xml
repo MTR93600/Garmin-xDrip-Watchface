@@ -1,4 +1,6 @@
 <drawables>
     <bitmap id="LauncherIcon" filename="launcher_icon.png" />
-    <bitmap id="EmptyBattery" filename="empty-battery-20.png" />
+    <bitmap id="Battery" filename="battery_20.png" />
+    <bitmap id="Notification" filename="notification_20.png" />
+    <bitmap id="Alarm" filename="alarm_20.png" />
 </drawables>

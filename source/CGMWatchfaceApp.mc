@@ -13,7 +13,7 @@ var eco = 0;
 var punkte;
 var calculation = true;
 var nextTime;
-var bmpStopwatch, bmpBluetooth, bmpAlarmclock, bmpSteps, bmpStairs, bmpHeart, bmpSteps2, bmpHeart2, bmpHeartStairs, bmpNotification;
+var bmpNotification, bmpBattery, bmpAlarm;
 
 //BTL
 var isBackground = false;
@@ -50,14 +50,7 @@ class CGMWatchfaceApp extends App.AppBase {
             App.Storage.setValue("punkteWatchface", punkte);
         }
         // Free resources
-        bmpStopwatch = null;
-        bmpBluetooth = null;
-        bmpAlarmclock = null;
-        bmpSteps = null;
-        bmpStairs = null;
-        bmpHeart = null;
         bmpNotification = null;
-        bmpHeartStairs = null;
     }
 
     // Return the initial view of your application here

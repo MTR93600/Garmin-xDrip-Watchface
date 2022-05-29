@@ -217,11 +217,36 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 dc.drawLine(sX, sY, eX, eY);
             }
 
-            // Critical battery
+            // Critical battery & alarm
+            var moveBattery = 0, moveAlarm = 0;
             var batteryLoad = Sys.getSystemStats().battery;
+            if ( batteryLoad < 10 && dev.alarmCount > 0 ) {
+                moveBattery = 12;
+                moveAlarm = 12;
+            }
             if (batteryLoad < 10 ) {
-                var battery = WatchUi.loadResource(Rez.Drawables.EmptyBattery);
-                dc.drawBitmap(hWidth-8, height-25, battery);
+                if( bmpBattery == null ) {
+                    bmpBattery = WatchUi.loadResource(Rez.Drawables.Battery);
+                }
+                dc.drawBitmap(hWidth-10-moveBattery, 10, bmpBattery);
+            }
+            if (dev.alarmCount > 0 ) {
+                if( bmpAlarm == null ) {
+                    bmpAlarm = WatchUi.loadResource(Rez.Drawables.Alarm);
+                }
+                dc.drawBitmap(hWidth-10+moveAlarm, 10, bmpAlarm);
+            }
+
+            // Notification
+            if( dev.notificationCount > 0 ) {
+                if( bmpNotification == null ) {
+                    bmpNotification = Ui.loadResource(Rez.Drawables.Notification);
+                }
+                dc.drawBitmap(
+                    hWidth - 10,
+                    height - 28,
+                    bmpNotification
+                );
             }
 
             // Date
@@ -268,7 +293,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 );
             }
 
-
             // Error
             if ( fehler == true ) {
                 dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
@@ -280,8 +304,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     Graphics.TEXT_JUSTIFY_CENTER
                 );
             }
-
-
 
             // Draw the hour hand
             var hourHandAngle = (((clockTime.hour % 12) * 60) + clockTime.min);
