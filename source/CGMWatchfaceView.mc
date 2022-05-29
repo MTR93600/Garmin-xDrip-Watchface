@@ -69,8 +69,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
             return;
         }
 
-
-
         var dev = Sys.getDeviceSettings();
 
         setLayout(Rez.Layouts.WatchFace(dc));
@@ -247,14 +245,14 @@ class CGMWatchfaceView extends Ui.WatchFace {
             dc.drawCircle(hWidth, hHeight, 35);
 
             // Draw CGM
-            var textCGM = " " + anzeigeDelta + " " + anzeigeSGV + " " + verzoegerung + "'";
+            var textCGM = " " + anzeigeSGV + " " + anzeigeDelta + " " + verzoegerung + "'";
             dc.setPenWidth(2);
             dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
             dc.fillRoundedRectangle(
                 -7,
                 hHeight-constAscentFontTiny/2-6,
-                dc.getTextWidthInPixels(textCGM, Graphics.FONT_TINY)+10,
-                constAscentFontTiny+11,
+                dc.getTextWidthInPixels(textCGM, Graphics.FONT_TINY)+14,
+                constAscentFontTiny+12,
                 5
             );
             dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
