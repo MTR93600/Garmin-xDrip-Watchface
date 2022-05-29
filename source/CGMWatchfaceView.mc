@@ -190,18 +190,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
             var ziffernblatt = WatchUi.loadResource(Rez.Drawables.Ziffernblatt);
             dc.drawBitmap(0, 0, ziffernblatt);
 
-            // Error
-            if ( fehler == true ) {
-                dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
-                dc.drawText(
-                    hWidth,
-                    hHeight + 32,
-                    Graphics.FONT_XTINY,
-                    anzeigeFehler,
-                    Graphics.TEXT_JUSTIFY_CENTER
-                );
-            }
-
             // Critical battery
             var batteryLoad = Sys.getSystemStats().battery;
             if (batteryLoad < 10 ) {
@@ -212,12 +200,52 @@ class CGMWatchfaceView extends Ui.WatchFace {
             // Date
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
             dc.drawText(
-                width-12,
+                width-13,
                 hHeight-1,
                 Graphics.FONT_TINY,
                 datum,
                 Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER
             );
+
+            // TEST
+           dc.drawText(
+                13,
+                hHeight-1,
+                Graphics.FONT_TINY,
+                verzoegerung + " m",
+                Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER
+            );
+            dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(
+                hWidth,
+                height * 0.25 - 3,
+                Graphics.FONT_NUMBER_THAI_HOT,
+                anzeigeSGV,
+                Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
+            );
+
+            dc.drawText(
+                hWidth,
+                height * 0.75 + 2,
+                Graphics.FONT_NUMBER_THAI_HOT,
+                anzeigeDelta,
+                Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
+            );
+
+
+            // Error
+            if ( fehler == true ) {
+                dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
+                dc.drawText(
+                    hWidth,
+                    10,
+                    Graphics.FONT_XTINY,
+                    anzeigeFehler,
+                    Graphics.TEXT_JUSTIFY_CENTER
+                );
+            }
+
+
 
             // Draw the hour hand
             var hourHandAngle = (((clockTime.hour % 12) * 60) + clockTime.min);
@@ -225,27 +253,27 @@ class CGMWatchfaceView extends Ui.WatchFace {
             hourHandAngle = hourHandAngle * Math.PI * 2;
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
             dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, 70, 0, 6));
+            dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, 33, 0, 6));
             dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, 35, 0, 6));
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, 30, 0, 6));
 
 
             // Draw the minute hand
             var minuteHandAngle = (clockTime.min / 60.0) * Math.PI * 2;
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
             dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, 105, 0, 6));
+            dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, 33, 0, 6));
             dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, 35, 0, 6));
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, 30, 0, 6));
 
+            // White Point
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
             dc.fillCircle(hWidth, hHeight, 5);
 
-            // Draw black space
-            dc.setPenWidth(3);
-            dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
-            dc.drawCircle(hWidth, hHeight, 35);
-
             // Draw CGM
-            var textCGM = " " + anzeigeSGV + " " + anzeigeDelta + " " + verzoegerung + "'";
+            /*var textCGM = " " + anzeigeSGV + " " + anzeigeDelta + " " + verzoegerung + "'";
             dc.setPenWidth(2);
             dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
             dc.fillRoundedRectangle(
@@ -274,7 +302,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 Graphics.FONT_TINY,
                 textCGM,
                 Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER
-            );
+            ); */
 
 
         } else {
