@@ -122,19 +122,13 @@ class CGMWatchfaceApp extends App.AppBase {
     // New app settings have been received so trigger a UI update
     function onSettingsChanged() {
         masseinheit = App.getApp().getProperty("Einheiten").toNumber();
-        zielbereichLow = App.getApp().getProperty("Zielbereich1").toNumber();
-        zielbereichHigh = App.getApp().getProperty("Zielbereich2").toNumber();
         delay = App.getApp().getProperty("Delay").toNumber();
-        pinfit = App.getApp().getProperty("pinfit").toNumber();
         showNotification = App.getApp().getProperty("Notification").toNumber();
         eco = App.getApp().getProperty("eco").toNumber();
         lowPowerModeEnabled = App.getApp().getProperty("lowPowerMode").toNumber() == 0 ? true : false;
         if( masseinheit == null ) { masseinheit = 0; }
-        if( zielbereichLow == null ) { zielbereichLow = 70; }
-        if( zielbereichHigh == null ) { zielbereichHigh = 180; }
         if( delay == null ) { delay = 20; }
         if( eco == null ) { eco = 0; }
-        if( pinfit == null ) { pinfit = 0; }
         if( showNotification == null ) { showNotification = 1; }
     }
 
