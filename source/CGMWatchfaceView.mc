@@ -20,6 +20,7 @@ var wert, anzeigeDelta, anzeigeFehler;
 var anzeigeSGV = "", verzoegerung;
 var showNotification = 0;
 var screenCenterPoint;
+var screenShape;
 
 class CGMWatchfaceView extends Ui.WatchFace {
 
@@ -187,8 +188,34 @@ class CGMWatchfaceView extends Ui.WatchFace {
             // Call the parent onUpdate function to redraw the layout
             View.onUpdate(dc);
             //Sys.println("View.onUpdate");
-            var ziffernblatt = WatchUi.loadResource(Rez.Drawables.Ziffernblatt);
-            dc.drawBitmap(0, 0, ziffernblatt);
+
+            // Draw the tick marks around the edges of the screen
+            var sX, sY;
+            var eX, eY;
+            var outerRad = width / 2;
+            var innerRad = outerRad - 5;
+            // Loop through each 5 minute block and draw tick marks.
+            dc.setPenWidth(1);
+            dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
+            for (var i = Math.PI / 30; i <= 30 * Math.PI / 6; i += (Math.PI / 30)) {
+                // Partially unrolled loop to draw two tickmarks in 15 minute block.
+                sY = outerRad + innerRad * Math.sin(i);
+                eY = outerRad + outerRad * Math.sin(i);
+                sX = outerRad + innerRad * Math.cos(i);
+                eX = outerRad + outerRad * Math.cos(i);
+                dc.drawLine(sX, sY, eX, eY);
+            }
+            // Loop through each 15 minute block and draw tick marks.
+            dc.setPenWidth(2);
+            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+            for (var i = Math.PI / 6; i <= 12 * Math.PI / 6; i += (Math.PI / 6)) {
+                // Partially unrolled loop to draw two tickmarks in 15 minute block.
+                sY = outerRad + innerRad * Math.sin(i);
+                eY = outerRad + outerRad * Math.sin(i);
+                sX = outerRad + innerRad * Math.cos(i);
+                eX = outerRad + outerRad * Math.cos(i);
+                dc.drawLine(sX, sY, eX, eY);
+            }
 
             // Critical battery
             var batteryLoad = Sys.getSystemStats().battery;
@@ -207,7 +234,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER
             );
 
-            // TEST
+           // BG as background
            dc.drawText(
                 13,
                 hHeight-1,
@@ -218,19 +245,28 @@ class CGMWatchfaceView extends Ui.WatchFace {
             dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
             dc.drawText(
                 hWidth,
-                height * 0.25 - 3,
+                height * 0.25 + 2,
                 Graphics.FONT_NUMBER_THAI_HOT,
                 anzeigeSGV,
                 Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
             );
-
             dc.drawText(
                 hWidth,
-                height * 0.75 + 2,
+                height * 0.75 -7,
                 Graphics.FONT_NUMBER_THAI_HOT,
                 anzeigeDelta,
                 Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
             );
+            // Strike outdated BG
+            if (outdatedSGV == true) {
+                dc.setPenWidth(5);
+                dc.drawLine(
+                    hWidth - dc.getTextWidthInPixels(anzeigeSGV, Graphics.FONT_NUMBER_THAI_HOT)/2,
+                    height * 0.25 + 5,
+                    hWidth + dc.getTextWidthInPixels(anzeigeSGV, Graphics.FONT_NUMBER_THAI_HOT)/2,
+                    height * 0.25 + 5
+                );
+            }
 
 
             // Error
@@ -256,7 +292,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
             dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, 33, 0, 6));
             dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, 30, 0, 6));
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, 28, 0, 6));
 
 
             // Draw the minute hand
@@ -266,7 +302,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
             dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, 33, 0, 6));
             dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, 30, 0, 6));
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, 28, 0, 6));
 
             // White Point
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
@@ -353,7 +389,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         return( (now - timestamp/1000) / 60 );
     }
 
-        function generateHandCoordinates(centerPoint, angle, handLength, tailLength, width) {
+    function generateHandCoordinates(centerPoint, angle, handLength, tailLength, width) {
         // Map out the coordinates of the watch hand
         var coords = [[-(width / 2), tailLength], [-(width / 2), -handLength], [width / 2, -handLength], [width / 2, tailLength]];
         var result = new [4];
