@@ -197,8 +197,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             // Loop through each 5 minute block and draw tick marks.
             dc.setPenWidth(1);
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
-            for (var i = Math.PI / 30; i <= 30 * Math.PI / 6; i += (Math.PI / 30)) {
-                // Partially unrolled loop to draw two tickmarks in 15 minute block.
+            for (var i = Math.PI / 30; i <= 60 * Math.PI / 30; i += (Math.PI / 30)) {
                 sY = outerRad + innerRad * Math.sin(i);
                 eY = outerRad + outerRad * Math.sin(i);
                 sX = outerRad + innerRad * Math.cos(i);
