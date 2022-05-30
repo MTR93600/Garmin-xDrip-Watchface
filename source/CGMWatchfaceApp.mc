@@ -13,7 +13,7 @@ var eco = 0;
 var punkte;
 var calculation = true;
 var nextTime;
-var bmpNotification, bmpBattery, bmpAlarm;
+var bmpNotification, bmpBattery, bmpAlarm, bmpBluetooth;
 
 //BTL
 var isBackground = false;

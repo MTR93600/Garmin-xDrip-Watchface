@@ -216,24 +216,39 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 dc.drawLine(sX, sY, eX, eY);
             }
 
-            // Critical battery & alarm
-            var moveBattery = 0, moveAlarm = 0;
+            // Critical battery
             var batteryLoad = Sys.getSystemStats().battery;
-            if ( batteryLoad < 10 && dev.alarmCount > 0 ) {
-                moveBattery = 12;
-                moveAlarm = 12;
-            }
             if (batteryLoad < 10 ) {
                 if( bmpBattery == null ) {
                     bmpBattery = WatchUi.loadResource(Rez.Drawables.Battery);
                 }
-                dc.drawBitmap(hWidth-10-moveBattery, 10, bmpBattery);
+                dc.drawBitmap(
+                    hWidth - Math.sin(Math.PI/3)*hWidth + 10,
+                    hHeight - Math.cos(Math.PI/3)*hHeight,
+                    bmpBattery);
             }
+
+            // Bluetooth
+            if ( dev.phoneConnected == false ) {
+                if( bmpBluetooth == null ) {
+                    bmpBluetooth = Ui.loadResource(Rez.Drawables.Bluetooth);
+                }
+                dc.drawBitmap(
+                    hWidth - Math.sin(Math.PI/3)*hWidth + 10,
+                    hHeight + Math.cos(Math.PI/3)*hHeight - 20,
+                    bmpBluetooth
+                );
+            }
+
+            // Alarm
             if (dev.alarmCount > 0 ) {
                 if( bmpAlarm == null ) {
                     bmpAlarm = WatchUi.loadResource(Rez.Drawables.Alarm);
                 }
-                dc.drawBitmap(hWidth-10+moveAlarm, 10, bmpAlarm);
+                dc.drawBitmap(
+                    Math.sin(Math.PI/3)*hWidth + hWidth - 30,
+                    hHeight - Math.cos(Math.PI/3)*hHeight,
+                    bmpAlarm);
             }
 
             // Notification
@@ -242,8 +257,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     bmpNotification = Ui.loadResource(Rez.Drawables.Notification);
                 }
                 dc.drawBitmap(
-                    hWidth - 10,
-                    height - 28,
+                    Math.sin(Math.PI/3)*hWidth + hWidth - 30,
+                    hHeight + Math.cos(Math.PI/3)*hHeight - 20,
                     bmpNotification
                 );
             }
