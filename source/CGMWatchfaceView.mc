@@ -34,7 +34,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         width = dc.getWidth();
         hHeight = height/2;
         hWidth = width/2;
-        constAscentFontTiny = dc.getFontAscent(Graphics.FONT_TINY);
+        constAscentFontTiny = dc.getFontAscent(Gfx.FONT_TINY);
         screenCenterPoint = [dc.getWidth()/2, dc.getHeight()/2];
 
         masseinheit = App.getApp().getProperty("Einheiten").toNumber();
@@ -73,6 +73,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
         var dev = Sys.getDeviceSettings();
 
         setLayout(Rez.Layouts.WatchFace(dc));
+        var accentColor = Gfx.COLOR_WHITE; //Gfx.COLOR_BLUE;
+        var secondColor = Gfx.COLOR_LT_GRAY; //Gfx.COLOR_DK_BLUE;
 
         // Get the current time and format it correctly
         //Sys.println("onUpdate");
@@ -193,10 +195,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
             var sX, sY;
             var eX, eY;
             var outerRad = width / 2;
-            var innerRad = outerRad - 5;
+            var innerRad = outerRad - 7;
             // Loop through each 5 minute block and draw tick marks.
             dc.setPenWidth(1);
-            dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
+            dc.setColor(accentColor, Gfx.COLOR_BLACK);
             for (var i = Math.PI / 30; i <= 60 * Math.PI / 30; i += (Math.PI / 30)) {
                 sY = outerRad + innerRad * Math.sin(i);
                 eY = outerRad + outerRad * Math.sin(i);
@@ -206,7 +208,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             }
             // Loop through each 15 minute block and draw tick marks.
             dc.setPenWidth(2);
-            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+            //dc.setColor(secondColor, Gfx.COLOR_BLACK);
             for (var i = Math.PI / 6; i <= 12 * Math.PI / 6; i += (Math.PI / 6)) {
                 // Partially unrolled loop to draw two tickmarks in 15 minute block.
                 sY = outerRad + innerRad * Math.sin(i);
@@ -264,58 +266,58 @@ class CGMWatchfaceView extends Ui.WatchFace {
             }
 
             // Date
-            dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
+            dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);
             dc.drawText(
-                width-13,
+                width-16,
                 hHeight-1,
-                Graphics.FONT_TINY,
+                Gfx.FONT_TINY,
                 datum,
-                Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER
+                Gfx.TEXT_JUSTIFY_RIGHT | Gfx.TEXT_JUSTIFY_VCENTER
             );
 
            // BG as background
+           dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_TRANSPARENT);
            dc.drawText(
-                13,
+                16,
                 hHeight-1,
-                Graphics.FONT_TINY,
+                Gfx.FONT_MEDIUM,
                 verzoegerung + " m",
-                Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER
+                Gfx.TEXT_JUSTIFY_LEFT | Gfx.TEXT_JUSTIFY_VCENTER
             );
-            dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
             dc.drawText(
                 hWidth,
                 height * 0.25 + 2,
-                Graphics.FONT_NUMBER_THAI_HOT,
+                Gfx.FONT_NUMBER_THAI_HOT,
                 anzeigeSGV,
-                Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
+                Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER
             );
             dc.drawText(
                 hWidth,
                 height * 0.75 -7,
-                Graphics.FONT_NUMBER_THAI_HOT,
+                Gfx.FONT_NUMBER_THAI_HOT,
                 anzeigeDelta,
-                Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER
+                Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER
             );
             // Strike outdated BG
             if (outdatedSGV == true) {
                 dc.setPenWidth(5);
                 dc.drawLine(
-                    hWidth - dc.getTextWidthInPixels(anzeigeSGV, Graphics.FONT_NUMBER_THAI_HOT)/2,
+                    hWidth - dc.getTextWidthInPixels(anzeigeSGV, Gfx.FONT_NUMBER_THAI_HOT)/2,
                     height * 0.25 + 5,
-                    hWidth + dc.getTextWidthInPixels(anzeigeSGV, Graphics.FONT_NUMBER_THAI_HOT)/2,
+                    hWidth + dc.getTextWidthInPixels(anzeigeSGV, Gfx.FONT_NUMBER_THAI_HOT)/2,
                     height * 0.25 + 5
                 );
             }
 
             // Error
             if ( fehler == true ) {
-                dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
+                dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_BLACK);
                 dc.drawText(
                     hWidth,
                     10,
-                    Graphics.FONT_XTINY,
+                    Gfx.FONT_XTINY,
                     anzeigeFehler,
-                    Graphics.TEXT_JUSTIFY_CENTER
+                    Gfx.TEXT_JUSTIFY_CENTER
                 );
             }
 
@@ -323,57 +325,57 @@ class CGMWatchfaceView extends Ui.WatchFace {
             var hourHandAngle = (((clockTime.hour % 12) * 60) + clockTime.min);
             hourHandAngle = hourHandAngle / (12 * 60.0);
             hourHandAngle = hourHandAngle * Math.PI * 2;
-            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(accentColor, Gfx.COLOR_TRANSPARENT);
             dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, 70, 0, 6));
-            dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
             dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, 33, 0, 6));
-            dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(secondColor, Gfx.COLOR_TRANSPARENT);
             dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, 28, 0, 6));
 
 
             // Draw the minute hand
             var minuteHandAngle = (clockTime.min / 60.0) * Math.PI * 2;
-            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, 105, 0, 6));
-            dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(accentColor, Gfx.COLOR_TRANSPARENT);
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, 102, 0, 6)); // 105
+            dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
             dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, 33, 0, 6));
-            dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(secondColor, Gfx.COLOR_TRANSPARENT);
             dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, 28, 0, 6));
 
             // White Point
-            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(accentColor, Gfx.COLOR_TRANSPARENT);
             dc.fillCircle(hWidth, hHeight, 5);
 
             // Draw CGM
             /*var textCGM = " " + anzeigeSGV + " " + anzeigeDelta + " " + verzoegerung + "'";
             dc.setPenWidth(2);
-            dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
+            dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
             dc.fillRoundedRectangle(
                 -7,
                 hHeight-constAscentFontTiny/2-6,
-                dc.getTextWidthInPixels(textCGM, Graphics.FONT_TINY)+14,
+                dc.getTextWidthInPixels(textCGM, Gfx.FONT_TINY)+14,
                 constAscentFontTiny+12,
                 5
             );
-            dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
+            dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_BLACK);
             dc.drawRoundedRectangle(
                 -7,
                 hHeight-constAscentFontTiny/2-7,
-                dc.getTextWidthInPixels(textCGM, Graphics.FONT_TINY)+15,
+                dc.getTextWidthInPixels(textCGM, Gfx.FONT_TINY)+15,
                 constAscentFontTiny+13,
                 5
             );
             if( outdatedSGV == false ) {
-                dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+                dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
             } else {
-                dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
+                dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_TRANSPARENT);
             }
             dc.drawText(
                 0,
                 hHeight-1,
-                Graphics.FONT_TINY,
+                Gfx.FONT_TINY,
                 textCGM,
-                Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER
+                Gfx.TEXT_JUSTIFY_LEFT | Gfx.TEXT_JUSTIFY_VCENTER
             ); */
 
 
