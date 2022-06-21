@@ -74,7 +74,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
         setLayout(Rez.Layouts.WatchFace(dc));
         var accentColor = Gfx.COLOR_WHITE; //Gfx.COLOR_BLUE;
-        var secondColor = Gfx.COLOR_LT_GRAY; //Gfx.COLOR_DK_BLUE;
+        var secondColor = Gfx.COLOR_DK_GRAY; //Gfx.COLOR_DK_BLUE;
 
         // Get the current time and format it correctly
         //Sys.println("onUpdate");
@@ -220,8 +220,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
             // Critical battery
             var batteryLoad = Sys.getSystemStats().battery;
-            if (batteryLoad < 10 ) {
-                if( bmpBattery == null ) {
+            if (batteryLoad < 50) {
+                if( batteryLoad > 20 ) {
+                    bmpBattery = WatchUi.loadResource(Rez.Drawables.BatteryHalf);
+                } else {
                     bmpBattery = WatchUi.loadResource(Rez.Drawables.Battery);
                 }
                 dc.drawBitmap(
@@ -237,7 +239,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 }
                 dc.drawBitmap(
                     hWidth - Math.sin(Math.PI/3)*hWidth + 10,
-                    hHeight + Math.cos(Math.PI/3)*hHeight - 20,
+                    hHeight + Math.cos(Math.PI/3)*hHeight - 25,
                     bmpBluetooth
                 );
             }
@@ -248,7 +250,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     bmpAlarm = WatchUi.loadResource(Rez.Drawables.Alarm);
                 }
                 dc.drawBitmap(
-                    Math.sin(Math.PI/3)*hWidth + hWidth - 30,
+                    Math.sin(Math.PI/3)*hWidth + hWidth - 36,
                     hHeight - Math.cos(Math.PI/3)*hHeight,
                     bmpAlarm);
             }
@@ -259,8 +261,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     bmpNotification = Ui.loadResource(Rez.Drawables.Notification);
                 }
                 dc.drawBitmap(
-                    Math.sin(Math.PI/3)*hWidth + hWidth - 30,
-                    hHeight + Math.cos(Math.PI/3)*hHeight - 20,
+                    Math.sin(Math.PI/3)*hWidth + hWidth - 36,
+                    hHeight + Math.cos(Math.PI/3)*hHeight - 25,
                     bmpNotification
                 );
             }
@@ -345,6 +347,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
             // White Point
             dc.setColor(accentColor, Gfx.COLOR_TRANSPARENT);
             dc.fillCircle(hWidth, hHeight, 5);
+            dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
+            dc.drawCircle(hWidth, hHeight, 6);
 
             // Draw CGM
             /*var textCGM = " " + anzeigeSGV + " " + anzeigeDelta + " " + verzoegerung + "'";
