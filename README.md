@@ -83,7 +83,7 @@ See [Test xDrip+](#test-xdrip), but change the URL to
 - or `https://<YOURAPP.HEROKU.COM>/api/v1/entries/sgv.json?count=12&token=<ACCESS-TOKEN>` in case, you need an access token.
 
 ### **AndroidAPS**
-If you like to see your loop status enable “xDrip+ Statusline (Watch)” in AndroidAPS.
+If you like to see your loop status enable â€œxDrip+ Statusline (Watch)â€� in AndroidAPS.
 
 ------------------------
 ## **Troubleshooting Q/A**
@@ -124,6 +124,7 @@ Some of the codes are handled explicitely:
 ------------------------
 ## **Changelog**
 
+V3.90 - Support for new devices (Forerunner 955 series, Edge 140 series)
 V3.81 - Format Spikes IOB without decimal digits
 V3.80 - Spike App: Show IOB and COB (TBR isn't supported afaik)
 V3.75 -  Try to fix the problem of missing data if the watchface was not active for a while (code from Vaughanabe13)<br />
