@@ -5,7 +5,7 @@ using Toybox.Communications;
 using Toybox.ActivityMonitor;
 
 (:background)
-class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
+class CGMWatchfaceAnalogBGServiceDelegate extends Toybox.System.ServiceDelegate {
 
     function initialize() {
         Sys.ServiceDelegate.initialize();

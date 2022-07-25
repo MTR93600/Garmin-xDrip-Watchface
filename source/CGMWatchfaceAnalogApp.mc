@@ -23,7 +23,7 @@ var isHighPower = true;
 var lowPowerModeEnabled = false;
 
 (:background)
-class CGMWatchfaceApp extends App.AppBase {
+class CGMWatchfaceAnalogApp extends App.AppBase {
 
     function initialize() {
         AppBase.initialize();
@@ -66,7 +66,7 @@ class CGMWatchfaceApp extends App.AppBase {
             }
             adjustTime = false;
         }
-        return [ new CGMWatchfaceView() ];
+        return [ new CGMWatchfaceAnalogView() ];
     }
 
     function onBackgroundData(data) {
@@ -109,7 +109,7 @@ class CGMWatchfaceApp extends App.AppBase {
     }
 
     function getServiceDelegate(){
-        return [new CGMWatchfaceBGServiceDelegate()];
+        return [new CGMWatchfaceAnalogBGServiceDelegate()];
     }
 
     // New app settings have been received so trigger a UI update

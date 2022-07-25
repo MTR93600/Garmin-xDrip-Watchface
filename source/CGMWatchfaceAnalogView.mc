@@ -22,7 +22,7 @@ var showNotification = 0;
 var screenCenterPoint;
 var screenShape;
 
-class CGMWatchfaceView extends Ui.WatchFace {
+class CGMWatchfaceAnalogView extends Ui.WatchFace {
 
     function initialize() {
         WatchFace.initialize();
