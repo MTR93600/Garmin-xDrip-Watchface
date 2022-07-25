@@ -328,11 +328,11 @@ class CGMWatchfaceView extends Ui.WatchFace {
             hourHandAngle = hourHandAngle / (12 * 60.0);
             hourHandAngle = hourHandAngle * Math.PI * 2;
             dc.setColor(accentColor, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, 70, 0, 6));
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, 75, 0, 6));
             dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, 33, 0, 6));
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, 40, 0, 6));
             dc.setColor(secondColor, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, 28, 0, 6));
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, 35, 0, 6));
 
 
             // Draw the minute hand
@@ -340,9 +340,9 @@ class CGMWatchfaceView extends Ui.WatchFace {
             dc.setColor(accentColor, Gfx.COLOR_TRANSPARENT);
             dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, 102, 0, 6)); // 105
             dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, 33, 0, 6));
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, 40, 0, 6));
             dc.setColor(secondColor, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, 28, 0, 6));
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, 35, 0, 6));
 
             // White Point
             dc.setColor(accentColor, Gfx.COLOR_TRANSPARENT);
