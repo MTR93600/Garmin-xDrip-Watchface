@@ -38,9 +38,10 @@
     <string id="opt_zielbereich_15">190 mg/dl | 10,5 mmol</string>
     <string id="opt_zielbereich_16">200 mg/dl | 11,1 mmol</string>
     
-    <string id="DelayTitel">Adjustment of the request delay</string>
+    <string id="DelayTitel">Size of the additional delay of the query</string>
+    <string id="opt_delay_0">Query strict every 5 min. without consideration of the time of measurement (not recommended!)</string>
     <string id="opt_delay_3">-10 sec.</string>
-    <string id="opt_delay_4">No adjustment</string>
+    <string id="opt_delay_4">0 sec.</string>
     <string id="opt_delay_5">+10 sec.</string>
     <string id="opt_delay_6">+20 sec.</string>
     <string id="opt_delay_7">+30 sec.</string>
