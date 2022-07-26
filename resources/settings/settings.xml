@@ -22,6 +22,7 @@
     </setting>
 	<setting propertyKey="@Properties.Delay" title="@Strings.DelayTitel" prompt="@Strings.AllgemeinPrompt">
            <settingConfig type="list">
+           	   <listEntry value="999">@Rez.Strings.opt_delay_0</listEntry>
                <listEntry value="-10">@Rez.Strings.opt_delay_3</listEntry>
                <listEntry value="0">@Rez.Strings.opt_delay_4</listEntry>
                <listEntry value="10">@Rez.Strings.opt_delay_5</listEntry>
