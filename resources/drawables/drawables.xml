@@ -1,7 +1,6 @@
 <drawables>
     <bitmap id="LauncherIcon" filename="launcher_icon.png" />
     <bitmap id="Battery" filename="batterie-niedrig-filled-25.png" />
-    <bitmap id="BatteryHalf" filename="batterie-halb-filled-25.png" />
     <bitmap id="Notification" filename="nachricht2-filled-25.png" />
     <bitmap id="Alarm" filename="alarm-filled-25.png" />
     <bitmap id="Bluetooth" filename="bluetooth-off-filled-25.png" />

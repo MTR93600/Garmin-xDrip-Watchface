@@ -220,10 +220,8 @@ class CGMWatchfaceAnalogView extends Ui.WatchFace {
 
             // Critical battery
             var batteryLoad = Sys.getSystemStats().battery;
-            if (batteryLoad < 50) {
-                if( batteryLoad > 20 ) {
-                    bmpBattery = WatchUi.loadResource(Rez.Drawables.BatteryHalf);
-                } else {
+            if (batteryLoad <= 20) {
+                if (bmpBattery == null) {
                     bmpBattery = WatchUi.loadResource(Rez.Drawables.Battery);
                 }
                 dc.drawBitmap(
