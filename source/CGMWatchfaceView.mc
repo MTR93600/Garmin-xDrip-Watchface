@@ -15,6 +15,7 @@ using Toybox.Activity;
 var sgv, aaps, timestamp, duration, masseinheit = 0, auswahlPfeil;
 var height, width, hHeight, hWidth, hoeheBalken, hoeheGraph, breiteGraph;
 var constSpace, constSpaceBar, constAscentFontSmall, constAscentFontNumber, constDescentFontNumber;
+var fontTime;
 var outdatedSGV = false;
 var wert, anzeigeDelta, anzeigeFehler;
 var heartAnzeige, stepsAnzeige;
@@ -41,9 +42,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
         hWidth = width/2;
         constSpace = 5;
         constSpaceBar = 10;
+        fontTime = Gfx.FONT_NUMBER_MEDIUM;
         constAscentFontSmall = dc.getFontAscent(Gfx.FONT_SMALL);
-        constAscentFontNumber = dc.getFontAscent(Gfx.FONT_NUMBER_MEDIUM);
-        constDescentFontNumber = dc.getFontDescent(Gfx.FONT_NUMBER_MEDIUM);
+        if( dc.getTextWidthInPixels("24:24", fontTime) + constSpaceBar > hWidth ) {
+            fontTime = Gfx.FONT_NUMBER_MILD;
+        }
+        constAscentFontNumber = dc.getFontAscent(fontTime);
+        constDescentFontNumber = dc.getFontDescent(fontTime);
         hoeheBalken = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)-2;
         hoeheGraph = -dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constAscentFontSmall;
         breiteGraph = hWidth - constSpaceBar;
@@ -317,6 +322,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             // Update the view
             var time = View.findDrawableById("TimeLabel");
             time.setText(timeString);
+            time.setFont(fontTime);
             time.setLocation(
                 hWidth-constSpaceBar,
                 hHeight-8-constAscentFontNumber
@@ -331,6 +337,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
             var sgvAnzeige = View.findDrawableById("sgvLabel");
             sgvAnzeige.setText(anzeigeSGV);
+            sgvAnzeige.setFont(fontTime);
             sgvAnzeige.setLocation(
                 hWidth+constSpaceBar,
                 hHeight-8-constAscentFontNumber
@@ -348,6 +355,18 @@ class CGMWatchfaceView extends Ui.WatchFace {
             deltaAnzeige.setLocation(
                 hWidth+constSpaceBar,
                 hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)
+            );
+
+            var verzAnzeige = View.findDrawableById("verzLabel");
+            verzAnzeige.setText(verzoegerung.toString()+"'");
+            if( energy == 1 ) {
+                verzAnzeige.setText(verzoegerung.toString()+" m");
+            } else {
+                verzAnzeige.setText(verzoegerung.toString()+"' e");
+            }
+            verzAnzeige.setLocation(
+                hWidth+constSpaceBar,
+                hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-dc.getFontAscent(Gfx.FONT_SMALL)-1
             );
 
             var iobAnzeige = View.findDrawableById("iobLabel");
@@ -386,18 +405,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)
                 );
             }
-
-            var verzAnzeige = View.findDrawableById("verzLabel");
-            verzAnzeige.setText(verzoegerung.toString()+"'");
-            if( energy == 1 ) {
-                verzAnzeige.setText(verzoegerung.toString()+" m");
-            } else {
-                verzAnzeige.setText(verzoegerung.toString()+"' e");
-            }
-            verzAnzeige.setLocation(
-                hWidth+constSpaceBar,
-                hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-dc.getFontHeight(Gfx.FONT_SMALL)
-            );
 
             // Call the parent onUpdate function to redraw the layout
             View.onUpdate(dc);
@@ -481,9 +488,9 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_LT_GRAY);
                 dc.setPenWidth(1);
                 dc.drawRectangle(
-                    0,
+                    -1,
                     hHeight + 8,
-                    breiteGraph,
+                    breiteGraph + 1,
                     hoeheGraph
                 );
                 //In range lines
@@ -494,7 +501,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     dc.drawLine(
                         0,
                         hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY)),
-                        breiteGraph,
+                        breiteGraph - 2,
                         hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY))
                     );
                 }
@@ -503,7 +510,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     dc.drawLine(
                         0,
                         hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY)),
-                        breiteGraph,
+                        breiteGraph - 2,
                         hHeight + 9 + hoeheGraph - ( plotSGV * (hoeheGraph*factorY))
                     );
                 }
