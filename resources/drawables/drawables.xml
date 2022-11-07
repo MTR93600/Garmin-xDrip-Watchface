@@ -1,16 +1,24 @@
 <drawables>
     <bitmap id="LauncherIcon" filename="launcher_icon.png" />
-    <bitmap id="steps" filename="footsteps-20.png" />
-    <bitmap id="stairs" filename="stairs-up-20.png" />
-    <bitmap id="heart" filename="heart-20.png" />
-    <bitmap id="iob" filename="iob-20.png"/>
-    <bitmap id="cob" filename="carbs-20.png"/>
-    <bitmap id="tbr" filename="tbr-20.png"/>
-    <bitmap id="heart_stairs" filename="heart-stairs.png"/>
+    <bitmap id="steps20" filename="footsteps-20.png" />
+    <bitmap id="steps30" filename="footsteps-30.png" />
+    <bitmap id="stairs20" filename="stairs-up-20.png" />
+    <bitmap id="stairs30" filename="stairs-up-30.png" />
+    <bitmap id="heart20" filename="heart-20.png" />
+    <bitmap id="heart30" filename="heart-30.png" />
+    <bitmap id="iob20" filename="iob-20.png"/>
+    <bitmap id="iob30" filename="iob-30.png"/>
+    <bitmap id="cob20" filename="carbs-20.png"/>
+    <bitmap id="cob30" filename="carbs-30.png"/>
+    <bitmap id="tbr20" filename="tbr-20.png"/>
+    <bitmap id="tbr30" filename="tbr-30.png"/>
+    <bitmap id="heart_stairs20" filename="heart-stairs-20.png"/>
+    <bitmap id="heart_stairs30" filename="heart-stairs-30.png"/>
     <bitmap id="bluetooth" filename="bluetooth-25.png" />
     <bitmap id="stopwatch" filename="stoppuhr-20.png" />
     <bitmap id="alarmclock" filename="alarm-21.png" />
-    <bitmap id="notification" filename="notification.png" />
+    <bitmap id="notification18" filename="notification-18.png" />
+    <bitmap id="notification36" filename="notification-36.png" />
     <bitmap id="id_1" filename="DownDown.png"/>
     <bitmap id="id_2" filename="SingleDown.png"/>
     <bitmap id="id_3" filename="FortyFiveDown.png"/>
