@@ -75,6 +75,9 @@ class CGMWatchfaceAnalogView extends Ui.WatchFace {
         setLayout(Rez.Layouts.WatchFace(dc));
         var accentColor = Gfx.COLOR_WHITE; //Gfx.COLOR_BLUE;
         var secondColor = Gfx.COLOR_DK_GRAY; //Gfx.COLOR_DK_BLUE;
+        var glucoseColorInRange = 0x0000FF; //0x0000AA;
+        var glucoseColorOffRange = 0x00FF000; // 0x000055;  // 0xAA0000;
+        var glucoseColor = Gfx.COLOR_DK_GRAY; // Gfx.COLOR_DK_GRAY;
 
         // Get the current time and format it correctly
         //Sys.println("onUpdate");
@@ -104,6 +107,9 @@ class CGMWatchfaceAnalogView extends Ui.WatchFace {
         if( punkte != null && punkte instanceof Lang.Array && punkte.size() > 0 ) {
             //Sys.println("CGM Daten");
             anzeigeFehler = "";
+
+            glucoseColor = punkte[0]["sgv"] != null && ( punkte[0]["sgv"] < 70 || punkte[0]["sgv"] > 180 ) ? glucoseColorOffRange : glucoseColorInRange;
+
             if( calculation == true ) {
                 calculation = false;
                 // Units: mmol/l or mg/dl
@@ -120,7 +126,6 @@ class CGMWatchfaceAnalogView extends Ui.WatchFace {
                 } else {
                     delta_errechnet = null;
                 }
-
 
                 // SGV and Delta
                 if( masseinheit != null && masseinheit == 1 && delta_errechnet != null ) {
@@ -191,11 +196,41 @@ class CGMWatchfaceAnalogView extends Ui.WatchFace {
             View.onUpdate(dc);
             //Sys.println("View.onUpdate");
 
+            // Draw an bg arc
+            /*if (punkte != null && punkte[0]["sgv"] != null) {
+                var bzUmgerechnet = punkte[0]["sgv"] * 360 / 250;
+                //bzUmgerechnet = 400 * 360 / 250;
+                //punkte[0]["sgv"] = 400;
+                var grad = bzUmgerechnet > 360 ? 360 : bzUmgerechnet;
+                dc.setColor(Gfx.COLOR_BLUE, Gfx.COLOR_TRANSPARENT);
+                dc.drawArc(width/2, height/2-1, width/2-1, Gfx.ARC_CLOCKWISE, 270, 270 - grad);
+                dc.drawArc(width/2, height/2-1, width/2-2, Gfx.ARC_CLOCKWISE, 270, 270 - grad);
+                //dc.drawArc(width/2, height/2-1, width/2-3, Gfx.ARC_CLOCKWISE, 270, 270 - grad);
+                dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
+                grad = bzUmgerechnet > 101 ? 101 : bzUmgerechnet;
+                dc.drawArc(width/2, height/2-1, width/2-1, Gfx.ARC_CLOCKWISE, 270, 270 - grad);
+                dc.drawArc(width/2, height/2-1, width/2-2, Gfx.ARC_CLOCKWISE, 270, 270 - grad);
+                //dc.drawArc(width/2, height/2-1, width/2-3, Gfx.ARC_CLOCKWISE, 270, 270 - grad);
+                if (punkte[0]["sgv"] > 180) {
+                    grad = bzUmgerechnet > 360  ? 360 : bzUmgerechnet;
+                    dc.drawArc(width/2, height/2-1, width/2-1, Gfx.ARC_CLOCKWISE, 270-259, 270 - grad);
+                    dc.drawArc(width/2, height/2-1, width/2-2, Gfx.ARC_CLOCKWISE, 270-259, 270 - grad);
+                    //dc.drawArc(width/2, height/2-1, width/2-3, Gfx.ARC_CLOCKWISE, 270-259, 270 - grad);
+                }
+                /*dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
+                dc.drawArc(width/2, height/2, width/2-1, Gfx.ARC_CLOCKWISE, 170, 166);
+                dc.drawArc(width/2, height/2, width/2-2, Gfx.ARC_CLOCKWISE, 170, 166);
+                dc.drawArc(width/2, height/2, width/2-3, Gfx.ARC_CLOCKWISE, 170, 166);
+                dc.drawArc(width/2, height/2, width/2-1, Gfx.ARC_CLOCKWISE, 13, 9);
+                dc.drawArc(width/2, height/2, width/2-2, Gfx.ARC_CLOCKWISE, 13, 9);
+                dc.drawArc(width/2, height/2, width/2-3, Gfx.ARC_CLOCKWISE, 13, 9);
+            }*/
+
             // Draw the tick marks around the edges of the screen
             var sX, sY;
             var eX, eY;
             var outerRad = width / 2;
-            var innerRad = outerRad - 7;
+            var innerRad = outerRad - 7; //-7
             // Loop through each 5 minute block and draw tick marks.
             dc.setPenWidth(1);
             dc.setColor(accentColor, Gfx.COLOR_BLACK);
@@ -225,8 +260,8 @@ class CGMWatchfaceAnalogView extends Ui.WatchFace {
                     bmpBattery = WatchUi.loadResource(Rez.Drawables.Battery);
                 }
                 dc.drawBitmap(
-                    hWidth - Math.sin(Math.PI/3)*hWidth + 10,
-                    hHeight - Math.cos(Math.PI/3)*hHeight,
+                    hWidth - Math.sin(Math.PI/2.6)*hWidth + 10,
+                    hHeight - Math.cos(Math.PI/2.6)*hHeight,
                     bmpBattery);
             }
 
@@ -236,8 +271,8 @@ class CGMWatchfaceAnalogView extends Ui.WatchFace {
                     bmpBluetooth = Ui.loadResource(Rez.Drawables.Bluetooth);
                 }
                 dc.drawBitmap(
-                    hWidth - Math.sin(Math.PI/3)*hWidth + 10,
-                    hHeight + Math.cos(Math.PI/3)*hHeight - 25,
+                    hWidth - Math.sin(Math.PI/2.6)*hWidth + 10,
+                    hHeight + Math.cos(Math.PI/2.6)*hHeight - 25,
                     bmpBluetooth
                 );
             }
@@ -248,8 +283,8 @@ class CGMWatchfaceAnalogView extends Ui.WatchFace {
                     bmpAlarm = WatchUi.loadResource(Rez.Drawables.Alarm);
                 }
                 dc.drawBitmap(
-                    Math.sin(Math.PI/3)*hWidth + hWidth - 36,
-                    hHeight - Math.cos(Math.PI/3)*hHeight,
+                    Math.sin(Math.PI/2.6)*hWidth + hWidth - 36,
+                    hHeight - Math.cos(Math.PI/2.6)*hHeight,
                     bmpAlarm);
             }
 
@@ -259,8 +294,8 @@ class CGMWatchfaceAnalogView extends Ui.WatchFace {
                     bmpNotification = Ui.loadResource(Rez.Drawables.Notification);
                 }
                 dc.drawBitmap(
-                    Math.sin(Math.PI/3)*hWidth + hWidth - 36,
-                    hHeight + Math.cos(Math.PI/3)*hHeight - 25,
+                    Math.sin(Math.PI/2.6)*hWidth + hWidth - 36,
+                    hHeight + Math.cos(Math.PI/2.6)*hHeight - 25,
                     bmpNotification
                 );
             }
@@ -276,7 +311,7 @@ class CGMWatchfaceAnalogView extends Ui.WatchFace {
             );
 
            // BG as background
-           dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_TRANSPARENT);
+           dc.setColor(glucoseColor, Gfx.COLOR_TRANSPARENT);
            dc.drawText(
                 16,
                 hHeight-1,
@@ -326,60 +361,27 @@ class CGMWatchfaceAnalogView extends Ui.WatchFace {
             hourHandAngle = hourHandAngle / (12 * 60.0);
             hourHandAngle = hourHandAngle * Math.PI * 2;
             dc.setColor(accentColor, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, 75, 0, 6));
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, hWidth - 45, 0, 6)); // 120- 75
             dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, 40, 0, 6));
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, hWidth - 80, 0, 6)); // 40
             dc.setColor(secondColor, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, 35, 0, 6));
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, hWidth - 85, 0, 6)); // 35
 
 
             // Draw the minute hand
             var minuteHandAngle = (clockTime.min / 60.0) * Math.PI * 2;
             dc.setColor(accentColor, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, 102, 0, 6)); // 105
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, hWidth - 18, 0, 6)); // 102
             dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, 40, 0, 6));
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, hWidth - 80, 0, 6)); // 40
             dc.setColor(secondColor, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, 35, 0, 6));
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, hWidth - 85, 0, 6)); // 35
 
             // White Point
             dc.setColor(accentColor, Gfx.COLOR_TRANSPARENT);
             dc.fillCircle(hWidth, hHeight, 5);
             dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
             dc.drawCircle(hWidth, hHeight, 6);
-
-            // Draw CGM
-            /*var textCGM = " " + anzeigeSGV + " " + anzeigeDelta + " " + verzoegerung + "'";
-            dc.setPenWidth(2);
-            dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
-            dc.fillRoundedRectangle(
-                -7,
-                hHeight-constAscentFontTiny/2-6,
-                dc.getTextWidthInPixels(textCGM, Gfx.FONT_TINY)+14,
-                constAscentFontTiny+12,
-                5
-            );
-            dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_BLACK);
-            dc.drawRoundedRectangle(
-                -7,
-                hHeight-constAscentFontTiny/2-7,
-                dc.getTextWidthInPixels(textCGM, Gfx.FONT_TINY)+15,
-                constAscentFontTiny+13,
-                5
-            );
-            if( outdatedSGV == false ) {
-                dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-            } else {
-                dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_TRANSPARENT);
-            }
-            dc.drawText(
-                0,
-                hHeight-1,
-                Gfx.FONT_TINY,
-                textCGM,
-                Gfx.TEXT_JUSTIFY_LEFT | Gfx.TEXT_JUSTIFY_VCENTER
-            ); */
-
 
         } else {
 //! LOW POWER
