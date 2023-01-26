@@ -16,7 +16,7 @@ var sgv, aaps, timestamp, duration, masseinheit = 0;
 var height, width, hHeight, hWidth;
 var constAscentFontTiny;
 var outdatedSGV = false;
-var wert, anzeigeDelta, anzeigeFehler;
+var wert, anzeigeDelta, anzeigeFehler, anzeigeVerzoegerung;
 var anzeigeSGV = "", verzoegerung;
 var showNotification = 0;
 var screenCenterPoint;
@@ -76,7 +76,7 @@ class CGMWatchfaceAnalogView extends Ui.WatchFace {
         var accentColor = Gfx.COLOR_WHITE; //Gfx.COLOR_BLUE;
         var secondColor = Gfx.COLOR_DK_GRAY; //Gfx.COLOR_DK_BLUE;
         var glucoseColorInRange = 0x0000FF; //0x0000AA;
-        var glucoseColorOffRange = 0x00FF000; // 0x000055;  // 0xAA0000;
+        var glucoseColorOffRange = 0xFF0000; // 0x000055;  // 0xAA0000;
         var glucoseColor = Gfx.COLOR_DK_GRAY; // Gfx.COLOR_DK_GRAY;
 
         // Get the current time and format it correctly
@@ -137,7 +137,7 @@ class CGMWatchfaceAnalogView extends Ui.WatchFace {
                     anzeigeDelta += delta_errechnet.format("%.1f");
                 } else if( delta_errechnet != null ) {
                     // mg
-                    anzeigeSGV = punkte[0]["sgv"] != null ? punkte[0]["sgv"].toString() : "--";
+                    anzeigeSGV = punkte[0]["sgv"] != null ? punkte[0]["sgv"].format("%.0f") : "--";
                     // Delta in String umwandeln, bei positiven Werten + davor
                     anzeigeDelta = delta_errechnet > 0 ? "+" : "";
                     anzeigeDelta += delta_errechnet.format("%.0f");
@@ -149,10 +149,11 @@ class CGMWatchfaceAnalogView extends Ui.WatchFace {
             // Delay in minutes, proof if SGV is outdated
             verzoegerung = punkte[0]["date"] != null ? minutesFromTimestamp(Time.now().value(), punkte[0]["date"]) : "999";
             outdatedSGV = ( verzoegerung != null && verzoegerung > 11 ) ? true : false;
+            anzeigeVerzoegerung = verzoegerung.format("%.0f");
 
         } else {
             anzeigeFehler = "Wait max.\n5 min";
-            verzoegerung = "--";
+            anzeigeVerzoegerung = "--";
             anzeigeSGV = "---";
             anzeigeDelta = "--";
         }
@@ -184,7 +185,7 @@ class CGMWatchfaceAnalogView extends Ui.WatchFace {
 
         //Test
         //anzeigeSGV = "22.4";
-        //verzoegerung = "12";
+        //anzeigeVerzoegerung = "12";
         //anzeigeDelta = "+14.2";
         //anzeigeBasal = "120%";
         //anzeigeIOB = "12,1";*/
@@ -195,36 +196,6 @@ class CGMWatchfaceAnalogView extends Ui.WatchFace {
             // Call the parent onUpdate function to redraw the layout
             View.onUpdate(dc);
             //Sys.println("View.onUpdate");
-
-            // Draw an bg arc
-            /*if (punkte != null && punkte[0]["sgv"] != null) {
-                var bzUmgerechnet = punkte[0]["sgv"] * 360 / 250;
-                //bzUmgerechnet = 400 * 360 / 250;
-                //punkte[0]["sgv"] = 400;
-                var grad = bzUmgerechnet > 360 ? 360 : bzUmgerechnet;
-                dc.setColor(Gfx.COLOR_BLUE, Gfx.COLOR_TRANSPARENT);
-                dc.drawArc(width/2, height/2-1, width/2-1, Gfx.ARC_CLOCKWISE, 270, 270 - grad);
-                dc.drawArc(width/2, height/2-1, width/2-2, Gfx.ARC_CLOCKWISE, 270, 270 - grad);
-                //dc.drawArc(width/2, height/2-1, width/2-3, Gfx.ARC_CLOCKWISE, 270, 270 - grad);
-                dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
-                grad = bzUmgerechnet > 101 ? 101 : bzUmgerechnet;
-                dc.drawArc(width/2, height/2-1, width/2-1, Gfx.ARC_CLOCKWISE, 270, 270 - grad);
-                dc.drawArc(width/2, height/2-1, width/2-2, Gfx.ARC_CLOCKWISE, 270, 270 - grad);
-                //dc.drawArc(width/2, height/2-1, width/2-3, Gfx.ARC_CLOCKWISE, 270, 270 - grad);
-                if (punkte[0]["sgv"] > 180) {
-                    grad = bzUmgerechnet > 360  ? 360 : bzUmgerechnet;
-                    dc.drawArc(width/2, height/2-1, width/2-1, Gfx.ARC_CLOCKWISE, 270-259, 270 - grad);
-                    dc.drawArc(width/2, height/2-1, width/2-2, Gfx.ARC_CLOCKWISE, 270-259, 270 - grad);
-                    //dc.drawArc(width/2, height/2-1, width/2-3, Gfx.ARC_CLOCKWISE, 270-259, 270 - grad);
-                }
-                /*dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
-                dc.drawArc(width/2, height/2, width/2-1, Gfx.ARC_CLOCKWISE, 170, 166);
-                dc.drawArc(width/2, height/2, width/2-2, Gfx.ARC_CLOCKWISE, 170, 166);
-                dc.drawArc(width/2, height/2, width/2-3, Gfx.ARC_CLOCKWISE, 170, 166);
-                dc.drawArc(width/2, height/2, width/2-1, Gfx.ARC_CLOCKWISE, 13, 9);
-                dc.drawArc(width/2, height/2, width/2-2, Gfx.ARC_CLOCKWISE, 13, 9);
-                dc.drawArc(width/2, height/2, width/2-3, Gfx.ARC_CLOCKWISE, 13, 9);
-            }*/
 
             // Draw the tick marks around the edges of the screen
             var sX, sY;
@@ -316,7 +287,7 @@ class CGMWatchfaceAnalogView extends Ui.WatchFace {
                 16,
                 hHeight-1,
                 Gfx.FONT_MEDIUM,
-                verzoegerung + " m",
+                anzeigeVerzoegerung + " m",
                 Gfx.TEXT_JUSTIFY_LEFT | Gfx.TEXT_JUSTIFY_VCENTER
             );
             dc.drawText(
@@ -361,21 +332,21 @@ class CGMWatchfaceAnalogView extends Ui.WatchFace {
             hourHandAngle = hourHandAngle / (12 * 60.0);
             hourHandAngle = hourHandAngle * Math.PI * 2;
             dc.setColor(accentColor, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, hWidth - 45, 0, 6)); // 120- 75
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, hWidth - 45, 0, 5)); // 120- 75
             dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, hWidth - 80, 0, 6)); // 40
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, hWidth - 80, 0, 5)); // 40
             dc.setColor(secondColor, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, hWidth - 85, 0, 6)); // 35
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, hWidth - 85, 0, 5)); // 35
 
 
             // Draw the minute hand
             var minuteHandAngle = (clockTime.min / 60.0) * Math.PI * 2;
             dc.setColor(accentColor, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, hWidth - 18, 0, 6)); // 102
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, hWidth - 18, 0, 5)); // 102
             dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, hWidth - 80, 0, 6)); // 40
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, hWidth - 80, 0, 5)); // 40
             dc.setColor(secondColor, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, hWidth - 85, 0, 6)); // 35
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, hWidth - 85, 0, 5)); // 35
 
             // White Point
             dc.setColor(accentColor, Gfx.COLOR_TRANSPARENT);
@@ -399,7 +370,7 @@ class CGMWatchfaceAnalogView extends Ui.WatchFace {
                 hWidth,
                 hHeight + 20,
                 Gfx.FONT_LARGE,
-                anzeigeSGV + " " + anzeigeDelta + " @ " + verzoegerung.toString() + " m",
+                anzeigeSGV + " " + anzeigeDelta + " @ " + anzeigeVerzoegerung + " m",
                 Gfx.TEXT_JUSTIFY_CENTER
             );
         }

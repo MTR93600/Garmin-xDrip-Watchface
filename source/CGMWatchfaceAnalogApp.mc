@@ -34,6 +34,12 @@ class CGMWatchfaceAnalogApp extends App.AppBase {
         //BTL
         //Indicate the face has returned and we can draw updates again
         isClosing = false;
+        if( isBackground != null && isBackground == false ) {
+            if( Toybox.System has :ServiceDelegate && Background.getTemporalEventRegisteredTime() == null) {
+                var setDuration = new Time.Duration(300);
+                Background.registerForTemporalEvent(setDuration);
+            }
+        }
     }
 
     // onStop() is called when your application is exiting
@@ -43,11 +49,13 @@ class CGMWatchfaceAnalogApp extends App.AppBase {
         //widgets, settings menu, activity, etc. This will always be called in a watch
         //face when the face is hidden.
         isClosing = true;
-        Background.deleteTemporalEvent();
         //Make sure we are not currently in the background thread, since you cannot use
         //the object store in the background context
-        if( isBackground != null && false == isBackground && punkte != null && punkte instanceof Lang.Array ) {
-            App.Storage.setValue("punkteWatchface", punkte);
+        if( isBackground != null && false == isBackground ){
+            if( punkte != null && punkte instanceof Lang.Array ) {
+                App.Storage.setValue("punkteWatchface", punkte);
+            }
+            //Background.deleteTemporalEvent();
         }
         // Free resources
         bmpNotification = null;
@@ -55,17 +63,6 @@ class CGMWatchfaceAnalogApp extends App.AppBase {
 
     // Return the initial view of your application here
     function getInitialView() {
-        if( Toybox.System has :ServiceDelegate && System.getDeviceSettings().phoneConnected ) {
-            //Sys.println("InitialView: has Service Delegate");
-            var lastTime = Background.getLastTemporalEventTime();
-            if (lastTime != null) {
-                var nextTime = lastTime.add(new Time.Duration(5 * 60));
-                Background.registerForTemporalEvent(nextTime);
-            } else {
-                Background.registerForTemporalEvent(Time.now());
-            }
-            adjustTime = false;
-        }
         return [ new CGMWatchfaceAnalogView() ];
     }
 
