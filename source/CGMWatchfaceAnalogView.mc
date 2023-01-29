@@ -332,25 +332,25 @@ class CGMWatchfaceAnalogView extends Ui.WatchFace {
             hourHandAngle = hourHandAngle / (12 * 60.0);
             hourHandAngle = hourHandAngle * Math.PI * 2;
             dc.setColor(accentColor, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, hWidth - 45, 0, 5)); // 120- 75
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, hWidth - 45, 0, 6)); // 120- 75
             dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, hWidth - 80, 0, 5)); // 40
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, hWidth - 80, 0, 6)); // 40
             dc.setColor(secondColor, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, hWidth - 85, 0, 5)); // 35
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, hourHandAngle, hWidth - 85, 0, 6)); // 35
 
 
             // Draw the minute hand
             var minuteHandAngle = (clockTime.min / 60.0) * Math.PI * 2;
             dc.setColor(accentColor, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, hWidth - 18, 0, 5)); // 102
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, hWidth - 18, 0, 6)); // 102
             dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, hWidth - 80, 0, 5)); // 40
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, hWidth - 80, 0, 6)); // 40
             dc.setColor(secondColor, Gfx.COLOR_TRANSPARENT);
-            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, hWidth - 85, 0, 5)); // 35
+            dc.fillPolygon(generateHandCoordinates(screenCenterPoint, minuteHandAngle, hWidth - 85, 0, 6)); // 35
 
             // White Point
             dc.setColor(accentColor, Gfx.COLOR_TRANSPARENT);
-            dc.fillCircle(hWidth, hHeight, 5);
+            dc.fillCircle(hWidth, hHeight, 6);
             dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
             dc.drawCircle(hWidth, hHeight, 6);
 
