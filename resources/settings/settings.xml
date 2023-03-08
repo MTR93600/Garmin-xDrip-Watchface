@@ -50,21 +50,21 @@
 	</setting>
 	<setting propertyKey="@Properties.Delay" title="@Strings.DelayTitel" prompt="@Strings.AllgemeinPrompt">
            <settingConfig type="list">
-           	   <listEntry value="999">@Rez.Strings.opt_delay_0</listEntry>
-               <listEntry value="-10">@Rez.Strings.opt_delay_3</listEntry>
-               <listEntry value="0">@Rez.Strings.opt_delay_4</listEntry>
-               <listEntry value="10">@Rez.Strings.opt_delay_5</listEntry>
-               <listEntry value="20">@Rez.Strings.opt_delay_6</listEntry>
-               <listEntry value="30">@Rez.Strings.opt_delay_7</listEntry>
-               <listEntry value="40">@Rez.Strings.opt_delay_8</listEntry>
-               <listEntry value="50">@Rez.Strings.opt_delay_9</listEntry>
-               <listEntry value="60">@Rez.Strings.opt_delay_10</listEntry>
-               <listEntry value="70">@Rez.Strings.opt_delay_11</listEntry>
-               <listEntry value="80">@Rez.Strings.opt_delay_12</listEntry>
-               <listEntry value="90">@Rez.Strings.opt_delay_13</listEntry>
-               <listEntry value="100">@Rez.Strings.opt_delay_14</listEntry>
-               <listEntry value="110">@Rez.Strings.opt_delay_15</listEntry>
-               <listEntry value="120">@Rez.Strings.opt_delay_16</listEntry>                            
+           	   <listEntry value="999">@Strings.opt_delay_0</listEntry>
+               <listEntry value="-10">@Strings.opt_delay_3</listEntry>
+               <listEntry value="0">@Strings.opt_delay_4</listEntry>
+               <listEntry value="10">@Strings.opt_delay_5</listEntry>
+               <listEntry value="20">@Strings.opt_delay_6</listEntry>
+               <listEntry value="30">@Strings.opt_delay_7</listEntry>
+               <listEntry value="40">@Strings.opt_delay_8</listEntry>
+               <listEntry value="50">@Strings.opt_delay_9</listEntry>
+               <listEntry value="60">@Strings.opt_delay_10</listEntry>
+               <listEntry value="70">@Strings.opt_delay_11</listEntry>
+               <listEntry value="80">@Strings.opt_delay_12</listEntry>
+               <listEntry value="90">@Strings.opt_delay_13</listEntry>
+               <listEntry value="100">@Strings.opt_delay_14</listEntry>
+               <listEntry value="110">@Strings.opt_delay_15</listEntry>
+               <listEntry value="120">@Strings.opt_delay_16</listEntry>                            
            </settingConfig>
 	</setting>
 	<setting propertyKey="@Properties.pinfit" title="@Strings.pinfitTitle" prompt="@Strings.AllgemeinPrompt">
