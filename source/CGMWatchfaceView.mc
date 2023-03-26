@@ -802,7 +802,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
 //! LOW POWER
             dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
             dc.clear();
-            dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_BLACK);
+            dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_BLACK);
             dc.drawText(
                 hWidth,
                 hHeight - dc.getFontAscent(Gfx.FONT_NUMBER_HOT) - 5,
