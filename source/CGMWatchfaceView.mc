@@ -475,8 +475,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 var factorY = 0.0033; // Faktor: 1/300
                 var graphCorr = 0;
                 for( var i = 0; i < punkte.size(); i++ ) {
-                    if( lowValue > punkte[i]["sgv"] ) { lowValue = punkte[i]["sgv"]; }
-                    if( highValue < punkte[i]["sgv"] ) { highValue = punkte[i]["sgv"]; }
+                    if( punkte[i]["sgv"] != null ) {
+                        lowValue = lowValue > punkte[i]["sgv"] ? punkte[i]["sgv"] : lowValue;
+                        highValue = highValue < punkte[i]["sgv"] ? punkte[i]["sgv"] : highValue;
+                    }
                 }
                 var difference = highValue - lowValue;
                 if( difference != null && difference <= 90 ) {
