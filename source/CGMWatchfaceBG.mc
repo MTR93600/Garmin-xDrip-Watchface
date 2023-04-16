@@ -60,8 +60,22 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
     function verarbeiteWerte( responseCode, data ) {
         //Sys.println("verarbeite Werte, Code:" + responseCode);
         //Sys.println(data);
-        if( responseCode == 200 ) { Background.exit(data); }
-        else { Background.exit(responseCode); }
+        if( responseCode == 200 ) { 
+            data[0] = { 
+                "date" => data[0]["date"], 
+                "sgv" => data[0]["sgv"],
+                "units_hint" => data[0]["units_hint"],
+                "delta" => data[0]["delta"],
+                "aaps" => data[0]["aaps"],
+                "aaps-ts" => data[0]["aaps-ts"],
+                "IOB" => data[0]["IOB"],
+                "COB" => data[0]["COB"]
+            };
+            for( var i = 1; i < data.size(); i++ ) {
+                data[i] = { "date" => data[i]["date"], "sgv" => data[i]["sgv"] };
+            }
+            Background.exit(data); 
+        } else { Background.exit(responseCode); }
     }
 
 }
