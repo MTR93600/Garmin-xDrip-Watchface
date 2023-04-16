@@ -490,6 +490,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     minutes = 5;
                 }
                 // Array ggf. vergrößern
+                if( punkte.size() > numberValuesTotal ) {
+                    punkte = new [1];
+                    punkte[0] = { "date" => 0, "sgv" => 0};
+                }
                 if( bgReadingsAccumulated.size() != numberValuesTotal ) {
                     var temp = new [numberValuesTotal];
                     for( var i = 0; i < punkte.size(); i++ ) {
@@ -566,7 +570,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 dc.setPenWidth(1);
                 // Plot bloodglucose
                 for( var i = 0; i < bgReadingsAccumulated.size(); i++ ) {
-                    if(bgReadingsAccumulated[i]["sgv"] != null && bgReadingsAccumulated[i]["date"] != null ) {
+                    if( bgReadingsAccumulated[i]["sgv"] != null && bgReadingsAccumulated[i]["date"] != null && bgReadingsAccumulated[i]["sgv"] > 0 ) {
                         plotSGV = (bgReadingsAccumulated[i]["sgv"] - lowValue) + graphCorr;
                         // Factor for stretching / compressing the values on the x-axis depending on the number of sgv values
                         var factorX = 1/(minutes * bgReadingsAccumulated.size()).toFloat(); // 1 / ( 5 minutes * x readings )
