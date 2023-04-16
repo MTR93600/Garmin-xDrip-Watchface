@@ -27,6 +27,8 @@ var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", anzeigeCOB = "", verzoe
 var showActivity = 0, counterActivityAnzeige = 0;
 var showNotification = 0;
 var BGFarbe = false, BarsFarbe = true;
+var numberValuesTotal = 24, newValues = 1, minutes = 5;
+var bgReadingsAccumulated = new [1];
 
 class CGMWatchfaceView extends Ui.WatchFace {
 
@@ -80,6 +82,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
         if( temp != null && temp instanceof Lang.Array) {
             punkte = temp;
             calculation = true;
+        }
+        temp = App.Storage.getValue("bgReadingsAccumulatedWatchface");
+        if( temp != null && temp instanceof Lang.Array) {
+            bgReadingsAccumulated = temp;
         }
     }
 
@@ -471,13 +477,52 @@ class CGMWatchfaceView extends Ui.WatchFace {
             }
             // Graph
             if( punkte != null && punkte instanceof Lang.Array ) {
+                
+                // Umspeichern
+                // Check for need of 1 minute values 
+                if( punkte[0]["date"] && punkte[1]["date"] && (punkte[0]["date"] - punkte[1]["date"]) * 0.001 < 2 * 60 ) {                   
+                    numberValuesTotal = 60;
+                    newValues = 5;
+                    minutes = 1;
+                } else {
+                    numberValuesTotal = 24;
+                    newValues = 1;
+                    minutes = 5;
+                }
+                // Array ggf. vergrößern
+                if( bgReadingsAccumulated.size() != numberValuesTotal ) {
+                    var temp = new [numberValuesTotal];
+                    for( var i = 0; i < punkte.size(); i++ ) {
+                        temp[i] = punkte[i];
+                    }
+                    for( var i = punkte.size(); i < numberValuesTotal; i++) {
+                        temp[i] = { "date" => 0, "sgv" => 0};
+                    }
+                    bgReadingsAccumulated = temp;
+                    //App.Storage.setValue("bgReadingsAccumulatedWatchface", bgReadingsAccumulated);
+                }
+                if( bgReadingsAccumulated[0]["date"] < punkte[0]["date"] ) {    
+                    for( var i = numberValuesTotal-1; i >= punkte.size(); i-- ) {
+                        var k = i-newValues;
+                        bgReadingsAccumulated[i]["date"] = bgReadingsAccumulated[k]["date"] ? bgReadingsAccumulated[k]["date"] : 0;
+                        bgReadingsAccumulated[i]["sgv"] = bgReadingsAccumulated[k]["sgv"] ? bgReadingsAccumulated[k]["sgv"] : 0;
+                    }
+                    for( var i = 0; i < punkte.size(); i++ ) {
+                        bgReadingsAccumulated[i]["date"] = punkte[i]["date"];
+                        bgReadingsAccumulated[i]["sgv"] = punkte[i]["sgv"];
+                    }
+                    //App.Storage.setValue("bgReadingsAccumulatedWatchface", bgReadingsAccumulated); 
+                }
+                //Sys.println(bgReadingsAccumulated.size());
+
+
                 var lowValue = 1000, highValue = 0;
                 var factorY = 0.0033; // Faktor: 1/300
                 var graphCorr = 0;
-                for( var i = 0; i < punkte.size(); i++ ) {
-                    if( punkte[i]["sgv"] != null ) {
-                        lowValue = lowValue > punkte[i]["sgv"] ? punkte[i]["sgv"] : lowValue;
-                        highValue = highValue < punkte[i]["sgv"] ? punkte[i]["sgv"] : highValue;
+                for( var i = 0; i < bgReadingsAccumulated.size(); i++ ) {
+                    if( bgReadingsAccumulated[i]["sgv"] != null && bgReadingsAccumulated[i]["sgv"] > 0 ) {
+                        lowValue = lowValue > bgReadingsAccumulated[i]["sgv"] ? bgReadingsAccumulated[i]["sgv"] : lowValue;
+                        highValue = highValue < bgReadingsAccumulated[i]["sgv"] ? bgReadingsAccumulated[i]["sgv"] : highValue;
                     }
                 }
                 var difference = highValue - lowValue;
@@ -520,14 +565,14 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 }
                 dc.setPenWidth(1);
                 // Plot bloodglucose
-                for( var i = 0; i < punkte.size(); i++ ) {
-                    if(punkte[i]["sgv"] != null && punkte[i]["date"] != null ) {
-                        plotSGV = (punkte[i]["sgv"] - lowValue) + graphCorr;
+                for( var i = 0; i < bgReadingsAccumulated.size(); i++ ) {
+                    if(bgReadingsAccumulated[i]["sgv"] != null && bgReadingsAccumulated[i]["date"] != null ) {
+                        plotSGV = (bgReadingsAccumulated[i]["sgv"] - lowValue) + graphCorr;
                         // Factor for stretching / compressing the values on the x-axis depending on the number of sgv values
-                        var factorX = 1/(5 * punkte.size()).toFloat(); // 1 / ( 5 minutes * x readings )
-                        var plotBreite = breiteGraph - 3 - (minutesFromTimestamp(Time.now().value(), punkte[i]["date"]) * ( (breiteGraph-3) * factorX) );
+                        var factorX = 1/(minutes * bgReadingsAccumulated.size()).toFloat(); // 1 / ( 5 minutes * x readings )
+                        var plotBreite = breiteGraph - 3 - (minutesFromTimestamp(Time.now().value(), bgReadingsAccumulated[i]["date"]) * ( (breiteGraph-3) * factorX) );
                         var plotHoehe = hoeheGraph - ( plotSGV * ((hoeheGraph)*factorY));
-                        if( zielbereichLow <= punkte[i]["sgv"] && punkte[i]["sgv"] <= zielbereichHigh ) {
+                        if( zielbereichLow <= bgReadingsAccumulated[i]["sgv"] && bgReadingsAccumulated[i]["sgv"] <= zielbereichHigh ) {
                             dc.setColor(farbeZielbereich, Gfx.COLOR_TRANSPARENT);
                         } else {
                             dc.setColor(farbeAlarm, Gfx.COLOR_TRANSPARENT);

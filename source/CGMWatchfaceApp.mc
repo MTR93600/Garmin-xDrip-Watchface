@@ -46,8 +46,9 @@ class CGMWatchfaceApp extends App.AppBase {
         Background.deleteTemporalEvent();
         //Make sure we are not currently in the background thread, since you cannot use
         //the object store in the background context
-        if( isBackground != null && false == isBackground && punkte != null && punkte instanceof Lang.Array ) {
+        if( isBackground != null && false == isBackground && punkte != null && punkte instanceof Lang.Array && bgReadingsAccumulated != null) {
             App.Storage.setValue("punkteWatchface", punkte);
+            App.Storage.setValue("bgReadingsAccumulatedWatchface", bgReadingsAccumulated); 
         }
         // Free resources
         bmpStopwatch = null;
