@@ -80,12 +80,6 @@
                <listEntry value="1">@Strings.opt_Notification_2</listEntry> 
            </settingConfig>
 	</setting>
-	<setting propertyKey="@Properties.eco" title="@Strings.ecoTitle" prompt="@Strings.AllgemeinPrompt">
-           <settingConfig type="list">
-               <listEntry value="0">@Strings.opt_eco_1</listEntry>
-               <listEntry value="1">@Strings.opt_eco_2</listEntry> 
-           </settingConfig>
-	</setting>
 	<setting propertyKey="@Properties.lowPowerMode" title="@Strings.lowPowerModeTitle" prompt="@Strings.AllgemeinPrompt">
            <settingConfig type="list">
                <listEntry value="0">@Strings.opt_lowPowerMode_1</listEntry>

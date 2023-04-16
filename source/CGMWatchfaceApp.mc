@@ -7,10 +7,9 @@ var fehler, fehler_code = "";
 var delay = 20;
 var adjustTime = true;
 var zielbereichLow, zielbereichHigh;
-var energy = 1;
 var pinfit = 0;
-var eco = 0;
 var punkte;
+var numberValuesTotal = 24, newValues = 1, minutes = 5;
 var calculation = true;
 var nextTime;
 var bmpStopwatch, bmpBluetooth, bmpAlarmclock, bmpSteps, bmpStairs, bmpHeart, bmpSteps2, bmpHeart2, bmpHeartStairs, bmpNotification;
@@ -88,27 +87,14 @@ class CGMWatchfaceApp extends App.AppBase {
             App.Storage.setValue("punkteWatchface", punkte);
             calculation = true;
             var differenz = Time.now().value() - data[0]["date"]/1000;
-            if( delay == 999 ) {
+            if( delay == 999 || (minutes != null && minutes != 1) ) {
                 duration = new Time.Duration(300);
             } else if( differenz != null && differenz > (40 + delay) && differenz < 300 ) {
                 adjustTime = true;
                 duration = new Time.Duration(600 - differenz + 15 + delay);
             } else {
                 adjustTime = false;
-                var delta_errechnet;
-                if( data.size() > 1 && data[0]["sgv"] != null && data[0]["date"] != null && data[1]["sgv"] != null && data[1]["date"] != null  && punkte[0]["date"] > punkte[1]["date"] ) {
-                    delta_errechnet = ( data[0]["sgv"] - data[1]["sgv"] ) / ( (data[0]["date"] - data[1]["date"]) * 0.001 )  * 5 * 60;
-                    //ecoMode
-                    if( eco == 1 ) {
-                        energy = (data[0]["sgv"] < 120 && delta_errechnet <= -5) || delta_errechnet <= -10 || data[0]["sgv"] < 90 ? 1 : 2;
-                    } else {
-                        energy = 1;
-                    }
-                } else {
-                    delta_errechnet = null;
-                    energy = 1;
-                }
-                duration = differenz != null && differenz < (10 + delay) ? new Time.Duration(energy * 5 * 60 + 15 + delay) : new Time.Duration(energy * 5 * 60);
+                duration = differenz != null && differenz < (10 + delay) ? new Time.Duration(5 * 60 + 15 + delay) : new Time.Duration(5 * 60);
             }
             nextTime = lastTime != null ? lastTime.add(duration) : Time.now();
         } else {
@@ -130,13 +116,11 @@ class CGMWatchfaceApp extends App.AppBase {
         delay = App.getApp().getProperty("Delay").toNumber();
         pinfit = App.getApp().getProperty("pinfit").toNumber();
         showNotification = App.getApp().getProperty("Notification").toNumber();
-        eco = App.getApp().getProperty("eco").toNumber();
         lowPowerModeEnabled = App.getApp().getProperty("lowPowerMode").toNumber() == 0 ? true : false;
         if( masseinheit == null ) { masseinheit = 0; }
         if( zielbereichLow == null ) { zielbereichLow = 70; }
         if( zielbereichHigh == null ) { zielbereichHigh = 180; }
         if( delay == null ) { delay = 20; }
-        if( eco == null ) { eco = 0; }
         if( pinfit == null ) { pinfit = 0; }
         if( showNotification == null ) { showNotification = 1; }
     }

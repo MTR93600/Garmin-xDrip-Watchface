@@ -27,7 +27,6 @@ var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", anzeigeCOB = "", verzoe
 var showActivity = 0, counterActivityAnzeige = 0;
 var showNotification = 0;
 var BGFarbe = false, BarsFarbe = true;
-var numberValuesTotal = 24, newValues = 1, minutes = 5;
 var bgReadingsAccumulated = new [1];
 
 class CGMWatchfaceView extends Ui.WatchFace {
@@ -61,13 +60,11 @@ class CGMWatchfaceView extends Ui.WatchFace {
         delay = App.getApp().getProperty("Delay").toNumber();
         pinfit = App.getApp().getProperty("pinfit").toNumber();
         showNotification = App.getApp().getProperty("Notification").toNumber();
-        eco = App.getApp().getProperty("eco").toNumber();
         lowPowerModeEnabled = App.getApp().getProperty("lowPowerMode").toNumber() == 0 ? true : false;
         if( masseinheit == null ) { masseinheit = 0; }
         if( zielbereichLow == null ) { zielbereichLow = 70; }
         if( zielbereichHigh == null ) { zielbereichHigh = 180; }
         if( delay == null ) { delay = 20; }
-        if( eco == null ) { eco = 0; }
         if( pinfit == null ) { pinfit = 0; }
         if( showNotification == null ) { showNotification = 1; }
     }
@@ -161,6 +158,48 @@ class CGMWatchfaceView extends Ui.WatchFace {
             anzeigeFehler = "";
             if( calculation == true ) {
                 calculation = false;
+
+                // Restore bg values for graph
+                // Check for need of 1 minute values 
+                if( punkte[0]["date"] && punkte[1]["date"] && (punkte[0]["date"] - punkte[1]["date"]) * 0.001 < 2 * 60 ) {                   
+                    numberValuesTotal = 60;
+                    newValues = 5;
+                    minutes = 1;
+                } else {
+                    numberValuesTotal = 24;
+                    newValues = 1;
+                    minutes = 5;
+                }
+                // Adjust array size
+                if( punkte.size() > numberValuesTotal ) {
+                    punkte = new [1];
+                    punkte[0] = { "date" => 0, "sgv" => 0};
+                }
+                if( bgReadingsAccumulated.size() != numberValuesTotal ) {
+                    var temp = new [numberValuesTotal];
+                    for( var i = 0; i < punkte.size(); i++ ) {
+                        temp[i] = punkte[i];
+                    }
+                    for( var i = punkte.size(); i < numberValuesTotal; i++) {
+                        temp[i] = { "date" => 0, "sgv" => 0};
+                    }
+                    bgReadingsAccumulated = temp;
+                    //App.Storage.setValue("bgReadingsAccumulatedWatchface", bgReadingsAccumulated);
+                }
+                if( bgReadingsAccumulated[0]["date"] < punkte[0]["date"] ) {    
+                    for( var i = numberValuesTotal-1; i >= punkte.size(); i-- ) {
+                        var k = i-newValues;
+                        bgReadingsAccumulated[i]["date"] = bgReadingsAccumulated[k]["date"] ? bgReadingsAccumulated[k]["date"] : 0;
+                        bgReadingsAccumulated[i]["sgv"] = bgReadingsAccumulated[k]["sgv"] ? bgReadingsAccumulated[k]["sgv"] : 0;
+                    }
+                    for( var i = 0; i < punkte.size(); i++ ) {
+                        bgReadingsAccumulated[i]["date"] = punkte[i]["date"];
+                        bgReadingsAccumulated[i]["sgv"] = punkte[i]["sgv"];
+                    }
+                    //App.Storage.setValue("bgReadingsAccumulatedWatchface", bgReadingsAccumulated); 
+                }
+                //Sys.println(bgReadingsAccumulated.size());
+
                 // Units: mmol/l or mg/dl
                 if( punkte[0]["units_hint"] != null ) {
                     masseinheit = punkte[0]["units_hint"].equals("mmol") ? 1 : 0;
@@ -168,7 +207,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 // Calculate delta
                 var delta_errechnet;
                 if( punkte.size() > 1 && punkte[0]["sgv"] != null && punkte[0]["date"] != null && punkte[1]["sgv"] != null && punkte[1]["date"] != null && punkte[0]["date"] > punkte[1]["date"] ) {
-                    delta_errechnet = ( punkte[0]["sgv"] - punkte[1]["sgv"] ) / ( (punkte[0]["date"] - punkte[1]["date"]) * 0.001 )  * 5 * 60;
+                    delta_errechnet = ( punkte[0]["sgv"] - punkte[1]["sgv"] ) / ( (punkte[0]["date"] - punkte[1]["date"]) * 0.001 )  *  minutes * 60;
                 } else if ( punkte[0]["delta"] != null ) {
                     delta_errechnet = punkte[0]["delta"];
                 } else {
@@ -364,12 +403,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             );
 
             var verzAnzeige = View.findDrawableById("verzLabel");
-            verzAnzeige.setText(verzoegerung.toString()+"'");
-            if( energy == 1 ) {
-                verzAnzeige.setText(verzoegerung.toString()+" m");
-            } else {
-                verzAnzeige.setText(verzoegerung.toString()+"' e");
-            }
+            verzAnzeige.setText(verzoegerung.toString()+" m");
             verzAnzeige.setLocation(
                 hWidth+constSpaceBar,
                 hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-dc.getFontAscent(Gfx.FONT_SMALL)-1
@@ -477,49 +511,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
             }
             // Graph
             if( punkte != null && punkte instanceof Lang.Array ) {
-                
-                // Umspeichern
-                // Check for need of 1 minute values 
-                if( punkte[0]["date"] && punkte[1]["date"] && (punkte[0]["date"] - punkte[1]["date"]) * 0.001 < 2 * 60 ) {                   
-                    numberValuesTotal = 60;
-                    newValues = 5;
-                    minutes = 1;
-                } else {
-                    numberValuesTotal = 24;
-                    newValues = 1;
-                    minutes = 5;
-                }
-                // Array ggf. vergrößern
-                if( punkte.size() > numberValuesTotal ) {
-                    punkte = new [1];
-                    punkte[0] = { "date" => 0, "sgv" => 0};
-                }
-                if( bgReadingsAccumulated.size() != numberValuesTotal ) {
-                    var temp = new [numberValuesTotal];
-                    for( var i = 0; i < punkte.size(); i++ ) {
-                        temp[i] = punkte[i];
-                    }
-                    for( var i = punkte.size(); i < numberValuesTotal; i++) {
-                        temp[i] = { "date" => 0, "sgv" => 0};
-                    }
-                    bgReadingsAccumulated = temp;
-                    //App.Storage.setValue("bgReadingsAccumulatedWatchface", bgReadingsAccumulated);
-                }
-                if( bgReadingsAccumulated[0]["date"] < punkte[0]["date"] ) {    
-                    for( var i = numberValuesTotal-1; i >= punkte.size(); i-- ) {
-                        var k = i-newValues;
-                        bgReadingsAccumulated[i]["date"] = bgReadingsAccumulated[k]["date"] ? bgReadingsAccumulated[k]["date"] : 0;
-                        bgReadingsAccumulated[i]["sgv"] = bgReadingsAccumulated[k]["sgv"] ? bgReadingsAccumulated[k]["sgv"] : 0;
-                    }
-                    for( var i = 0; i < punkte.size(); i++ ) {
-                        bgReadingsAccumulated[i]["date"] = punkte[i]["date"];
-                        bgReadingsAccumulated[i]["sgv"] = punkte[i]["sgv"];
-                    }
-                    //App.Storage.setValue("bgReadingsAccumulatedWatchface", bgReadingsAccumulated); 
-                }
-                //Sys.println(bgReadingsAccumulated.size());
-
-
                 var lowValue = 1000, highValue = 0;
                 var factorY = 0.0033; // Faktor: 1/300
                 var graphCorr = 0;

@@ -60,10 +60,6 @@
     <string id="opt_pinfit_2">Pin heartrate</string>
     <string id="opt_pinfit_3">Pin steps</string>
     
-    <string id="ecoTitle">ecoMode (reduces queries if bg is stable)</string>
-    <string id="opt_eco_1">Request usually after 5 min</string>
-    <string id="opt_eco_2">If bg is stable, a query is started every 10 min</string>
-    
     <string id="lowPowerModeTitle">Enable Low Power Mode (for amoled Displays f. e.)?</string>
     <string id="opt_lowPowerMode_1">Yes</string>
     <string id="opt_lowPowerMode_2">No</string> 
