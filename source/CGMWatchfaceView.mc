@@ -161,7 +161,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
                 // Restore bg values for graph
                 // Check for need of 1 minute values 
-                if( punkte[0]["date"] && punkte[1]["date"] && (punkte[0]["date"] - punkte[1]["date"]) * 0.001 < 4 * 60 ) {                   
+                if( punkte.size() > 1 && punkte[0]["date"] != null && punkte[1]["date"] != null && (punkte[0]["date"] - punkte[1]["date"]) * 0.001 < 4 * 60 ) {                   
                     numberValuesTotal = 60;
                     newValues = 5;
                     minutes = 1;
