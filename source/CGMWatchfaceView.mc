@@ -648,12 +648,14 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 if( bmpBluetooth == null ) {
                     bmpBluetooth = Ui.loadResource(Rez.Drawables.bluetooth);
                 }
-                dc.drawBitmap(
-                    hWidth-constSpaceBar-14-constSpace-15,
-                    hHeight-8-constAscentFontNumber+constDescentFontNumber-5-dc.getFontHeight(Gfx.FONT_MEDIUM)-4-25,
-                    bmpBluetooth
-                );
-                btSymbolOffset = 22;
+                if( bmpBluetooth != null ) {
+                    dc.drawBitmap(
+                        hWidth-constSpaceBar-14-constSpace-15,
+                        hHeight-8-constAscentFontNumber+constDescentFontNumber-5-dc.getFontHeight(Gfx.FONT_MEDIUM)-4-25,
+                        bmpBluetooth
+                    );
+                    btSymbolOffset = 22;
+                }
             }
 
             // Alarm clock

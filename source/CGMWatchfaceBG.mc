@@ -3,6 +3,7 @@ using Toybox.Background;
 using Toybox.System as Sys;
 using Toybox.Communications;
 using Toybox.ActivityMonitor;
+using Toybox.Lang as Lang;
 
 (:background)
 class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
@@ -61,18 +62,20 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
         //Sys.println("verarbeite Werte, Code:" + responseCode);
         //Sys.println(data);
         if( responseCode == 200 ) { 
-            data[0] = { 
-                "date" => data[0]["date"], 
-                "sgv" => data[0]["sgv"],
-                "units_hint" => data[0]["units_hint"],
-                "delta" => data[0]["delta"],
-                "aaps" => data[0]["aaps"],
-                "aaps-ts" => data[0]["aaps-ts"],
-                "IOB" => data[0]["IOB"],
-                "COB" => data[0]["COB"]
-            };
-            for( var i = 1; i < data.size(); i++ ) {
-                data[i] = { "date" => data[i]["date"], "sgv" => data[i]["sgv"] };
+            if( data != null && data instanceof Lang.Array && data.size() > 0 ) {
+                data[0] = { 
+                    "date" => data[0]["date"], 
+                    "sgv" => data[0]["sgv"],
+                    "units_hint" => data[0]["units_hint"],
+                    "delta" => data[0]["delta"],
+                    "aaps" => data[0]["aaps"],
+                    "aaps-ts" => data[0]["aaps-ts"],
+                    "IOB" => data[0]["IOB"],
+                    "COB" => data[0]["COB"]
+                };
+                for( var i = 1; i < data.size(); i++ ) {
+                    data[i] = { "date" => data[i]["date"], "sgv" => data[i]["sgv"] };
+                }
             }
             Background.exit(data); 
         } else { Background.exit(responseCode); }
