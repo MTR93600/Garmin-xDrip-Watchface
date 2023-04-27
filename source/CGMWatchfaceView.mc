@@ -27,7 +27,6 @@ var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", anzeigeCOB = "", verzoe
 var showActivity = 0, counterActivityAnzeige = 0;
 var showNotification = 0;
 var BGFarbe = false, BarsFarbe = true;
-var bgReadingsAccumulated = new [1];
 
 class CGMWatchfaceView extends Ui.WatchFace {
 
@@ -184,7 +183,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                         temp[i] = { "date" => 0, "sgv" => 0};
                     }
                     bgReadingsAccumulated = temp;
-                    //App.Storage.setValue("bgReadingsAccumulatedWatchface", bgReadingsAccumulated);
+                    App.Storage.setValue("bgReadingsAccumulatedWatchface", bgReadingsAccumulated);
                 }
                 if( bgReadingsAccumulated[0]["date"] < punkte[0]["date"] ) {    
                     for( var i = numberValuesTotal-1; i >= punkte.size(); i-- ) {
@@ -196,9 +195,8 @@ class CGMWatchfaceView extends Ui.WatchFace {
                         bgReadingsAccumulated[i]["date"] = punkte[i]["date"];
                         bgReadingsAccumulated[i]["sgv"] = punkte[i]["sgv"];
                     }
-                    //App.Storage.setValue("bgReadingsAccumulatedWatchface", bgReadingsAccumulated); 
+                    App.Storage.setValue("bgReadingsAccumulatedWatchface", bgReadingsAccumulated); 
                 }
-                //Sys.println(bgReadingsAccumulated.size());
 
                 // Units: mmol/l or mg/dl
                 if( punkte[0]["units_hint"] != null ) {

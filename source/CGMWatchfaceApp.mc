@@ -9,6 +9,7 @@ var adjustTime = true;
 var zielbereichLow, zielbereichHigh;
 var pinfit = 0;
 var punkte;
+var bgReadingsAccumulated = new [1];
 var numberValuesTotal = 24, newValues = 1, minutes = 5;
 var calculation = true;
 var nextTime;
@@ -45,19 +46,20 @@ class CGMWatchfaceApp extends App.AppBase {
         Background.deleteTemporalEvent();
         //Make sure we are not currently in the background thread, since you cannot use
         //the object store in the background context
-        if( isBackground != null && false == isBackground && punkte != null && punkte instanceof Lang.Array && bgReadingsAccumulated != null) {
-            App.Storage.setValue("punkteWatchface", punkte);
-            App.Storage.setValue("bgReadingsAccumulatedWatchface", bgReadingsAccumulated); 
+        if( isBackground != null && false == isBackground /*&& punkte != null && punkte instanceof Lang.Array && bgReadingsAccumulated != null*/) {
+            //App.Storage.setValue("punkteWatchface", punkte);
+            //App.Storage.setValue("bgReadingsAccumulatedWatchface", bgReadingsAccumulated); 
+        
+            // Free resources
+            bmpStopwatch = null;
+            bmpBluetooth = null;
+            bmpAlarmclock = null;
+            bmpSteps = null;
+            bmpStairs = null;
+            bmpHeart = null;
+            bmpNotification = null;
+            bmpHeartStairs = null;
         }
-        // Free resources
-        bmpStopwatch = null;
-        bmpBluetooth = null;
-        bmpAlarmclock = null;
-        bmpSteps = null;
-        bmpStairs = null;
-        bmpHeart = null;
-        bmpNotification = null;
-        bmpHeartStairs = null;
     }
 
     // Return the initial view of your application here
