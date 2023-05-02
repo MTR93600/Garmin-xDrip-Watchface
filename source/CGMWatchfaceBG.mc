@@ -62,9 +62,9 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
         //Sys.println("verarbeite Werte, Code:" + responseCode);
         //Sys.println(data);
         if( responseCode == 200 ) { 
-            if( data != null && data instanceof Lang.Array && data.size() > 0 ) {
+            if( data != null && data instanceof Lang.Array && data.size() > 0 && data[0]["date"] != null ) {
                 data[0] = { 
-                    "date" => data[0]["date"], 
+                    "date" => data[0]["date"].toLong(), 
                     "sgv" => data[0]["sgv"],
                     "units_hint" => data[0]["units_hint"],
                     "delta" => data[0]["delta"],
@@ -74,7 +74,9 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
                     "COB" => data[0]["COB"]
                 };
                 for( var i = 1; i < data.size(); i++ ) {
-                    data[i] = { "date" => data[i]["date"], "sgv" => data[i]["sgv"] };
+                    if( data[i]["date"] != null ) {
+                        data[i] = { "date" => data[i]["date"].toLong(), "sgv" => data[i]["sgv"] };
+                    }                 
                 }
             }
             Background.exit(data); 
