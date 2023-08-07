@@ -84,25 +84,41 @@ class CGMWatchfaceApp extends App.AppBase {
         isBackground = false;
         fehler = data.toString().substring(0,1).equals("[") ? false : true;
         var lastTime = Background.getLastTemporalEventTime();
+        var calcDuration = 0;
         if( fehler == false && data != null && data instanceof Toybox.Lang.Array && data.size() > 0 && data[0]["date"] != null ) {
             punkte = data;
             App.Storage.setValue("punkteWatchface", punkte);
             calculation = true;
             var differenz = Time.now().value() - data[0]["date"]/1000;
             if( delay == 999 || (minutes != null && minutes == 1) ) {
-                duration = new Time.Duration(300);
-            } else if( differenz != null && differenz > (40 + delay) && differenz < 300 ) {
+                // Time adjustment deactivated or BG values per minute
+                calcDuration = 300;
+            } else if( differenz != null && differenz > (40 + delay)) {
+                // Delay greater than 40 seconds,
+                // adjust the time by waiting up to 10 minutes
                 adjustTime = true;
-                duration = new Time.Duration(600 - differenz + 15 + delay);
+                calcDuration = 600 - differenz + 15 + delay;              
             } else {
+                // Distance to measurement very small or correct
                 adjustTime = false;
-                duration = differenz != null && differenz < (10 + delay) ? new Time.Duration(5 * 60 + 15 + delay) : new Time.Duration(5 * 60);
+                calcDuration = differenz != null && differenz < (10 + delay) ? 300 + 15 + delay : 300;
             }
-            nextTime = lastTime != null ? lastTime.add(duration) : Time.now();
+            if( calcDuration < 0 ) {
+                // If the last measurement is more than 10 minutes ago,
+                // a negative difference occurs; sett 300 sec to avoid exception
+                calcDuration = 300;
+            } else if( calcDuration < 300 ) {
+                // Distance to measurement greater than 5 minutes,
+                // thus the difference is less than 5 minutes
+                calcDuration = calcDuration + 300;
+            }
         } else {
+            // Error during query, try again in 5 minutes
             fehler_code = data;
-            nextTime = lastTime != null ? lastTime.add(new Time.Duration(5 * 60)) : Time.now();
+            calcDuration = 300;
         }
+        // Register the background process
+        nextTime = lastTime != null ? lastTime.add(new Time.Duration(calcDuration)) : Time.now();
         Background.registerForTemporalEvent(nextTime);
     }
 
