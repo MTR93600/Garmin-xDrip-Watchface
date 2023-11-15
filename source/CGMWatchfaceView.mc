@@ -14,7 +14,7 @@ using Toybox.Activity;
 
 var sgv, aaps, timestamp, duration, masseinheit = 0, auswahlPfeil;
 var height, width, hHeight, hWidth, hoeheBalken, hoeheGraph, breiteGraph;
-var constSpace, constSpaceBar, constAscentFontSmall, constAscentFontNumber, constDescentFontNumber;
+var constSpace, constSpaceCenterH, constSpaceBar, constAscentFontSmall, constAscentFontNumber, constDescentFontNumber;
 var fontTime;
 var outdatedSGV = false;
 var wert, anzeigeDelta, anzeigeFehler;
@@ -40,8 +40,9 @@ class CGMWatchfaceView extends Ui.WatchFace {
         width = dc.getWidth();
         hHeight = height/2;
         hWidth = width/2;
-        constSpace = 5;
-        constSpaceBar = 10;
+        constSpace = height < 400 ? 5 : 12;
+        constSpaceCenterH = height < 400 ? 8 : 16;
+        constSpaceBar = width < 400 ? 10 : 15;
         fontTime = Gfx.FONT_NUMBER_MEDIUM;
         constAscentFontSmall = dc.getFontAscent(Gfx.FONT_SMALL);
         if( dc.getTextWidthInPixels("24:24", fontTime) + constSpaceBar > hWidth ) {
@@ -49,7 +50,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
         }
         constAscentFontNumber = dc.getFontAscent(fontTime);
         constDescentFontNumber = dc.getFontDescent(fontTime);
-        hoeheBalken = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)-2;
+        hoeheBalken = hHeight+constSpaceCenterH-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)-2;
         hoeheGraph = -dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constAscentFontSmall;
         breiteGraph = hWidth - constSpaceBar;
 
@@ -368,14 +369,14 @@ class CGMWatchfaceView extends Ui.WatchFace {
             time.setFont(fontTime);
             time.setLocation(
                 hWidth-constSpaceBar,
-                hHeight-8-constAscentFontNumber
+                hHeight-constSpaceCenterH-constAscentFontNumber
             );
 
             var date = View.findDrawableById("DateLabel");
             date.setText(datum);
             date.setLocation(
                 hWidth-constSpaceBar,
-                hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)
+                hHeight-constSpaceCenterH-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)
             );
 
             var sgvAnzeige = View.findDrawableById("sgvLabel");
@@ -383,7 +384,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             sgvAnzeige.setFont(fontTime);
             sgvAnzeige.setLocation(
                 hWidth+constSpaceBar,
-                hHeight-8-constAscentFontNumber
+                hHeight-constSpaceCenterH-constAscentFontNumber
             );
             if( BGFarbe == 0 && punkte != null && punkte instanceof Lang.Array && punkte[0]["sgv"] != null ) {
                 if( punkte[0]["sgv"] >= zielbereichLow && punkte[0]["sgv"] <= zielbereichHigh ) {
@@ -397,14 +398,14 @@ class CGMWatchfaceView extends Ui.WatchFace {
             deltaAnzeige.setText(anzeigeDelta);
             deltaAnzeige.setLocation(
                 hWidth+constSpaceBar,
-                hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)
+                hHeight-constSpaceCenterH-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)
             );
 
             var verzAnzeige = View.findDrawableById("verzLabel");
             verzAnzeige.setText(verzoegerung.toString()+" m");
             verzAnzeige.setLocation(
                 hWidth+constSpaceBar,
-                hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-dc.getFontAscent(Gfx.FONT_SMALL)-1
+                hHeight-constSpaceCenterH-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-dc.getFontAscent(Gfx.FONT_SMALL)-1
             );
 
             var iobAnzeige = View.findDrawableById("iobLabel");
@@ -426,7 +427,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 iobAnzeige.setText(anzeigeIOB);
                 iobAnzeige.setLocation(
                     hWidth+constSpaceBar+25+spaceBigDisplay,
-                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)
+                    hHeight+constSpaceCenterH-dc.getFontDescent(Gfx.FONT_SMALL)
                 );
             }
 
@@ -434,7 +435,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 basalAnzeige.setText(anzeigeBasal);
                 basalAnzeige.setLocation(
                     hWidth+constSpaceBar+25+spaceBigDisplay,
-                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+constAscentFontSmall+constSpace
+                    hHeight+constSpaceCenterH-dc.getFontDescent(Gfx.FONT_SMALL)+constAscentFontSmall+constSpace
                 );
             }
 
@@ -442,7 +443,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 cobAnzeige.setText(anzeigeCOB);
                 cobAnzeige.setLocation(
                     hWidth+constSpaceBar+25+spaceBigDisplay,
-                    hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)
+                    hHeight+constSpaceCenterH-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)
                 );
             }
 
@@ -482,7 +483,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             );
             // Progress-Bar
             if( steps != null && stepGoal != null && stepGoal != 0 ) {
-                var barHeight = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constAscentFontSmall;
+                var barHeight = hHeight+constSpaceCenterH-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constAscentFontSmall;
                 var polygonPosition = barHeight - ( (steps * barHeight) / stepGoal);
                 if( polygonPosition < -5 ) { polygonPosition = -5; }
 
@@ -531,7 +532,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 dc.setPenWidth(1);
                 dc.drawRectangle(
                     -1,
-                    hHeight + 8,
+                    hHeight + constSpaceCenterH,
                     breiteGraph + 1,
                     hoeheGraph
                 );
@@ -586,7 +587,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_WHITE);
                 dc.drawText(
                     breiteGraph - 2,
-                    hHeight+8,
+                    hHeight+constSpaceCenterH,
                     Gfx.FONT_XTINY,
                     anzeigeFehler,
                     Gfx.TEXT_JUSTIFY_RIGHT
@@ -600,7 +601,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             if( adjustTime != null && adjustTime == true && anzeigeSGV != null ) {
                 dc.drawBitmap(
                    hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeSGV, Gfx.FONT_NUMBER_MEDIUM)+constSpace,
-                   hHeight-8-0.5*(constAscentFontNumber-constDescentFontNumber)-10,
+                   hHeight-constSpaceCenterH-0.5*(constAscentFontNumber-constDescentFontNumber)-10,
                    bmpStopwatch
                 );
             }
@@ -617,7 +618,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             // Battery body
             dc.fillRoundedRectangle(
                 hWidth-constSpaceBar-14,
-                hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-22,
+                hHeight-constSpaceCenterH-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-22,
                 14,
                 22,
                 2
@@ -625,7 +626,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             // Battery contact
             dc.fillRectangle(
                 hWidth-constSpaceBar-10,
-                hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-22-2,
+                hHeight-constSpaceCenterH-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-22-2,
                 6,
                 2
             );
@@ -634,7 +635,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
             dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT); // Fuellung
             dc.fillRoundedRectangle(
                 hWidth-constSpaceBar-14+2,
-                hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-22+2,
+                hHeight-constSpaceCenterH-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-22+2,
                 10,
                 18-battery,
                 2
@@ -649,7 +650,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 if( bmpBluetooth != null ) {
                     dc.drawBitmap(
                         hWidth-constSpaceBar-14-constSpace-15,
-                        hHeight-8-constAscentFontNumber+constDescentFontNumber-5-dc.getFontHeight(Gfx.FONT_MEDIUM)-4-25,
+                        hHeight-constSpaceCenterH-constAscentFontNumber+constDescentFontNumber-constSpace-dc.getFontHeight(Gfx.FONT_MEDIUM)-constSpace-25,
                         bmpBluetooth
                     );
                     btSymbolOffset = 22;
@@ -663,7 +664,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 }
                 dc.drawBitmap(
                     hWidth-constSpaceBar-12-constSpace-btSymbolOffset-15,
-                    hHeight-8-constAscentFontNumber+constDescentFontNumber-5-dc.getFontHeight(Gfx.FONT_MEDIUM)-0-25,
+                    hHeight-constSpaceCenterH-constAscentFontNumber+constDescentFontNumber-5-dc.getFontHeight(Gfx.FONT_MEDIUM)-0-25,
                     bmpAlarmclock
                 );
             }
@@ -680,7 +681,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 else if (auswahlPfeil.equals("DoubleUp")) { bmp = Ui.loadResource(Rez.Drawables.id_7); }
                 dc.drawBitmap(
                     hWidth+constSpaceBar+dc.getTextWidthInPixels(anzeigeDelta, Gfx.FONT_MEDIUM)+constSpace,
-                    hHeight-8-constAscentFontNumber+constDescentFontNumber-constSpace-0.5*dc.getFontHeight(Gfx.FONT_MEDIUM)-12,
+                    hHeight-constSpaceCenterH-constAscentFontNumber+constDescentFontNumber-constSpace-0.5*dc.getFontHeight(Gfx.FONT_MEDIUM)-12,
                     bmp
                 );
             }
@@ -709,19 +710,19 @@ class CGMWatchfaceView extends Ui.WatchFace {
             dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
             dc.drawBitmap(
                 hWidth+constSpaceBar,
-                hHeight+8,
+                hHeight+constSpaceCenterH,
                 bmpSteps
             );
 
             dc.drawBitmap(
                 hWidth+constSpaceBar,
-                hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+constAscentFontSmall+2*constSpace+1,
+                hHeight+constSpaceCenterH-dc.getFontDescent(Gfx.FONT_SMALL)+constAscentFontSmall+2*constSpace+1,
                 bmpStairs
             );
 
             dc.drawBitmap(
                 hWidth+constSpaceBar,
-                hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constSpace+1,
+                hHeight+constSpaceCenterH-dc.getFontDescent(Gfx.FONT_SMALL)+2*(constAscentFontSmall+constSpace)+constSpace+1,
                 bmpHeart
             );
 
@@ -729,7 +730,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 if( showNotification == 0 && dev.notificationCount > 0 ) {
                     dc.drawText(
                         hWidth-constSpace+1,
-                        hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
+                        hHeight+constSpaceCenterH-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
                         Gfx.FONT_SMALL,
                         dev.notificationCount.toString(),
                         Gfx.TEXT_JUSTIFY_RIGHT
@@ -739,13 +740,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     }
                     dc.drawBitmap(
                         hWidth+constSpace-1,
-                        hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+8,
+                        hHeight+constSpaceCenterH-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+8,
                         bmpNotification
                     );
                 } else {
                     dc.drawText(
                         hWidth,
-                        hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,
+                        hHeight+constSpaceCenterH-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,
                         Gfx.FONT_TINY,
                         ":-)",
                         Gfx.TEXT_JUSTIFY_CENTER
@@ -768,7 +769,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 if( showNotification == 0 && dev.notificationCount > 0 ) {
                     dc.drawText(
                         hWidth-constSpace+1,
-                        hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
+                        hHeight+constSpaceCenterH-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
                         Gfx.FONT_SMALL,
                         dev.notificationCount.toString(),
                         Gfx.TEXT_JUSTIFY_RIGHT
@@ -778,13 +779,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     }
                     dc.drawBitmap(
                         hWidth+constSpace-1,
-                        hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+8,
+                        hHeight+constSpaceCenterH-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+8,
                         bmpNotification
                     );
                 } else if( showActivity == 1 && heartrate != null && stairs == null) {
                     dc.drawText(
                         hWidth+(15+constSpace)/2,
-                        hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
+                        hHeight+constSpaceCenterH-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
                         Gfx.FONT_SMALL,
                         heartrate.toString(),
                         Gfx.TEXT_JUSTIFY_CENTER
@@ -794,11 +795,11 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     }
                     dc.drawBitmap(
                         hWidth-(15+constSpace)/2-dc.getTextWidthInPixels(heartrate.toString(), Gfx.FONT_SMALL)/2 - spaceBigDisplay,
-                        hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,
+                        hHeight+constSpaceCenterH-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,
                         bmpHeart2
                     );
                 } else if( showActivity == 1 && heartrate != null && stairs != null) {
-                    var heightHeartStairs = hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace);
+                    var heightHeartStairs = hHeight+constSpaceCenterH-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace);
                     dc.drawText(
                         hWidth-16-5-spaceBigDisplay*0.5,
                         heightHeartStairs,
@@ -825,7 +826,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     var kombiAnzeige = steps.toString();
                     dc.drawText(
                         hWidth+(15+constSpace)/2,
-                        hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
+                        hHeight+constSpaceCenterH-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace),
                         Gfx.FONT_TINY,
                         kombiAnzeige,
                         Gfx.TEXT_JUSTIFY_CENTER
@@ -835,7 +836,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     }
                     dc.drawBitmap(
                         hWidth-(15+constSpace)/2-dc.getTextWidthInPixels(kombiAnzeige, Gfx.FONT_SMALL)/2 - spaceBigDisplay,
-                        hHeight+8-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,
+                        hHeight+constSpaceCenterH-dc.getFontDescent(Gfx.FONT_SMALL)+3*(constAscentFontSmall+constSpace)+4,
                         bmpSteps2
                     );
                 }
