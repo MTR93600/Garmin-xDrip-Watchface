@@ -38,7 +38,7 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
         } else if ( xDripSpike >= 2 ) {
             var nightscoutURL = App.getApp().getProperty("URL").toString();
             if( nightscoutURL != null ) {
-                url = "https://" + nightscoutURL + "/api/v1/entries/sgv.json?count=12"; // Nightscout-URL
+                url = "https://" + nightscoutURL + "/api/v1/entries/sgv.json?count=11"; // Nightscout-URL
             }
             var nightscoutToken = App.getApp().getProperty("NsToken").toString();
             if( xDripSpike == 3 && nightscoutToken != null ) {
