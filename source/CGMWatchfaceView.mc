@@ -310,7 +310,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 // IOB and COB -> spike, AAPS
                 //punkte[0]["IOB"] = 0.01;
                 //punkte[0]["COB"] = 10.000001;
-                //punkte[0]["tbr"] = "120%";
+                //punkte[0]["tbr"] = 120;
                 if( punkte[0]["iob"] != null || punkte[0]["cob"] != null ) {
                     isAAPS = true;
                     anzeigeIOB = punkte[0]["iob"] != null ? punkte[0]["iob"].format("%.1f") + " U" : "-- U";
