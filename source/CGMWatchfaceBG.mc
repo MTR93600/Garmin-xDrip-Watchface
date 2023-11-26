@@ -30,18 +30,21 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
         // Build URL & WebRequest
         var url = "http://127.0.0.1:17580/sgv.json?brief_mode=Y&count=18&all_data=Y"; // xDrip+-URL
         var xDripSpike = App.getApp().getProperty("xDripSpike").toNumber();
+        xDripSpike = 1;
         if( xDripSpike == null ) {
             xDripSpike = 0;
         }
         if( xDripSpike == 1 ) {
+            url = "http://127.0.0.1:28891/sgv.json?brief_mode=true&count=24"; // AAPS-URL
+        } else if( xDripSpike == 2 ) {
             url = "http://127.0.0.1:1979/sgv.json?brief_mode=Y&count=18&all_data=Y"; // Spike-URL
-        } else if ( xDripSpike >= 2 ) {
+        } else if ( xDripSpike >= 3 ) {
             var nightscoutURL = App.getApp().getProperty("URL").toString();
             if( nightscoutURL != null ) {
                 url = "https://" + nightscoutURL + "/api/v1/entries/sgv.json?count=11"; // Nightscout-URL
             }
             var nightscoutToken = App.getApp().getProperty("NsToken").toString();
-            if( xDripSpike == 3 && nightscoutToken != null ) {
+            if( xDripSpike == 4 && nightscoutToken != null ) {
                 url = url + "&token=" + nightscoutToken; // add Nightscout Token
             }
         }
@@ -63,16 +66,33 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
         //Sys.println(data);
         if( responseCode == 200 ) { 
             if( data != null && data instanceof Lang.Array && data.size() > 0 && data[0]["date"] != null ) {
-                data[0] = { 
-                    "date" => data[0]["date"].toLong(), 
-                    "sgv" => data[0]["sgv"],
-                    "units_hint" => data[0]["units_hint"],
-                    "delta" => data[0]["delta"],
-                    "aaps" => data[0]["aaps"],
-                    "aaps-ts" => data[0]["aaps-ts"],
-                    "IOB" => data[0]["IOB"],
-                    "COB" => data[0]["COB"]
-                };
+                var xDripSpike = App.getApp().getProperty("xDripSpike").toNumber();
+                xDripSpike = 1;
+                if( xDripSpike == 2 ) {
+                    // Spike
+                    data[0] = { 
+                        "date" => data[0]["date"].toLong(), 
+                        "sgv" => data[0]["sgv"],
+                        "units_hint" => data[0]["units_hint"],
+                        "delta" => data[0]["delta"],
+                        "iob" => data[0]["IOB"],
+                        "cob" => data[0]["COB"],
+                    };
+                } else {
+                    // Nighscout, xDrip+, AAPS
+                    data[0] = { 
+                        "date" => data[0]["date"].toLong(), 
+                        "sgv" => data[0]["sgv"],
+                        "units_hint" => data[0]["units_hint"],
+                        "delta" => data[0]["delta"],
+                        "aaps" => data[0]["aaps"],
+                        "aaps-ts" => data[0]["aaps-ts"],
+                        "iob" => data[0]["iob"],
+                        "cob" => data[0]["cob"],
+                        "tbr" => data[0]["tbr"]
+                    };
+                }
+                
                 for( var i = 1; i < data.size(); i++ ) {
                     if( data[i]["date"] != null ) {
                         data[i] = { "date" => data[i]["date"].toLong(), "sgv" => data[i]["sgv"] };

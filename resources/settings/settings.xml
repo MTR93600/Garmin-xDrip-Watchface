@@ -5,6 +5,7 @@
             <listEntry value="1">@Strings.opt_xDripSpike_2</listEntry>
             <listEntry value="2">@Strings.opt_xDripSpike_3</listEntry>
             <listEntry value="3">@Strings.opt_xDripSpike_4</listEntry>
+            <listEntry value="4">@Strings.opt_xDripSpike_4</listEntry>
         </settingConfig>   
     </setting>
     <setting propertyKey="@Properties.URL" title="@Strings.URLTitle"  prompt="@Strings.URLPrompt">

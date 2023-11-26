@@ -6,9 +6,10 @@
     
     <string id="xDripSpikeTitle">BG Data Source</string>
     <string id="opt_xDripSpike_1">xDrip+ (Android only)</string>
-    <string id="opt_xDripSpike_2">Spike (iOS only)</string>
-    <string id="opt_xDripSpike_3">Nightscout URL (mobile data connection required)</string>
-    <string id="opt_xDripSpike_4">Nightscout URL secured with token (optional)</string>
+    <string id="opt_xDripSpike_2">AAPS (Android only)</string>
+    <string id="opt_xDripSpike_3">Spike (iOS only)</string>
+    <string id="opt_xDripSpike_4">Nightscout URL (mobile data connection required)</string>
+    <string id="opt_xDripSpike_5">Nightscout URL secured with token (optional)</string>
     
     <string id="URLTitle">Nightscout URL (if previously selected)</string>
     <string id="URLPrompt">URL WITHOUT [https://] and [/api/v1] (subdomain.herokuapp.com)</string>

@@ -307,14 +307,15 @@ class CGMWatchfaceView extends Ui.WatchFace {
                         }
                     }
                 }
-                // IOB and COB -> spike
+                // IOB and COB -> spike, AAPS
                 //punkte[0]["IOB"] = 0.01;
                 //punkte[0]["COB"] = 10.000001;
-                if( punkte[0]["IOB"] != null || punkte[0]["COB"] != null ) {
+                //punkte[0]["tbr"] = "120%";
+                if( punkte[0]["iob"] != null || punkte[0]["cob"] != null ) {
                     isAAPS = true;
-                    anzeigeIOB = punkte[0]["IOB"] != null ? punkte[0]["IOB"].format("%.1f") + " U" : "-- U";
-                    anzeigeCOB = punkte[0]["COB"] != null ? punkte[0]["COB"].format("%.0f") + " g" : "-- g";
-                    anzeigeBasal = "--";
+                    anzeigeIOB = punkte[0]["iob"] != null ? punkte[0]["iob"].format("%.1f") + " U" : "-- U";
+                    anzeigeCOB = punkte[0]["cob"] != null ? punkte[0]["cob"].format("%.0f") + " g" : "-- g";
+                    anzeigeBasal = punkte[0]["tbr"] != null ? punkte[0]["tbr"] + " %" : "--";
                 }
             }
 
