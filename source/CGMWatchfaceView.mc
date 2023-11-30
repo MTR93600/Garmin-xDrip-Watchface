@@ -315,7 +315,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     isAAPS = true;
                     anzeigeIOB = punkte[0]["iob"] != null ? punkte[0]["iob"].format("%.1f") + " U" : "-- U";
                     anzeigeCOB = punkte[0]["cob"] != null ? punkte[0]["cob"].format("%.0f") + " g" : "-- g";
-                    anzeigeBasal = punkte[0]["tbr"] != null ? punkte[0]["tbr"] + " %" : "--";
+                    anzeigeBasal = punkte[0]["tbr"] != null ? punkte[0]["tbr"].toString() + " %" : "-- %";
                 }
             }
 
