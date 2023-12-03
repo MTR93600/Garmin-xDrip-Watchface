@@ -2,10 +2,10 @@
 	<setting propertyKey="@Properties.xDripSpike" title="@Strings.xDripSpikeTitle"  prompt="@Strings.AllgemeinPrompt">
     	<settingConfig type="list">
         	<listEntry value="0">@Strings.opt_xDripSpike_1</listEntry>
-            <listEntry value="1">@Strings.opt_xDripSpike_2</listEntry>
-            <listEntry value="2">@Strings.opt_xDripSpike_3</listEntry>
-            <listEntry value="3">@Strings.opt_xDripSpike_4</listEntry>
-            <listEntry value="4">@Strings.opt_xDripSpike_4</listEntry>
+            <listEntry value="4">@Strings.opt_xDripSpike_2</listEntry>
+            <listEntry value="1">@Strings.opt_xDripSpike_3</listEntry>
+            <listEntry value="2">@Strings.opt_xDripSpike_4</listEntry>
+            <listEntry value="3">@Strings.opt_xDripSpike_5</listEntry>
         </settingConfig>   
     </setting>
     <setting propertyKey="@Properties.URL" title="@Strings.URLTitle"  prompt="@Strings.URLPrompt">
