@@ -53,7 +53,7 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
         if( heartrate != null) {
             url = url + "&heart=" + heartrate;
         }
-        Sys.println(url);
+        //Sys.println(url);
         Communications.makeWebRequest( url, {},
             { :headers => { "Content-Type" => Communications.REQUEST_CONTENT_TYPE_URL_ENCODED },
             :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON},
