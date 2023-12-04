@@ -66,7 +66,6 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
         if( responseCode == 200 ) { 
             if( data != null && data instanceof Lang.Array && data.size() > 0 && data[0]["date"] != null ) {
                 var xDripSpike = App.getApp().getProperty("xDripSpike").toNumber();
-                xDripSpike = 1;
                 if( xDripSpike == 2 ) {
                     // Spike
                     data[0] = { 
