@@ -43,7 +43,7 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
                 url = "https://" + nightscoutURL + "/api/v1/entries/sgv.json?count=11"; // Nightscout-URL
             }
             var nightscoutToken = App.getApp().getProperty("NsToken").toString();
-            if( xDripSpike == 4 && nightscoutToken != null ) {
+            if( xDripSpike == 3 && nightscoutToken != null ) {
                 url = url + "&token=" + nightscoutToken; // add Nightscout Token
             }
         }
