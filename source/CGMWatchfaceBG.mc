@@ -16,36 +16,47 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
     }
 
     function onTemporalEvent() {
+        var xDripSpike = App.getApp().getProperty("xDripSpike").toNumber();
+        if( xDripSpike == null ) {
+            xDripSpike = 0;
+        }
          // Heartrate & Steps
         var steps = ActivityMonitor.getInfo().steps;
-        var heartrate;
-        if (ActivityMonitor has :getHeartRateHistory) {
-            var hrHistory =  ActivityMonitor.getHeartRateHistory(1, true);
-            heartrate = hrHistory.next().heartRate;
-            if( heartrate == ActivityMonitor.INVALID_HR_SAMPLE ) { // Plausibilitaet des Wertes pruefen
-                heartrate = null; // Wenn nicht plausibel, variable leeren
+        var avgHeartrate = 0;
+        if( ActivityMonitor has :getHeartRateHistory && (xDripSpike == 0 || xDripSpike == 4) ) {
+            var heartrate;
+            var avgCounter = 0;
+            var hrHistory =  ActivityMonitor.getHeartRateHistory(4, true);
+            for (var i = 0; i < 4; i++ ) {
+                var sample = hrHistory.next();
+                if( sample ) {
+                    heartrate = sample.heartRate;
+                    if( heartrate && heartrate != ActivityMonitor.INVALID_HR_SAMPLE ) { // Plausibilitaet des Wertes pruefen
+                        avgHeartrate += heartrate;
+                        avgCounter ++;
+                    }
+                }
+                Sys.println(avgCounter + ":" + avgHeartrate);
             }
-        } else {
-            heartrate = null;
+            if (avgHeartrate != 0 && avgCounter != 0) {
+                avgHeartrate = (avgHeartrate.toFloat() / avgCounter.toFloat()).toNumber();
+                Sys.println(avgHeartrate);
+            }
         }
         // Build URL & WebRequest
         var url = "http://127.0.0.1:17580/sgv.json?brief_mode=Y&count=18&all_data=Y"; // xDrip+-URL
         if(steps != null) {
             url = url + "&steps=" + steps;
         }
-        if( heartrate != null) {
-            url = url + "&heart=" + heartrate;
-        }
-        var xDripSpike = App.getApp().getProperty("xDripSpike").toNumber();
-        if( xDripSpike == null ) {
-            xDripSpike = 0;
+        if( avgHeartrate != 0) {
+            url = url + "&heart=" + avgHeartrate;
         }
         if( xDripSpike == 4 ) {
             url = "http://127.0.0.1:28891/sgv.json?brief_mode=true&count=24"; // AAPS-URL
-            if( heartrate != null) {
+            if( avgHeartrate != 0 ) {
                 var hrEnd = Time.now().value();
                 var hrStart = hrEnd - 300;
-                url = url + "&hr=" + heartrate + "&hrStart=" + hrStart + "&hrEnd=" + hrEnd + "&device=" + "Garmin-Watchface";
+                url = url + "&hr=" + avgHeartrate + "&hrStart=" + hrStart + "&hrEnd=" + hrEnd + "&device=" + "Garmin-Watchface";
             }
         } else if( xDripSpike == 1 ) {
             url = "http://127.0.0.1:1979/sgv.json?brief_mode=Y&count=18&all_data=Y"; // Spike-URL
