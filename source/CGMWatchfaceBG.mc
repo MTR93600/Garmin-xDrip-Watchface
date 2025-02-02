@@ -36,11 +36,11 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
                         avgCounter ++;
                     }
                 }
-                Sys.println(avgCounter + ":" + avgHeartrate);
+                //Sys.println(avgCounter + ":" + avgHeartrate);
             }
             if (avgHeartrate != 0 && avgCounter != 0) {
                 avgHeartrate = (avgHeartrate.toFloat() / avgCounter.toFloat()).toNumber();
-                Sys.println(avgHeartrate);
+                //Sys.println(avgHeartrate);
             }
         }
         // Build URL & WebRequest
@@ -70,7 +70,7 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
                 url = url + "&token=" + nightscoutToken; // add Nightscout Token
             }
         }
-        Sys.println(url);
+        //Sys.println(url);
         Communications.makeWebRequest( url, {},
             { :headers => { "Content-Type" => Communications.REQUEST_CONTENT_TYPE_URL_ENCODED },
             :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON},
