@@ -253,59 +253,10 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 isAAPS = false;
                 if( punkte[0]["aaps"] != null ) {
                     isAAPS = true;
-                    aaps = punkte[0]["aaps"].toString();
-                    var index1 = null, index2 = null, index3 = null, index4 = null, index5 = null;
-                    if( aaps != null && aaps.equals("") == false ) {
-                        anzeigeIOB = "-- U";
-                        anzeigeCOB = "-- g";
-                        anzeigeBasal = "--%";
-                        var deleteText = aaps.find("\n");
-                        if( deleteText != null ) {
-                            aaps = aaps.substring(deleteText+1,aaps.length());
-                        }
-                        if( aaps.equals("No Status") == false) {
-                            index1 = aaps.find(" ");
-                            index2 = aaps.find("%");
-                            index3 = aaps.find("U/h");
-                            index4 = aaps.find("U");
-                            // Basal
-                            if( index2 != null ) {
-                                anzeigeBasal = aaps.substring(0,index2+1);
-                            } else if( index3 != null ) {
-                                anzeigeBasal =  aaps.substring(0,index3) + " U/h";
-                            } else if( index3 == null && index4 != null ) {
-                                anzeigeBasal = "100%";
-                            }
-                            // IOB
-                            if(index2 == null && index3 == null && index4 != null ) {
-                                anzeigeIOB = aaps.substring(0,index4-1) + " U";
-                            } else if( index1 != null ) {
-                                var aapsPart1 = aaps.substring(index1+1,aaps.length()) + " U";
-                                index4 = aapsPart1.find("U");
-                                if( index4 != null ) {
-                                    anzeigeIOB = aapsPart1.substring(0,index4-1) + " U";
-                                }
-                            }
-                            // COB
-                            if( aaps.find("g") != null ) {
-                                var length = aaps.length();
-                                var aapsPart2 = aaps.substring(length-8, length);
-                                index5 = aapsPart2.find(" ");
-                                if( index5 != null ) {
-                                    var cob = aapsPart2.substring((index5+1),(aapsPart2.length()-1));
-                                    anzeigeCOB = cob.toString() + " g";
-                                }
-                            }
-                        }
-                        if( punkte[0]["aaps-ts"] != null) { // Meldung AAPS Status nicht aktuell
-                            var verzoegerungAAPS = minutesFromTimestamp(Time.now().value(), punkte[0]["aaps-ts"]);
-                            if( verzoegerungAAPS != null && verzoegerungAAPS > 20 ) {
-                                anzeigeIOB = "-- U";
-                                anzeigeCOB = "-- g";
-                                anzeigeBasal = "--%";
-                            }
-                        }
-                    }
+                    anzeigeIOB = "Source:";
+                    anzeigeCOB = "AAPS";
+                    anzeigeBasal = "Choose";
+
                 }
                 // IOB and COB -> spike, AAPS
                 //punkte[0]["iob"] = 0.01;
