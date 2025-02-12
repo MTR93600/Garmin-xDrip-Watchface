@@ -808,14 +808,21 @@ class CGMWatchfaceView extends Ui.WatchFace {
             dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_BLACK);
             dc.drawText(
                 hWidth,
-                hHeight - dc.getFontAscent(Gfx.FONT_NUMBER_HOT) - 5,
-                Gfx.FONT_NUMBER_HOT,
-                timeString,
+                hHeight -  dc.getFontHeight(Gfx.FONT_NUMBER_HOT) * 0.5 - dc.getFontHeight(Gfx.FONT_LARGE),
+                Gfx.FONT_LARGE,
+                datum,
                 Gfx.TEXT_JUSTIFY_CENTER
             );
             dc.drawText(
                 hWidth,
-                hHeight + 20,
+                hHeight,
+                Gfx.FONT_NUMBER_HOT,
+                timeString,
+                Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER
+            );
+            dc.drawText(
+                hWidth,
+                hHeight +  dc.getFontHeight(Gfx.FONT_NUMBER_HOT) * 0.5,
                 Gfx.FONT_LARGE,
                 anzeigeSGV + " " + anzeigeDelta + " @ " + verzoegerung.toString() + " m",
                 Gfx.TEXT_JUSTIFY_CENTER
