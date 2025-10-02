@@ -7,3 +7,11 @@ bin/
 # settings for sideloading
 *.SET 
 /.project
+
+#osx files
+.DS_*
+
+# build scripts
+Makefile
+properties.mk
+.sdkmanrc
