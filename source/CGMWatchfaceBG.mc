@@ -53,6 +53,9 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
         }
         if( xDripSpike == 4 ) {
             url = "http://127.0.0.1:28891/sgv.json?brief_mode=true&count=24"; // AAPS-URL
+            if(steps != null) {
+                url = url + "&steps=" + steps;
+            }
             if( avgHeartrate != 0 ) {
                 var hrEnd = Time.now().value();
                 var hrStart = hrEnd - 300;
