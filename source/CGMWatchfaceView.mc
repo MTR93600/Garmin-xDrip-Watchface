@@ -233,7 +233,7 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     anzeigeDelta += delta_errechnet.format("%.1f");
                 } else if( delta_errechnet != null ) {
                     // mg
-                    anzeigeSGV = punkte[0]["sgv"] != null ? punkte[0]["sgv"].toString() : "--";
+                    anzeigeSGV = punkte[0]["sgv"] != null ? punkte[0]["sgv"].format("%.0f").toString() : "--";
                     // Delta in String umwandeln, bei positiven Werten + davor
                     anzeigeDelta = delta_errechnet > 0 ? "+" : "";
                     anzeigeDelta += delta_errechnet.format("%.0f");
@@ -251,13 +251,13 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 //punkte[0]["aaps"] = "Loop deaktiviert\n0,46U(0,46|0,00)";
                 //punkte[0]["aaps"] = null;
                 isAAPS = false;
-                if( punkte[0]["aaps"] != null ) {
-                    isAAPS = true;
-                    anzeigeIOB = "Source:";
-                    anzeigeCOB = "AAPS";
-                    anzeigeBasal = "Choose";
+                //if( punkte[0]["aaps"] != null ) {
+                //    isAAPS = true;
+                //    anzeigeIOB = "Source:";
+                //    anzeigeCOB = "AAPS";
+                //    anzeigeBasal = "Choose";
+                //}
 
-                }
                 // IOB and COB -> spike, AAPS
                 //punkte[0]["iob"] = 0.01;
                 //punkte[0]["cob"] = 10.000001;
