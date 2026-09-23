@@ -3,7 +3,8 @@ using Toybox.WatchUi as Ui;
 using Toybox.Application as App;
 using Toybox.Lang as Lang;
 
-//! AIMICO E1 layout drawer (opt-in via layoutStyle=1).
+//! AIMICO Card Band layout (layoutStyle=1).
+//! One horizontal card: unicorn + BG/delta/arrow; loop strip; time bottom.
 module CGMWatchfaceE1 {
 
     function draw(
@@ -64,116 +65,160 @@ module CGMWatchfaceE1 {
                 } else {
                     sgvColor = farbeAlarm;
                 }
+            } else {
+                sgvColor = Gfx.COLOR_WHITE;
             }
         }
 
-        var leftW = (width * 0.46).toNumber();
-        var topY = pad;
-        var bottomReserve = (height * 0.22).toNumber();
-        var contentH = height - bottomReserve - topY;
+        // Header: date left, steps · HR right
+        dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
+        if (datum != null) {
+            dc.drawText(pad, pad - 2, Gfx.FONT_TINY, datum, Gfx.TEXT_JUSTIFY_LEFT);
+        }
+        var stepsStr = steps != null ? steps.toString() : "--";
+        var hrStr = heartrate != null ? heartrate.toString() : "--";
+        dc.drawText(width - pad, pad - 2, Gfx.FONT_TINY, stepsStr + " · " + hrStr, Gfx.TEXT_JUSTIFY_RIGHT);
 
+        var headerH = dc.getFontHeight(Gfx.FONT_TINY) + 8;
+        var timeFont = Gfx.FONT_NUMBER_MEDIUM;
+        if (width >= 360) {
+            timeFont = Gfx.FONT_NUMBER_HOT;
+        }
+        var timeH = dc.getFontHeight(timeFont);
+        var statusH = dc.getFontHeight(Gfx.FONT_TINY) + 4;
+        var footerH = timeH + statusH + pad + 4;
+
+        // Card band region
+        var cardTop = pad + headerH;
+        var cardH = height - cardTop - footerH - 6;
+        if (cardH < 90) {
+            cardH = 90;
+        }
+        var cardX = pad;
+        var cardW = width - pad * 2;
+        var cardY = cardTop;
+
+        // Card background
+        dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_DK_GRAY);
+        // softer dark panel via fill rounded approx
+        dc.fillRoundedRectangle(cardX, cardY, cardW, cardH, 16);
+
+        var innerPad = 8;
+        var uniMaxH = cardH - innerPad * 2;
+        if (uniMaxH > 150) {
+            uniMaxH = 150;
+        }
+
+        // --- Unicorn (left of card) ---
         if (drawMascot) {
             var kind = AimicoState.mascotKind(sgvMgdl, zielbereichLow, zielbereichHigh);
-            // Keep unicorn visible while waiting for first SGV
             if (kind.equals("none")) {
                 kind = "inrange";
             }
             var bmp = AimicoState.mascotDrawable(kind);
             if (bmp != null) {
                 var bw = bmp.getWidth();
-                var mx = ((leftW - bw) / 2).toNumber();
-                if (mx < pad) { mx = pad; }
-                dc.drawBitmap(mx, topY + 4, bmp);
+                var bh = bmp.getHeight();
+                var mx = cardX + innerPad;
+                var my = cardY + ((cardH - bh) / 2).toNumber();
+                if (my < cardY + 4) {
+                    my = cardY + 4;
+                }
+                dc.drawBitmap(mx, my, bmp);
             }
         }
 
-        dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
-        var loopY = topY + contentH - dc.getFontHeight(Gfx.FONT_SMALL) * 3 - 8;
-        if (loopY < topY + 80) {
-            loopY = topY + 80;
-        }
-        var loopX = pad;
-        if (anzeigeIOB != null && anzeigeIOB.equals("") == false) {
-            dc.drawText(loopX, loopY, Gfx.FONT_SMALL, anzeigeIOB, Gfx.TEXT_JUSTIFY_LEFT);
-            loopY += dc.getFontHeight(Gfx.FONT_SMALL) + 2;
-        }
-        if (anzeigeBasal != null && anzeigeBasal.equals("") == false) {
-            dc.drawText(loopX, loopY, Gfx.FONT_SMALL, anzeigeBasal, Gfx.TEXT_JUSTIFY_LEFT);
-            loopY += dc.getFontHeight(Gfx.FONT_SMALL) + 2;
-        }
-        if (anzeigeCOB != null && anzeigeCOB.equals("") == false) {
-            dc.drawText(loopX, loopY, Gfx.FONT_SMALL, anzeigeCOB, Gfx.TEXT_JUSTIFY_LEFT);
-        }
-
-        drawMiniGraph(dc, pad, topY + (drawMascot ? 100 : 20), leftW - pad * 2, 36, punkte, zielbereichLow, zielbereichHigh);
-
+        // --- BG + age + delta + AIMICO arrow (right of card) ---
         var fontBg = Gfx.FONT_NUMBER_HOT;
-        if (width < 280) {
+        if (width < 300) {
             fontBg = Gfx.FONT_NUMBER_MEDIUM;
         }
-        dc.setColor(sgvColor, Gfx.COLOR_TRANSPARENT);
         var sgvText = "--";
         if (anzeigeSGV != null && anzeigeSGV.equals("") == false) {
             sgvText = anzeigeSGV;
         }
-        dc.drawText(width - pad, topY + 8, fontBg, sgvText, Gfx.TEXT_JUSTIFY_RIGHT);
+        var rightX = width - pad - innerPad;
+        var bgY = cardY + innerPad + 2;
+        dc.setColor(sgvColor, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(rightX, bgY, fontBg, sgvText, Gfx.TEXT_JUSTIFY_RIGHT);
 
-        var metaY = topY + 8 + dc.getFontHeight(fontBg) - 4;
-        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+        // Row under BG: "3 m" + delta + arrow bitmap
+        var rowY = bgY + dc.getFontHeight(fontBg) - 2;
         var ageStr = "";
         if (verzoegerung != null) {
-            ageStr = verzoegerung.toString() + " m";
+            var vz = verzoegerung.toString();
+            if (vz.equals("--") == false && vz.equals("999") == false) {
+                ageStr = vz + " m";
+            }
         }
         var deltaStr = "";
-        if (anzeigeDelta != null && anzeigeDelta.equals("") == false) {
+        if (anzeigeDelta != null && anzeigeDelta.equals("") == false && anzeigeDelta.equals("--") == false) {
             deltaStr = anzeigeDelta;
         }
-        var metaLine = ageStr;
-        if (deltaStr.equals("") == false) {
-            if (metaLine.equals("") == false) {
-                metaLine = metaLine + "  ";
-            }
-            metaLine = metaLine + deltaStr;
-        }
-        if (metaLine.equals("") == false) {
-            dc.drawText(width - pad - 40, metaY, Gfx.FONT_SMALL, metaLine, Gfx.TEXT_JUSTIFY_RIGHT);
-        }
 
+        // Arrow first (rightmost), then delta, then age — reading toward the number
+        var cursorX = rightX;
         if (auswahlPfeil != null) {
             var arrowBmp = AimicoState.arrowDrawable(auswahlPfeil);
             if (arrowBmp != null) {
-                dc.drawBitmap(width - pad - arrowBmp.getWidth(), metaY + 2, arrowBmp);
+                var aw = arrowBmp.getWidth();
+                var ah = arrowBmp.getHeight();
+                cursorX = cursorX - aw;
+                var ay = rowY + (dc.getFontHeight(Gfx.FONT_SMALL) - ah) / 2;
+                dc.drawBitmap(cursorX, ay.toNumber(), arrowBmp);
+                cursorX = cursorX - 6;
             }
         }
-
-        var actY = metaY + dc.getFontHeight(Gfx.FONT_SMALL) + 14;
+        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+        if (deltaStr.equals("") == false) {
+            dc.drawText(cursorX, rowY, Gfx.FONT_SMALL, deltaStr, Gfx.TEXT_JUSTIFY_RIGHT);
+            cursorX = cursorX - dc.getTextWidthInPixels(deltaStr, Gfx.FONT_SMALL) - 8;
+        }
         dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
-        var stepsStr = steps != null ? steps.toString() : "--";
-        var hrStr = heartrate != null ? heartrate.toString() : "--";
-        dc.drawText(width - pad, actY, Gfx.FONT_SMALL, stepsStr + " steps", Gfx.TEXT_JUSTIFY_RIGHT);
-        dc.drawText(width - pad, actY + dc.getFontHeight(Gfx.FONT_SMALL) + 2, Gfx.FONT_SMALL, hrStr + " bpm", Gfx.TEXT_JUSTIFY_RIGHT);
-
-        dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_TRANSPARENT);
-        if (datum != null) {
-            dc.drawText(pad, 4, Gfx.FONT_TINY, datum, Gfx.TEXT_JUSTIFY_LEFT);
+        if (ageStr.equals("") == false) {
+            dc.drawText(cursorX, rowY, Gfx.FONT_SMALL, ageStr, Gfx.TEXT_JUSTIFY_RIGHT);
         }
 
-        // Status / error: compact line above the clock (does not cover mascot)
+        // Loop strip under card
+        var stripY = cardY + cardH + 6;
+        dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
+        var loopParts = "";
+        if (anzeigeIOB != null && anzeigeIOB.equals("") == false) {
+            loopParts = anzeigeIOB;
+        }
+        if (anzeigeBasal != null && anzeigeBasal.equals("") == false) {
+            if (loopParts.equals("") == false) {
+                loopParts = loopParts + " · ";
+            }
+            loopParts = loopParts + anzeigeBasal;
+        }
+        if (anzeigeCOB != null && anzeigeCOB.equals("") == false) {
+            if (loopParts.equals("") == false) {
+                loopParts = loopParts + " · ";
+            }
+            loopParts = loopParts + anzeigeCOB;
+        }
+        if (loopParts.equals("") == false) {
+            dc.drawText(pad, stripY, Gfx.FONT_TINY, loopParts, Gfx.TEXT_JUSTIFY_LEFT);
+        }
+
+        // Status above clock
         if (anzeigeFehler != null && anzeigeFehler.equals("") == false) {
             var err = anzeigeFehler;
             if (err.equals("Wait max.\n5 min")) {
                 err = "Waiting for BG…";
+            } else if (err.equals("Error: -300\nSettings?")) {
+                err = "No link to phone/AAPS";
+            } else if (err.equals("Error: -300")) {
+                err = "No link to phone/AAPS";
             }
             dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, height - pad - dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM) - dc.getFontHeight(Gfx.FONT_TINY) - 6, Gfx.FONT_TINY, err, Gfx.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, height - pad - timeH - statusH, Gfx.FONT_TINY, err, Gfx.TEXT_JUSTIFY_CENTER);
         }
 
+        // Time
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        var timeFont = Gfx.FONT_NUMBER_MEDIUM;
-        if (width >= 360) {
-            timeFont = Gfx.FONT_NUMBER_HOT;
-        }
-        dc.drawText(width / 2, height - pad - dc.getFontHeight(timeFont), timeFont, timeString, Gfx.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, height - pad - timeH, timeFont, timeString, Gfx.TEXT_JUSTIFY_CENTER);
     }
 
     function hideLabel(view, id) {
@@ -181,43 +226,6 @@ module CGMWatchfaceE1 {
         if (d != null) {
             d.setText("");
             d.setLocation(-999, -999);
-        }
-    }
-
-    function drawMiniGraph(dc, x, y, w, h, punkte, low, high) {
-        if (punkte == null || (punkte instanceof Lang.Array) == false || punkte.size() < 2) {
-            return;
-        }
-        if (w < 20 || h < 10) {
-            return;
-        }
-        dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_TRANSPARENT);
-        dc.drawRectangle(x, y, w, h);
-
-        var n = punkte.size();
-        if (n > 18) { n = 18; }
-        var minV = low;
-        var maxV = high;
-        for (var i = 0; i < n; i++) {
-            if (punkte[i]["sgv"] == null) { continue; }
-            var v = punkte[i]["sgv"];
-            if (v < minV) { minV = v; }
-            if (v > maxV) { maxV = v; }
-        }
-        if (maxV <= minV) {
-            maxV = minV + 1;
-        }
-        var span = (maxV - minV).toFloat();
-        for (var j = 0; j < n; j++) {
-            if (punkte[j]["sgv"] == null) { continue; }
-            var vv = punkte[j]["sgv"].toFloat();
-            var px = x + w - 2 - ((j.toFloat() / (n - 1).toFloat()) * (w - 4)).toNumber();
-            var py = y + h - 2 - (((vv - minV.toFloat()) / span) * (h - 4)).toNumber();
-            var col = Gfx.COLOR_GREEN;
-            if (vv < low) { col = Gfx.COLOR_RED; }
-            else if (vv > high) { col = Gfx.COLOR_YELLOW; }
-            dc.setColor(col, Gfx.COLOR_TRANSPARENT);
-            dc.fillCircle(px, py, 2);
         }
     }
 
