@@ -26,5 +26,17 @@
     <bitmap id="id_5" filename="FortyFiveUp.png"/>
     <bitmap id="id_6" filename="SingleUp.png"/>
     <bitmap id="id_7" filename="UpUp.png"/>
+    <!-- AIMICO V1 (E1 layout) -->
+    <bitmap id="MascotLow" filename="mascot_low.png"/>
+    <bitmap id="MascotInRange" filename="mascot_inrange.png"/>
+    <bitmap id="MascotHigh" filename="mascot_high.png"/>
+    <bitmap id="AimicoArrowFlat" filename="aimico_arrow_flat.png"/>
+    <bitmap id="AimicoArrowSingleUp" filename="aimico_arrow_single_up.png"/>
+    <bitmap id="AimicoArrowSingleDown" filename="aimico_arrow_single_down.png"/>
+    <bitmap id="AimicoArrow45Up" filename="aimico_arrow_45_up.png"/>
+    <bitmap id="AimicoArrow45Down" filename="aimico_arrow_45_down.png"/>
+    <bitmap id="AimicoArrowDoubleUp" filename="aimico_arrow_double_up.png"/>
+    <bitmap id="AimicoArrowDoubleDown" filename="aimico_arrow_double_down.png"/>
+    <bitmap id="AimicoArrowNone" filename="aimico_arrow_none.png"/>
 </drawables>
 

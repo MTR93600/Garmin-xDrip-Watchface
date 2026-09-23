@@ -3,6 +3,14 @@
     <string id="AppName">xDrip+/Spike Watchface</string>
     
     <string id="AllgemeinPrompt">Choose from the list.</string>
+
+    <string id="layoutStyleTitle">Watchface layout</string>
+    <string id="opt_layoutStyle_0">Classic (4 quadrants)</string>
+    <string id="opt_layoutStyle_1">AIMICO E1 (mascot + large BG)</string>
+    <string id="showMascotTitle">Show AIMICO mascot (E1)</string>
+    <string id="opt_showMascot_0">Off</string>
+    <string id="opt_showMascot_1">On</string>
+    <string id="opt_showMascot_2">Off in low power only</string>
     
     <string id="xDripSpikeTitle">BG Data Source</string>
     <string id="opt_xDripSpike_1">xDrip+ (Android only)</string>

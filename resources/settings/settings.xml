@@ -1,4 +1,17 @@
 <settings>
+	<setting propertyKey="@Properties.layoutStyle" title="@Strings.layoutStyleTitle" prompt="@Strings.AllgemeinPrompt">
+           <settingConfig type="list">
+               <listEntry value="0">@Strings.opt_layoutStyle_0</listEntry>
+               <listEntry value="1">@Strings.opt_layoutStyle_1</listEntry>
+           </settingConfig>
+	</setting>
+	<setting propertyKey="@Properties.showMascot" title="@Strings.showMascotTitle" prompt="@Strings.AllgemeinPrompt">
+           <settingConfig type="list">
+               <listEntry value="0">@Strings.opt_showMascot_0</listEntry>
+               <listEntry value="1">@Strings.opt_showMascot_1</listEntry>
+               <listEntry value="2">@Strings.opt_showMascot_2</listEntry>
+           </settingConfig>
+	</setting>
 	<setting propertyKey="@Properties.xDripSpike" title="@Strings.xDripSpikeTitle"  prompt="@Strings.AllgemeinPrompt">
     	<settingConfig type="list">
         	<listEntry value="0">@Strings.opt_xDripSpike_1</listEntry>

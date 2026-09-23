@@ -321,6 +321,37 @@ class CGMWatchfaceView extends Ui.WatchFace {
         //anzeigeBasal = "120%";
         //anzeigeIOB = "12,1";*/
 
+        // Opt-in AIMICO E1 layout (default Classic = 0 — leave existing face unchanged)
+        var layoutStyleProp = App.getApp().getProperty("layoutStyle");
+        var layoutStyle = layoutStyleProp != null ? layoutStyleProp.toNumber() : 0;
+        if (layoutStyle == null) { layoutStyle = 0; }
+        if (layoutStyle == 1) {
+            CGMWatchfaceE1.draw(
+                self,
+                dc,
+                isHighPower,
+                steps,
+                heartrate,
+                timeString,
+                datum,
+                punkte,
+                zielbereichLow,
+                zielbereichHigh,
+                farbeZielbereich,
+                farbeAlarm,
+                BGFarbe,
+                anzeigeSGV,
+                anzeigeDelta,
+                verzoegerung,
+                anzeigeIOB,
+                anzeigeBasal,
+                anzeigeCOB,
+                anzeigeFehler,
+                auswahlPfeil
+            );
+            return;
+        }
+
 //! HIGH POWER
         if( isHighPower == true || lowPowerModeEnabled == false) {
             // Update the view

@@ -12,6 +12,16 @@ There are four phone synchronization possibilities:
 1. Diabox (Android, iOS, no internet connection required)
 1. Nightscout (cross-platform, internet connection required). 
 
+
+------------------------
+## **AIMICO E1 layout (dev branch `dev/aimico-e1`)**
+Optional modern layout with the AIMICO V1 unicorn mascot (switches Low / In-range / High with your BG targets) and trend arrows.
+
+- **Default remains Classic** (4 quadrants) — existing look and AAPS/xDrip HR+steps upload are unchanged.
+- In Garmin Connect → Watchface settings → **Watchface layout** → choose `AIMICO E1`.
+- **Show AIMICO mascot**: On / Off / Off in low power only.
+- Source art: `assets/aimico-v1/` (Deise + MTR). Runtime PNGs under `resources/drawables/mascot_*.png`.
+
 ------------------------
 ## **PLEASE READ THIS ADVISORY FIRST**
 Never make a medical decision based on a reading that you see on this app e.g. your watch. Always perform a fingerstick blood glucose check first.
