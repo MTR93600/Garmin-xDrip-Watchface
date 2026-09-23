@@ -26,7 +26,7 @@
     <bitmap id="id_5" filename="FortyFiveUp.png"/>
     <bitmap id="id_6" filename="SingleUp.png"/>
     <bitmap id="id_7" filename="UpUp.png"/>
-    <!-- AIMICO V1 (E1 layout) -->
+    <!-- AIMICO V2 (E1 layout) -->
     <bitmap id="MascotLow" filename="mascot_low.png"/>
     <bitmap id="MascotInRange" filename="mascot_inrange.png"/>
     <bitmap id="MascotHigh" filename="mascot_high.png"/>

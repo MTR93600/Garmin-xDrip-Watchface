@@ -15,7 +15,7 @@
     <property id="BarsFarbe" type="number">0</property>
     <property id="Notification" type="number">1</property>
     <!-- 0=Classic, 1=AIMICO E1 (default on this sideload build) -->
-    <property id="layoutStyle" type="number">1</property>
+    <property id="layoutStyle" type="number">2</property>
     <!-- 0=Off, 1=On, 2=Off in low power only -->
     <property id="showMascot" type="number">1</property>
 </properties>

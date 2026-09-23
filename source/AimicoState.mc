@@ -1,6 +1,6 @@
 using Toybox.WatchUi as Ui;
 
-//! AIMICO V1 mascot / arrow selection (E1 layout).
+//! AIMICO V2 mascot / arrow selection (E1 layout).
 //! Pure helpers — no HTTP side effects.
 module AimicoState {
 
@@ -25,27 +25,27 @@ module AimicoState {
         return "inrange";
     }
 
-    //! Map Classic trend string → AIMICO arrow drawable resource.
-    function arrowDrawable(auswahlPfeil) {
+    //! Classic trend arrow bitmaps (clean, scale well).
+    function classicArrowDrawable(auswahlPfeil) {
         if (auswahlPfeil == null) {
-            return Ui.loadResource(Rez.Drawables.AimicoArrowNone);
+            return null;
         }
         if (auswahlPfeil.equals("DoubleDown")) {
-            return Ui.loadResource(Rez.Drawables.AimicoArrowDoubleDown);
+            return Ui.loadResource(Rez.Drawables.id_1);
         } else if (auswahlPfeil.equals("SingleDown")) {
-            return Ui.loadResource(Rez.Drawables.AimicoArrowSingleDown);
+            return Ui.loadResource(Rez.Drawables.id_2);
         } else if (auswahlPfeil.equals("FortyFiveDown")) {
-            return Ui.loadResource(Rez.Drawables.AimicoArrow45Down);
+            return Ui.loadResource(Rez.Drawables.id_3);
         } else if (auswahlPfeil.equals("Flat")) {
-            return Ui.loadResource(Rez.Drawables.AimicoArrowFlat);
+            return Ui.loadResource(Rez.Drawables.id_4);
         } else if (auswahlPfeil.equals("FortyFiveUp")) {
-            return Ui.loadResource(Rez.Drawables.AimicoArrow45Up);
+            return Ui.loadResource(Rez.Drawables.id_5);
         } else if (auswahlPfeil.equals("SingleUp")) {
-            return Ui.loadResource(Rez.Drawables.AimicoArrowSingleUp);
+            return Ui.loadResource(Rez.Drawables.id_6);
         } else if (auswahlPfeil.equals("DoubleUp")) {
-            return Ui.loadResource(Rez.Drawables.AimicoArrowDoubleUp);
+            return Ui.loadResource(Rez.Drawables.id_7);
         }
-        return Ui.loadResource(Rez.Drawables.AimicoArrowNone);
+        return null;
     }
 
     function mascotDrawable(kind) {

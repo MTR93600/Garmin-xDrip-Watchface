@@ -3,6 +3,7 @@
            <settingConfig type="list">
                <listEntry value="0">@Strings.opt_layoutStyle_0</listEntry>
                <listEntry value="1">@Strings.opt_layoutStyle_1</listEntry>
+               <listEntry value="2">@Strings.opt_layoutStyle_2</listEntry>
            </settingConfig>
 	</setting>
 	<setting propertyKey="@Properties.showMascot" title="@Strings.showMascotTitle" prompt="@Strings.AllgemeinPrompt">
