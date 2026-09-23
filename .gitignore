@@ -15,3 +15,5 @@ bin/
 Makefile
 properties.mk
 .sdkmanrc
+
+.superpowers/
