@@ -74,6 +74,10 @@ module CGMWatchfaceE1 {
 
         if (drawMascot) {
             var kind = AimicoState.mascotKind(sgvMgdl, zielbereichLow, zielbereichHigh);
+            // Keep unicorn visible while waiting for first SGV
+            if (kind.equals("none")) {
+                kind = "inrange";
+            }
             var bmp = AimicoState.mascotDrawable(kind);
             if (bmp != null) {
                 var bw = bmp.getWidth();
@@ -108,18 +112,38 @@ module CGMWatchfaceE1 {
             fontBg = Gfx.FONT_NUMBER_MEDIUM;
         }
         dc.setColor(sgvColor, Gfx.COLOR_TRANSPARENT);
-        var sgvText = anzeigeSGV != null ? anzeigeSGV : "--";
+        var sgvText = "--";
+        if (anzeigeSGV != null && anzeigeSGV.equals("") == false) {
+            sgvText = anzeigeSGV;
+        }
         dc.drawText(width - pad, topY + 8, fontBg, sgvText, Gfx.TEXT_JUSTIFY_RIGHT);
 
         var metaY = topY + 8 + dc.getFontHeight(fontBg) - 4;
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        var ageStr = verzoegerung != null ? verzoegerung.toString() + " m" : "";
-        var deltaStr = anzeigeDelta != null ? anzeigeDelta : "";
-        dc.drawText(width - pad - 40, metaY, Gfx.FONT_SMALL, ageStr + "  " + deltaStr, Gfx.TEXT_JUSTIFY_RIGHT);
+        var ageStr = "";
+        if (verzoegerung != null) {
+            ageStr = verzoegerung.toString() + " m";
+        }
+        var deltaStr = "";
+        if (anzeigeDelta != null && anzeigeDelta.equals("") == false) {
+            deltaStr = anzeigeDelta;
+        }
+        var metaLine = ageStr;
+        if (deltaStr.equals("") == false) {
+            if (metaLine.equals("") == false) {
+                metaLine = metaLine + "  ";
+            }
+            metaLine = metaLine + deltaStr;
+        }
+        if (metaLine.equals("") == false) {
+            dc.drawText(width - pad - 40, metaY, Gfx.FONT_SMALL, metaLine, Gfx.TEXT_JUSTIFY_RIGHT);
+        }
 
-        var arrowBmp = AimicoState.arrowDrawable(auswahlPfeil);
-        if (arrowBmp != null) {
-            dc.drawBitmap(width - pad - arrowBmp.getWidth(), metaY + 2, arrowBmp);
+        if (auswahlPfeil != null) {
+            var arrowBmp = AimicoState.arrowDrawable(auswahlPfeil);
+            if (arrowBmp != null) {
+                dc.drawBitmap(width - pad - arrowBmp.getWidth(), metaY + 2, arrowBmp);
+            }
         }
 
         var actY = metaY + dc.getFontHeight(Gfx.FONT_SMALL) + 14;
@@ -134,9 +158,14 @@ module CGMWatchfaceE1 {
             dc.drawText(pad, 4, Gfx.FONT_TINY, datum, Gfx.TEXT_JUSTIFY_LEFT);
         }
 
+        // Status / error: compact line above the clock (does not cover mascot)
         if (anzeigeFehler != null && anzeigeFehler.equals("") == false) {
-            dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, height / 2, Gfx.FONT_TINY, anzeigeFehler, Gfx.TEXT_JUSTIFY_CENTER);
+            var err = anzeigeFehler;
+            if (err.equals("Wait max.\n5 min")) {
+                err = "Waiting for BG…";
+            }
+            dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
+            dc.drawText(width / 2, height - pad - dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM) - dc.getFontHeight(Gfx.FONT_TINY) - 6, Gfx.FONT_TINY, err, Gfx.TEXT_JUSTIFY_CENTER);
         }
 
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
