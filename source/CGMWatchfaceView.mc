@@ -160,20 +160,32 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 calculation = false;
 
                 // Restore bg values for graph
-                // Check for need of 1 minute values 
-                if( punkte.size() > 1 && punkte[0]["date"] != null && punkte[1]["date"] != null && (punkte[0]["date"] - punkte[1]["date"]) * 0.001 < 4 * 60 ) {                   
-                    numberValuesTotal = 60;
-                    newValues = 5;
-                    minutes = 1;
+                // Check for need of 1 minute values (dates: seconds or ms)
+                // V2 needs ≥36 points for TIR ring + sparkline (AAPS count=36)
+                if( punkte.size() > 1 && punkte[0]["date"] != null && punkte[1]["date"] != null ) {
+                    var span = punkte[0]["date"] - punkte[1]["date"];
+                    var spanSec = span > 100000 ? span * 0.001 : span;
+                    if (spanSec < 4 * 60) {
+                        numberValuesTotal = 60;
+                        newValues = 5;
+                        minutes = 1;
+                    } else {
+                        numberValuesTotal = 36;
+                        newValues = 1;
+                        minutes = 5;
+                    }
                 } else {
-                    numberValuesTotal = 24;
+                    numberValuesTotal = 36;
                     newValues = 1;
                     minutes = 5;
                 }
-                // Adjust array size
+                // Keep newest N points — never wipe to {sgv:0} (that killed V2 UI)
                 if( punkte.size() > numberValuesTotal ) {
-                    punkte = new [1];
-                    punkte[0] = { "date" => 0, "sgv" => 0};
+                    var trimmed = new [numberValuesTotal];
+                    for (var ti = 0; ti < numberValuesTotal; ti++) {
+                        trimmed[ti] = punkte[ti];
+                    }
+                    punkte = trimmed;
                 }
                 if( bgReadingsAccumulated.size() != numberValuesTotal ) {
                     var temp = new [numberValuesTotal];
@@ -203,10 +215,14 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 if( punkte[0]["units_hint"] != null ) {
                     masseinheit = punkte[0]["units_hint"].equals("mmol") ? 1 : 0;
                 }
-                // Calculate delta
+                // Calculate delta (dates may be seconds or milliseconds)
                 var delta_errechnet;
                 if( punkte.size() > 1 && punkte[0]["sgv"] != null && punkte[0]["date"] != null && punkte[1]["sgv"] != null && punkte[1]["date"] != null && punkte[0]["date"] > punkte[1]["date"] ) {
-                    delta_errechnet = ( punkte[0]["sgv"] - punkte[1]["sgv"] ) / ( (punkte[0]["date"] - punkte[1]["date"]) * 0.001 )  *  minutes * 60;
+                    var dateDiff = punkte[0]["date"] - punkte[1]["date"];
+                    // AAPS seconds diffs are ~300; ms diffs are ~300000
+                    var elapsedSec = dateDiff > 100000 ? (dateDiff * 0.001) : dateDiff.toFloat();
+                    if (elapsedSec < 1) { elapsedSec = 1; }
+                    delta_errechnet = ( punkte[0]["sgv"] - punkte[1]["sgv"] ) / elapsedSec * minutes * 60;
                 } else if ( punkte[0]["delta"] != null ) {
                     delta_errechnet = punkte[0]["delta"];
                 } else {
@@ -223,20 +239,26 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     else { auswahlPfeil = "DoubleUp"; }
                 }
 
-                // SGV and Delta
-                if( masseinheit != null && masseinheit == 1 && delta_errechnet != null ) {
-                    // mmol
-                    anzeigeSGV =  punkte[0]["sgv"] ? (0.05556 * punkte[0]["sgv"]).format("%.1f").toString() : "--";
-                    // Delta in mmol, in String umwandeln, bei positiven Werten + davor
-                    delta_errechnet = 0.05556 * delta_errechnet;
-                    anzeigeDelta = delta_errechnet > 0 ? "+" : "";
-                    anzeigeDelta += delta_errechnet.format("%.1f");
-                } else if( delta_errechnet != null ) {
-                    // mg
-                    anzeigeSGV = punkte[0]["sgv"] != null ? punkte[0]["sgv"].format("%.0f").toString() : "--";
-                    // Delta in String umwandeln, bei positiven Werten + davor
-                    anzeigeDelta = delta_errechnet > 0 ? "+" : "";
-                    anzeigeDelta += delta_errechnet.format("%.0f");
+                // SGV always (even when delta missing); ignore placeholder 0
+                if( punkte[0]["sgv"] != null && punkte[0]["sgv"].toNumber() >= 20 ) {
+                    if( masseinheit != null && masseinheit == 1 ) {
+                        anzeigeSGV = (0.05556 * punkte[0]["sgv"]).format("%.1f").toString();
+                    } else {
+                        anzeigeSGV = punkte[0]["sgv"].format("%.0f").toString();
+                    }
+                } else {
+                    anzeigeSGV = "--";
+                }
+                if( delta_errechnet != null ) {
+                    var d = delta_errechnet;
+                    if( masseinheit != null && masseinheit == 1 ) {
+                        d = 0.05556 * d;
+                        anzeigeDelta = d > 0 ? "+" : "";
+                        anzeigeDelta += d.format("%.1f");
+                    } else {
+                        anzeigeDelta = d > 0 ? "+" : "";
+                        anzeigeDelta += d.format("%.0f");
+                    }
                 } else {
                     anzeigeDelta = "--";
                 }
@@ -931,7 +953,17 @@ class CGMWatchfaceView extends Ui.WatchFace {
 
     // Verzoegerung ermitteln
     function minutesFromTimestamp(now, timestamp) {
-        return( (now - timestamp/1000) / 60 );
+        // AAPS often sends seconds; xDrip/NS often send milliseconds.
+        // Compare magnitude to "now" (Unix seconds) without 64-bit literals.
+        var ts = timestamp;
+        var ageSec;
+        if (ts > now + 86400 || ts > 2000000000) {
+            // Far larger than current unix-seconds → treat as milliseconds
+            ageSec = now - (ts / 1000);
+        } else {
+            ageSec = now - ts;
+        }
+        return ageSec / 60;
     }
 
 }

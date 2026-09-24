@@ -10,7 +10,7 @@ var zielbereichLow, zielbereichHigh;
 var pinfit = 0;
 var punkte;
 var bgReadingsAccumulated = new [1];
-var numberValuesTotal = 24, newValues = 1, minutes = 5;
+var numberValuesTotal = 36, newValues = 1, minutes = 5;
 var calculation = true;
 var nextTime;
 var bmpStopwatch, bmpBluetooth, bmpAlarmclock, bmpSteps, bmpStairs, bmpHeart, bmpSteps2, bmpHeart2, bmpHeartStairs, bmpNotification;
@@ -89,7 +89,13 @@ class CGMWatchfaceApp extends App.AppBase {
             punkte = data;
             App.Storage.setValue("punkteWatchface", punkte);
             calculation = true;
-            var differenz = Time.now().value() - data[0]["date"]/1000;
+            // date may be unix-seconds (AAPS) or milliseconds (xDrip/NS)
+            var rawDate = data[0]["date"];
+            var dateSec = rawDate;
+            if (rawDate > Time.now().value() + 86400 || rawDate > 2000000000) {
+                dateSec = rawDate / 1000;
+            }
+            var differenz = Time.now().value() - dateSec;
             if( delay == 999 || (minutes != null && minutes == 1) ) {
                 // Time adjustment deactivated or BG values per minute
                 calcDuration = 300;
