@@ -14,8 +14,10 @@
     <property id="BGFarbe" type="number">1</property>
     <property id="BarsFarbe" type="number">0</property>
     <property id="Notification" type="number">1</property>
-    <!-- 0=Classic, 1=AIMICO E1 (default on this sideload build) -->
+    <!-- 0=Classic, 1=Card C, 2=Split E, 3=V2 color-aware -->
     <property id="layoutStyle" type="number">1</property>
     <!-- 0=Off, 1=On, 2=Off in low power only -->
     <property id="showMascot" type="number">1</property>
+    <property id="hyperThreshold" type="number">250</property>
+    <property id="showTirRing" type="number">1</property>
 </properties>

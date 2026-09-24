@@ -52,7 +52,7 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
             url = url + "&heart=" + avgHeartrate;
         }
         if( xDripSpike == 4 ) {
-            url = "http://127.0.0.1:28891/sgv.json?brief_mode=true&count=24"; // AAPS-URL
+            url = "http://127.0.0.1:28891/sgv.json?brief_mode=true&count=36"; // AAPS-URL (36 pts for V2 TIR/sparkline)
             if(steps != null) {
                 url = url + "&steps=" + steps;
             }

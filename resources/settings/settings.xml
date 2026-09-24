@@ -4,6 +4,7 @@
                <listEntry value="0">@Strings.opt_layoutStyle_0</listEntry>
                <listEntry value="1">@Strings.opt_layoutStyle_1</listEntry>
                <listEntry value="2">@Strings.opt_layoutStyle_2</listEntry>
+               <listEntry value="3">@Strings.opt_layoutStyle_3</listEntry>
            </settingConfig>
 	</setting>
 	<setting propertyKey="@Properties.showMascot" title="@Strings.showMascotTitle" prompt="@Strings.AllgemeinPrompt">
@@ -11,6 +12,15 @@
                <listEntry value="0">@Strings.opt_showMascot_0</listEntry>
                <listEntry value="1">@Strings.opt_showMascot_1</listEntry>
                <listEntry value="2">@Strings.opt_showMascot_2</listEntry>
+           </settingConfig>
+	</setting>
+	<setting propertyKey="@Properties.hyperThreshold" title="@Strings.hyperThresholdTitle">
+           <settingConfig type="numeric" min="200" max="400"/>
+	</setting>
+	<setting propertyKey="@Properties.showTirRing" title="@Strings.showTirRingTitle" prompt="@Strings.AllgemeinPrompt">
+           <settingConfig type="list">
+               <listEntry value="0">@Strings.opt_showTirRing_0</listEntry>
+               <listEntry value="1">@Strings.opt_showTirRing_1</listEntry>
            </settingConfig>
 	</setting>
 	<setting propertyKey="@Properties.xDripSpike" title="@Strings.xDripSpikeTitle"  prompt="@Strings.AllgemeinPrompt">

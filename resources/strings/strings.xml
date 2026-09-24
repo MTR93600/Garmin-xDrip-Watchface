@@ -8,6 +8,11 @@
     <string id="opt_layoutStyle_0">Classic (4 quadrants)</string>
     <string id="opt_layoutStyle_1">AIMICO Card (C)</string>
     <string id="opt_layoutStyle_2">AIMICO Split Mirror (E)</string>
+    <string id="opt_layoutStyle_3">V2 Color-aware (TIR + sparkline)</string>
+    <string id="hyperThresholdTitle">Hyper threshold (mg/dL)</string>
+    <string id="showTirRingTitle">Show TIR ring (V2)</string>
+    <string id="opt_showTirRing_0">Off</string>
+    <string id="opt_showTirRing_1">On</string>
     <string id="showMascotTitle">Show AIMICO mascot (E1)</string>
     <string id="opt_showMascot_0">Off</string>
     <string id="opt_showMascot_1">On</string>
