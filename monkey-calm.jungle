@@ -1,0 +1,4 @@
+project.manifest = manifest-calm.xml
+project.optimization = 2
+project.typecheck = 0
+base.resourcePath = resources;resources-calm
