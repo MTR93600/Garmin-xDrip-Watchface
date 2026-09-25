@@ -1,0 +1,21 @@
+<properties>
+	<property id="xDripSpike" type="number">4</property>
+	<property id="URL" type="string">subdomain.herokuapp.com</property>
+    <property id="NsToken" type="string">garmin-xxxxxxxxxx</property>
+	<property id="Einheiten" type="number">2</property>
+	<property id="Zielbereich1" type="number">70</property>
+    <property id="Zielbereich2" type="number">180</property>
+    <property id="Delay" type="number">0</property>
+    <property id="lowPowerMode" type="number">1</property>
+    <property id="pinfit" type="number">0</property>
+    <property id="FarbeZielbereich" type="number">0</property>
+    <property id="FarbeAlarm" type="number">0</property>
+    <property id="BGFarbe" type="number">1</property>
+    <property id="BarsFarbe" type="number">0</property>
+    <property id="Notification" type="number">1</property>
+    <!-- 5 = Pilot -->
+    <property id="layoutStyle" type="number">5</property>
+    <property id="showMascot" type="number">0</property>
+    <property id="hyperThreshold" type="number">250</property>
+    <property id="showTirRing" type="number">1</property>
+</properties>
