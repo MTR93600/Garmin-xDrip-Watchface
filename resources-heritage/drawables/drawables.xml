@@ -1,0 +1,7 @@
+<drawables>
+    <bitmap id="unicorn_normal" filename="unicorn_normal_sleeping.png"/>
+    <bitmap id="unicorn_hypo" filename="unicorn_hypo_shivering.png"/>
+    <bitmap id="unicorn_hyper" filename="unicorn_hyper_running.png"/>
+    <bitmap id="unicorn_double_up" filename="unicorn_double_up.png"/>
+    <bitmap id="unicorn_double_down" filename="unicorn_double_down.png"/>
+</drawables>
