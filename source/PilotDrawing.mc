@@ -218,20 +218,17 @@ module PilotDrawing {
             fontBg = Gfx.FONT_NUMBER_MEDIUM;
             bgH = dc.getFontHeight(fontBg);
         }
-        var bgY = cy - (bgH / 2).toNumber() - 2;
+        var bgY = cy - (bgH / 2).toNumber() - 6;
         dc.setColor(col, Gfx.COLOR_TRANSPARENT);
         dc.drawText(cx, bgY, fontBg, sgvText, Gfx.TEXT_JUSTIFY_CENTER);
 
-        // Arrow + delta to the right of glucose (inside ring)
-        var ah = 30;
+        // Arrow centered under glucose (delta already shown as Δ below ring)
+        var ah = 28;
         var bmp = AimicoState.classicArrowDrawable(auswahlPfeil);
         if (bmp != null) {
-            var ax = cx + (bgH * 0.42).toNumber() + 6;
-            dc.drawScaledBitmap(ax, cy - ah / 2 - 2, ah, ah, bmp);
-            if (anzeigeDelta != null && anzeigeDelta.equals("") == false && anzeigeDelta.equals("--") == false) {
-                dc.setColor(0xAAAAAA, Gfx.COLOR_TRANSPARENT);
-                dc.drawText(ax + ah / 2, cy + ah / 2, Gfx.FONT_XTINY, anzeigeDelta, Gfx.TEXT_JUSTIFY_CENTER);
-            }
+            var ax = cx - ah / 2;
+            var ay = bgY + bgH - 2;
+            dc.drawScaledBitmap(ax, ay, ah, ah, bmp);
         }
 
         if (state == STATE_HYPO) {
