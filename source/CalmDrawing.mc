@@ -137,7 +137,7 @@ module CalmDrawing {
         dc.drawText(x + w, y + h + 1, Gfx.FONT_XTINY, "now", Gfx.TEXT_JUSTIFY_RIGHT);
     }
 
-    function drawGlucoseCalm(dc, cx, cy, sgvText, auswahlPfeil, state) {
+    function drawGlucoseCalm(dc, cx, cy, sgvText, auswahlPfeil, anzeigeDelta, state) {
         var col = 0x2C8EFF;
         if (state == STATE_HYPO || state == STATE_HYPER) {
             col = 0xFFFFFF;
@@ -148,20 +148,67 @@ module CalmDrawing {
             fontBg = Gfx.FONT_NUMBER_MEDIUM;
             bgH = dc.getFontHeight(fontBg);
         }
-        var bgY = cy - (bgH / 2).toNumber() - 8;
+        var bgY = cy - (bgH / 2).toNumber() - 6;
         dc.setColor(col, Gfx.COLOR_TRANSPARENT);
         dc.drawText(cx, bgY, fontBg, sgvText, Gfx.TEXT_JUSTIFY_CENTER);
 
-        var unitY = bgY + bgH - 8;
-        dc.setColor(col, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx + (bgH / 3).toNumber() + 8, unitY - 4, Gfx.FONT_TINY, "mg/dL", Gfx.TEXT_JUSTIFY_LEFT);
-
-        // Trend arrow under glucose (centered), not far right
+        // Larger trend arrow under glucose
+        var ah = 30;
+        var arrowY = bgY + bgH - 2;
         var bmp = AimicoState.classicArrowDrawable(auswahlPfeil);
         if (bmp != null) {
-            var ah = 22;
-            dc.drawScaledBitmap(cx - ah / 2, unitY + dc.getFontHeight(Gfx.FONT_TINY) + 2, ah, ah, bmp);
+            dc.drawScaledBitmap(cx - ah / 2, arrowY, ah, ah, bmp);
         }
+
+        // Delta small under arrow
+        var deltaStr = "";
+        if (anzeigeDelta != null && anzeigeDelta.equals("") == false && anzeigeDelta.equals("--") == false) {
+            deltaStr = anzeigeDelta;
+        }
+        if (deltaStr.equals("") == false) {
+            dc.setColor(0xAAAAAA, Gfx.COLOR_TRANSPARENT);
+            dc.drawText(cx, arrowY + ah + 1, Gfx.FONT_XTINY, deltaStr, Gfx.TEXT_JUSTIFY_CENTER);
+        }
+    }
+
+    //! IOB left / TBR basal right — outside the ring, near the bottom gap.
+    function drawRingLoopMetrics(dc, cx, cy, radius, iob, basal, state) {
+        var font = Gfx.FONT_XTINY;
+        var y = cy + (radius * 0.55).toNumber();
+        // Outside the ring (radius + gap), not inside the arc
+        var xOff = radius + 10;
+        var col = 0x888888;
+        if (state == STATE_HYPO || state == STATE_HYPER) {
+            col = 0xCCCCCC;
+        }
+        dc.setColor(col, Gfx.COLOR_TRANSPARENT);
+        var iobStr = "--";
+        if (iob != null && iob.equals("") == false && iob.equals("--") == false) {
+            iobStr = iob;
+        }
+        var basalStr = "--";
+        if (basal != null && basal.equals("") == false && basal.equals("--") == false && basal.equals("-- %") == false) {
+            basalStr = basal;
+        }
+        dc.drawText(cx - xOff, y, font, iobStr, Gfx.TEXT_JUSTIFY_RIGHT);
+        dc.drawText(cx + xOff, y, font, basalStr, Gfx.TEXT_JUSTIFY_LEFT);
+    }
+
+    function edgeInsetX(y, width, height, isRound) {
+        if (isRound == false) {
+            return width >= 400 ? 16 : 12;
+        }
+        var r = width / 2.0;
+        var cy = height / 2.0;
+        var dy = y.toFloat() - cy;
+        var inside = r * r - dy * dy;
+        if (inside <= 0) {
+            return (width * 0.20).toNumber();
+        }
+        var halfChord = Math.sqrt(inside);
+        var inset = (width / 2.0 - halfChord).toNumber() + 8;
+        if (inset < 16) { inset = 16; }
+        return inset;
     }
 
     function drawTopBarMinimal(dc, pad, datum, steps, heartrate, state) {

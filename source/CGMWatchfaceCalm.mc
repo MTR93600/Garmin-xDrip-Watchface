@@ -31,7 +31,15 @@ module CGMWatchfaceCalm {
         var width = dc.getWidth();
         var height = dc.getHeight();
         var cx = width / 2;
+        var settings = Sys.getDeviceSettings();
+        var isRound = false;
+        if (settings has :screenShape) {
+            isRound = settings.screenShape == Sys.SCREEN_SHAPE_ROUND;
+        }
+
         var pad = width >= 400 ? 16 : 12;
+        if (isRound) { pad = (width * 0.08).toNumber(); }
+        if (pad < 14) { pad = 14; }
 
         var hyperProp = App.getApp().getProperty("hyperThreshold");
         var hyper = hyperProp != null ? hyperProp.toNumber() : 250;
@@ -45,22 +53,37 @@ module CGMWatchfaceCalm {
         var graph = buildGraph(punkte);
         var tir = calcTir(graph, zielbereichLow, zielbereichHigh);
 
-        // Scale 448 reference → device
+        // Scale 448 reference → device (slightly smaller ring on round)
         var scale = height.toFloat() / 448.0;
-        var gluCy = (190.0 * scale).toNumber();
-        var ringR = (132.0 * (width < height ? width : height).toFloat() / 448.0).toNumber();
-        if (ringR < 70) { ringR = 70; }
+        var topPad = isRound ? pad + 4 : pad;
+        var ringFrac = isRound ? 0.26 : (132.0 / 448.0);
+        var gluCy = isRound ? ((height * 0.40).toNumber()) : (190.0 * scale).toNumber();
+        var ringR = ((width < height ? width : height).toFloat() * ringFrac).toNumber();
+        if (ringR < 68) { ringR = 68; }
+        if (isRound && ringR > width * 0.36) { ringR = (width * 0.36).toNumber(); }
+
         var sparkH = (22.0 * scale).toNumber();
-        if (sparkH < 16) { sparkH = 16; }
-        if (sparkH > 28) { sparkH = 28; }
-        var sparkY = (340.0 * scale).toNumber();
-        // Keep spark below ring
-        if (sparkY < gluCy + ringR + 8) {
-            sparkY = gluCy + ringR + 8;
+        if (sparkH < 14) { sparkH = 14; }
+        if (sparkH > 24) { sparkH = 24; }
+
+        var timeH = dc.getFontHeight(Gfx.FONT_SMALL);
+        var bottomPad = isRound ? pad + 10 : pad;
+        var timeY = height - bottomPad - timeH;
+        var pillReserve = 0;
+        if (state == CalmDrawing.STATE_HYPO || state == CalmDrawing.STATE_HYPER) {
+            pillReserve = 32;
+            timeY = height - bottomPad - pillReserve - timeH;
+        }
+        var sparkY = gluCy + ringR + (isRound ? 10 : 12);
+        var maxSparkBottom = timeY - 18;
+        if (sparkY + sparkH > maxSparkBottom) {
+            sparkY = maxSparkBottom - sparkH;
         }
 
         CalmDrawing.drawVignetteBackground(dc, state);
-        CalmDrawing.drawTopBarMinimal(dc, pad, datum, steps, heartrate, state);
+
+        var headInset = CalmDrawing.edgeInsetX(topPad + 4, width, height, isRound);
+        CalmDrawing.drawTopBarMinimal(dc, headInset, datum, steps, heartrate, state);
 
         var showTirProp = App.getApp().getProperty("showTirRing");
         var showTir = showTirProp == null || showTirProp.toNumber() != 0;
@@ -72,26 +95,22 @@ module CGMWatchfaceCalm {
         if (anzeigeSGV != null && anzeigeSGV.equals("") == false && anzeigeSGV.equals("--") == false) {
             sgvText = anzeigeSGV;
         }
-        CalmDrawing.drawGlucoseCalm(dc, cx, gluCy, sgvText, auswahlPfeil, state);
+        CalmDrawing.drawGlucoseCalm(dc, cx, gluCy, sgvText, auswahlPfeil, anzeigeDelta, state);
+        CalmDrawing.drawRingLoopMetrics(dc, cx, gluCy, ringR, anzeigeIOB, anzeigeBasal, state);
 
-        if (graph != null && graph.size() >= 2) {
-            CalmDrawing.drawCalmSparkline(dc, pad, sparkY, width - pad * 2, sparkH, graph, state);
+        if (graph != null && graph.size() >= 2 && sparkH >= 12) {
+            var sparkInset = CalmDrawing.edgeInsetX(sparkY + sparkH / 2, width, height, isRound);
+            CalmDrawing.drawCalmSparkline(dc, sparkInset, sparkY, width - sparkInset * 2, sparkH, graph, state);
         }
 
-        // No tech line (IOB/COB) — calm by design
         var err = AimicoDraw.friendlyError(anzeigeFehler);
         if (err.equals("") == false) {
             dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
-            dc.drawText(cx, sparkY - 16, Gfx.FONT_XTINY, err, Gfx.TEXT_JUSTIFY_CENTER);
+            dc.drawText(cx, sparkY - 14, Gfx.FONT_XTINY, err, Gfx.TEXT_JUSTIFY_CENTER);
         }
 
         CalmDrawing.drawBottomPill(dc, state, "3.4");
 
-        // Small gray time at bottom
-        var timeY = height - pad - dc.getFontHeight(Gfx.FONT_SMALL);
-        if (state == CalmDrawing.STATE_HYPO || state == CalmDrawing.STATE_HYPER) {
-            timeY = height - 12 - 28 - 4 - dc.getFontHeight(Gfx.FONT_SMALL);
-        }
         dc.setColor(0xAAAAAA, Gfx.COLOR_TRANSPARENT);
         dc.drawText(cx, timeY, Gfx.FONT_SMALL, timeString, Gfx.TEXT_JUSTIFY_CENTER);
     }
