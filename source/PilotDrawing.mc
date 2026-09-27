@@ -192,12 +192,12 @@ module PilotDrawing {
             }
         }
 
-        // Inner delta ring (-10..+10 → 0..270°)
+        // Inner delta ring (−5..+5 → 0..270°) — tighter scale so small Δ is visible
         var d = delta;
         if (d == null) { d = 0; }
-        if (d < -10) { d = -10; }
-        if (d > 10) { d = 10; }
-        var deltaA = (((d + 10).toFloat() / 20.0) * sweep).toNumber();
+        if (d < -5) { d = -5; }
+        if (d > 5) { d = 5; }
+        var deltaA = (((d + 5).toFloat() / 10.0) * sweep).toNumber();
         dc.setPenWidth(4);
         dc.setColor(0x222222, Gfx.COLOR_TRANSPARENT);
         dc.drawArc(cx, cy, innerR, Gfx.ARC_CLOCKWISE, gapStart, gapEnd);

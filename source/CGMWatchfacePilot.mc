@@ -49,9 +49,9 @@ module CGMWatchfacePilot {
         }
         var state = stateFromSgv(sgvMgdl, zielbereichLow, hyper);
         var past = buildGraph(punkte);
-        var deltaNum = parseDelta(anzeigeDelta);
+        var deltaNum = deltaFromAaps(punkte, anzeigeDelta);
         var future = mockFuture(past, sgvMgdl, deltaNum, state);
-        var tir = calcTir(past, zielbereichLow, zielbereichHigh);
+        var tir = tirFromAaps(punkte, past, zielbereichLow, zielbereichHigh);
         var ageMin = sanitizeAge(verzoegerung);
         var predict15 = null;
         if (future != null && future.size() >= 3) {
@@ -139,9 +139,39 @@ module CGMWatchfacePilot {
         return PilotDrawing.STATE_NORMAL;
     }
 
+    //! Prefer raw AAPS `delta` (number); fall back to display string (strip leading '+').
+    function deltaFromAaps(punkte, anzeigeDelta) {
+        if (punkte != null && punkte instanceof Lang.Array && punkte.size() > 0 && punkte[0]["delta"] != null) {
+            var raw = punkte[0]["delta"].toNumber();
+            if (raw != null) { return raw; }
+        }
+        return parseDelta(anzeigeDelta);
+    }
+
+    //! Prefer AAPS `tir` on latest point; fall back to local calc over graph.
+    function tirFromAaps(punkte, past, low, high) {
+        if (punkte != null && punkte instanceof Lang.Array && punkte.size() > 0 && punkte[0]["tir"] != null) {
+            var t = punkte[0]["tir"].toNumber();
+            if (t != null) {
+                if (t < 0) { t = 0; }
+                if (t > 100) { t = 100; }
+                return t;
+            }
+        }
+        return calcTir(past, low, high);
+    }
+
     function parseDelta(anzeigeDelta) {
         if (anzeigeDelta == null || anzeigeDelta.equals("") || anzeigeDelta.equals("--")) { return 0; }
-        var n = anzeigeDelta.toNumber();
+        var s = anzeigeDelta.toString();
+        // "+3" breaks String.toNumber() on some CIQ runtimes
+        if (s.length() > 0) {
+            var c0 = s.substring(0, 1);
+            if (c0.equals("+")) {
+                s = s.substring(1, s.length());
+            }
+        }
+        var n = s.toNumber();
         if (n == null) { return 0; }
         return n;
     }
