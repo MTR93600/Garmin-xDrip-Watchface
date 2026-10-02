@@ -303,7 +303,8 @@ module PilotDrawing {
     function drawPredictHint(dc, cx, y, predict15, state) {
         if (state != STATE_HYPO && state != STATE_HYPER) { return; }
         if (predict15 == null) { return; }
-        dc.setColor(0x888888, Gfx.COLOR_TRANSPARENT);
+        var col = state == STATE_HYPO ? 0xFF8C8C : 0xFFCC88;
+        dc.setColor(col, Gfx.COLOR_TRANSPARENT);
         dc.drawText(cx, y, Gfx.FONT_XTINY, "PREDICT 15min → " + predict15.toString(), Gfx.TEXT_JUSTIFY_CENTER);
     }
 

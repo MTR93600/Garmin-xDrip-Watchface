@@ -58,27 +58,29 @@ module CGMWatchfacePilot {
             predict15 = future[2]; // ~15 min at 5-min steps
         }
 
-        // Layout: band above ring (no overlap), no LOOP pill — free bottom for tech/TIR/time
+        // Layout: band above ring; bottom stack = tech → TIR/Δ → [predict if alert] → time
         var headInset = PilotDrawing.edgeInsetX(pad + 4, width, height, isRound);
         var topBarH = dc.getFontHeight(Gfx.FONT_XTINY) + 6;
         var timeH = dc.getFontHeight(Gfx.FONT_XTINY);
-        var footerH = timeH + (isRound ? 10 : 6);
+        var alert = (state == PilotDrawing.STATE_HYPO || state == PilotDrawing.STATE_HYPER);
+        var predictH = alert ? (timeH + 4) : 0;
+        var footerH = timeH + predictH + (isRound ? 10 : 6);
         var bandH = (isRound ? 48 : 54);
         var bandY = pad + topBarH + 2;
         var bandBottom = bandY + bandH;
 
         var availBottom = height - pad - footerH;
-        var availForRing = availBottom - bandBottom - 40; // room for tech + TIR below ring
+        var stackH = timeH + 4 + timeH + 4; // tech + TIR rows under ring
+        var availForRing = availBottom - bandBottom - stackH - 8;
         var outerR = (availForRing * 0.48).toNumber();
         var maxR = ((width < height ? width : height) * (isRound ? 0.30 : 0.28)).toNumber();
         if (outerR > maxR) { outerR = maxR; }
         if (outerR < 88) { outerR = 88; }
         var innerR = outerR - 16;
-        // Small clear gap under graph (~8px), not touching
         var gluCy = bandBottom + 8 + outerR;
         var ringBottom = gluCy + outerR;
-        if (ringBottom > availBottom - 44) {
-            gluCy = availBottom - 44 - outerR;
+        if (ringBottom > availBottom - stackH) {
+            gluCy = availBottom - stackH - outerR;
         }
 
         var bandInset = PilotDrawing.edgeInsetX(bandY + bandH / 2, width, height, isRound);
@@ -102,10 +104,13 @@ module CGMWatchfacePilot {
         }
         PilotDrawing.drawGlucosePilot(dc, cx, gluCy, sgvText, auswahlPfeil, anzeigeDelta, state);
 
-        // Tech + TIR below the ring with clear air gap
-        var techY = gluCy + outerR + 10;
-        if (techY > availBottom - (timeH * 2) - 4) {
-            techY = availBottom - (timeH * 2) - 4;
+        var timeY = height - pad - timeH;
+        var predictY = timeY - predictH;
+        // Tech + TIR sit above predict (or above time if normal)
+        var maxTirY = (alert ? predictY : timeY) - timeH - 4;
+        var techY = gluCy + outerR + 8;
+        if (techY + timeH + 4 > maxTirY) {
+            techY = maxTirY - timeH - 4;
         }
         PilotDrawing.drawTechLine(dc, cx, techY, anzeigeIOB, anzeigeBasal, anzeigeCOB, ageMin);
         var tirY = techY + timeH + 4;
@@ -117,13 +122,12 @@ module CGMWatchfacePilot {
             dc.drawText(cx, techY - 14, Gfx.FONT_XTINY, err, Gfx.TEXT_JUSTIFY_CENTER);
         }
 
-        // Alert-only predict hint above time (no LOOP pill)
-        if (state == PilotDrawing.STATE_HYPO || state == PilotDrawing.STATE_HYPER) {
-            PilotDrawing.drawPredictHint(dc, cx, height - pad - timeH - timeH - 2, predict15, state);
+        if (alert) {
+            PilotDrawing.drawPredictHint(dc, cx, predictY, predict15, state);
         }
 
         dc.setColor(0x888888, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx, height - pad - timeH, Gfx.FONT_XTINY, timeString, Gfx.TEXT_JUSTIFY_CENTER);
+        dc.drawText(cx, timeY, Gfx.FONT_XTINY, timeString, Gfx.TEXT_JUSTIFY_CENTER);
     }
 
     function stateFromSgv(sgv, low, hyper) {
