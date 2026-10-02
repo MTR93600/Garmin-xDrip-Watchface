@@ -240,30 +240,27 @@ module PilotDrawing {
         }
     }
 
-    //! y is absolute baseline for TIR / Δ (already below ring).
+    //! y is absolute baseline for TIR / Δ — left / right, clear of center PREDICT.
     function drawRingLabels(dc, cx, y, outerR, tir, delta) {
-        var xOff = (outerR * 0.78).toNumber();
-        if (xOff < 70) { xOff = 70; }
+        var w = dc.getWidth();
+        var padX = w >= 400 ? 16 : 10;
         dc.setColor(0x00C853, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx - xOff, y, Gfx.FONT_XTINY, tir.toString() + "% TIR", Gfx.TEXT_JUSTIFY_CENTER);
+        dc.drawText(padX, y, Gfx.FONT_XTINY, tir.toString() + "% TIR", Gfx.TEXT_JUSTIFY_LEFT);
         var dStr = "Δ --";
         if (delta != null) {
             dStr = delta > 0 ? ("Δ +" + delta.toString()) : ("Δ " + delta.toString());
         }
         dc.setColor(0x2C8EFF, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx + xOff, y, Gfx.FONT_XTINY, dStr, Gfx.TEXT_JUSTIFY_CENTER);
+        dc.drawText(w - padX, y, Gfx.FONT_XTINY, dStr, Gfx.TEXT_JUSTIFY_RIGHT);
     }
 
     function drawTechLine(dc, cx, y, iob, basal, cob, ageMin) {
         var tech = "";
         if (iob != null && iob.equals("") == false) { tech = iob; }
-        if (basal != null && basal.equals("") == false && basal.equals("-- %") == false) {
+        // TBR instead of COB on Pilot tech strip
+        if (basal != null && basal.equals("") == false && basal.equals("-- %") == false && basal.equals("--") == false) {
             if (tech.equals("") == false) { tech = tech + " · "; }
             tech = tech + basal;
-        }
-        if (cob != null && cob.equals("") == false && cob.equals("-- g") == false) {
-            if (tech.equals("") == false) { tech = tech + " · "; }
-            tech = tech + cob;
         }
         if (ageMin != null) {
             if (tech.equals("") == false) { tech = tech + " · "; }
@@ -305,7 +302,7 @@ module PilotDrawing {
         if (predict15 == null) { return; }
         var col = state == STATE_HYPO ? 0xFF8C8C : 0xFFCC88;
         dc.setColor(col, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx, y, Gfx.FONT_XTINY, "PREDICT 15min → " + predict15.toString(), Gfx.TEXT_JUSTIFY_CENTER);
+        dc.drawText(cx, y, Gfx.FONT_XTINY, "→ " + predict15.toString() + " in 15m", Gfx.TEXT_JUSTIFY_CENTER);
     }
 
 }

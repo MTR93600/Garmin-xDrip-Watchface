@@ -58,29 +58,48 @@ module CGMWatchfacePilot {
             predict15 = future[2]; // ~15 min at 5-min steps
         }
 
-        // Layout: band above ring; bottom stack = tech → TIR/Δ → [predict if alert] → time
+        // Layout: band above ring
+        // Normal bottom: tech → TIR/Δ → time
+        // Alert bottom:  tech → PREDICT → TIR/Δ → time  (TIR/Δ always lowest data row)
         var headInset = PilotDrawing.edgeInsetX(pad + 4, width, height, isRound);
         var topBarH = dc.getFontHeight(Gfx.FONT_XTINY) + 6;
         var timeH = dc.getFontHeight(Gfx.FONT_XTINY);
+        var rowGap = 4;
         var alert = (state == PilotDrawing.STATE_HYPO || state == PilotDrawing.STATE_HYPER);
-        var predictH = alert ? (timeH + 4) : 0;
-        var footerH = timeH + predictH + (isRound ? 10 : 6);
         var bandH = (isRound ? 48 : 54);
         var bandY = pad + topBarH + 2;
         var bandBottom = bandY + bandH;
 
-        var availBottom = height - pad - footerH;
-        var stackH = timeH + 4 + timeH + 4; // tech + TIR rows under ring
-        var availForRing = availBottom - bandBottom - stackH - 8;
+        var timeY = height - pad - timeH;
+        var tirY = timeY - timeH - rowGap;
+        var predictY = alert ? (tirY - timeH - rowGap) : tirY;
+        var techY = predictY - timeH - rowGap;
+        // Keep tech below ring; shrink ring if needed
+        var minTechY = bandBottom + 20;
+        if (techY < minTechY) {
+            techY = minTechY;
+            predictY = alert ? (techY + timeH + rowGap) : techY;
+            tirY = (alert ? predictY : techY) + timeH + rowGap;
+            if (tirY + timeH > timeY - 2) {
+                tirY = timeY - timeH - 2;
+            }
+        }
+
+        var availForRing = techY - bandBottom - 10;
         var outerR = (availForRing * 0.48).toNumber();
         var maxR = ((width < height ? width : height) * (isRound ? 0.30 : 0.28)).toNumber();
         if (outerR > maxR) { outerR = maxR; }
-        if (outerR < 88) { outerR = 88; }
+        if (outerR < 80) { outerR = 80; }
         var innerR = outerR - 16;
         var gluCy = bandBottom + 8 + outerR;
-        var ringBottom = gluCy + outerR;
-        if (ringBottom > availBottom - stackH) {
-            gluCy = availBottom - stackH - outerR;
+        if (gluCy + outerR > techY - 6) {
+            gluCy = techY - 6 - outerR;
+            if (gluCy - outerR < bandBottom + 4) {
+                outerR = ((techY - 6 - (bandBottom + 4)) / 2).toNumber();
+                if (outerR < 70) { outerR = 70; }
+                innerR = outerR - 14;
+                gluCy = bandBottom + 4 + outerR;
+            }
         }
 
         var bandInset = PilotDrawing.edgeInsetX(bandY + bandH / 2, width, height, isRound);
@@ -104,26 +123,16 @@ module CGMWatchfacePilot {
         }
         PilotDrawing.drawGlucosePilot(dc, cx, gluCy, sgvText, auswahlPfeil, anzeigeDelta, state);
 
-        var timeY = height - pad - timeH;
-        var predictY = timeY - predictH;
-        // Tech + TIR sit above predict (or above time if normal)
-        var maxTirY = (alert ? predictY : timeY) - timeH - 4;
-        var techY = gluCy + outerR + 8;
-        if (techY + timeH + 4 > maxTirY) {
-            techY = maxTirY - timeH - 4;
-        }
         PilotDrawing.drawTechLine(dc, cx, techY, anzeigeIOB, anzeigeBasal, anzeigeCOB, ageMin);
-        var tirY = techY + timeH + 4;
+        if (alert) {
+            PilotDrawing.drawPredictHint(dc, cx, predictY, predict15, state);
+        }
         PilotDrawing.drawRingLabels(dc, cx, tirY, outerR, tir, deltaNum);
 
         var err = AimicoDraw.friendlyError(anzeigeFehler);
         if (err.equals("") == false) {
             dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
             dc.drawText(cx, techY - 14, Gfx.FONT_XTINY, err, Gfx.TEXT_JUSTIFY_CENTER);
-        }
-
-        if (alert) {
-            PilotDrawing.drawPredictHint(dc, cx, predictY, predict15, state);
         }
 
         dc.setColor(0x888888, Gfx.COLOR_TRANSPARENT);
