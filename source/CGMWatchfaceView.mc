@@ -24,6 +24,7 @@ var isAAPS = true;
 var oldAAPS = true;
 var changedAAPS = true;
 var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", anzeigeCOB = "", verzoegerung;
+var anzeigeTarget = null, anzeigeMode = null, anzeigeTbrMins = null;
 var showActivity = 0, counterActivityAnzeige = 0;
 var showNotification = 0;
 var BGFarbe = false, BarsFarbe = true;
@@ -298,6 +299,35 @@ class CGMWatchfaceView extends Ui.WatchFace {
                         anzeigeBasal = "-- %";
                     }
                 }
+
+                // Atelier: loop target (mg/dL) + active mode (FCL/DINNER/...) + TBR remaining minutes.
+                // Defensive: the phone plugin may not send these fields yet.
+                anzeigeTarget = null;
+                anzeigeMode = null;
+                anzeigeTbrMins = null;
+                if( punkte[0]["target"] != null ) {
+                    var tgtRaw = punkte[0]["target"];
+                    if( tgtRaw instanceof Lang.String ) {
+                        anzeigeTarget = tgtRaw;
+                    } else {
+                        var tgtNum = tgtRaw.toNumber();
+                        if( tgtNum != null ) {
+                            anzeigeTarget = tgtNum.toString();
+                        }
+                    }
+                }
+                if( punkte[0]["mode"] != null ) {
+                    var modeStr = punkte[0]["mode"].toString();
+                    if( modeStr.length() > 0 && !modeStr.equals("--") ) {
+                        anzeigeMode = modeStr;
+                    }
+                }
+                if( punkte[0]["tbrMins"] != null ) {
+                    var tmNum = punkte[0]["tbrMins"].toNumber();
+                    if( tmNum != null && tmNum > 0 ) {
+                        anzeigeTbrMins = tmNum.toString();
+                    }
+                }
             }
 
             // Delay in minutes, proof if SGV is outdated
@@ -347,8 +377,32 @@ class CGMWatchfaceView extends Ui.WatchFace {
         var layoutStyleProp = App.getApp().getProperty("layoutStyle");
         var layoutStyle = layoutStyleProp != null ? layoutStyleProp.toNumber() : 0;
         if (layoutStyle == null) { layoutStyle = 0; }
-        if (layoutStyle == 1 || layoutStyle == 2 || layoutStyle == 3 || layoutStyle == 4 || layoutStyle == 5) {
-            if (layoutStyle == 5) {
+        if (layoutStyle == 1 || layoutStyle == 2 || layoutStyle == 3 || layoutStyle == 4 || layoutStyle == 5 || layoutStyle == 8) {
+            if (layoutStyle == 8) {
+                CGMWatchfaceAtelier.draw(
+                    self,
+                    dc,
+                    isHighPower,
+                    steps,
+                    heartrate,
+                    timeString,
+                    datum,
+                    punkte,
+                    zielbereichLow,
+                    zielbereichHigh,
+                    anzeigeSGV,
+                    anzeigeDelta,
+                    verzoegerung,
+                    anzeigeIOB,
+                    anzeigeBasal,
+                    anzeigeCOB,
+                    anzeigeFehler,
+                    auswahlPfeil,
+                    anzeigeTarget,
+                    anzeigeMode,
+                    anzeigeTbrMins
+                );
+            } else if (layoutStyle == 5) {
                 CGMWatchfacePilot.draw(
                     self,
                     dc,
