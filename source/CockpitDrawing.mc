@@ -2,6 +2,7 @@ using Toybox.Graphics as Gfx;
 using Toybox.Application as App;
 using Toybox.Lang as Lang;
 using Toybox.Math as Math;
+using Toybox.WatchUi as Ui;
 
 //! CONCEPT C — Cockpit TIR drawing helpers (layoutStyle=7).
 //! Hero TIR ring + compact graph band (3h + dotted +60m prediction) + data tiles.
@@ -77,7 +78,8 @@ module CockpitDrawing {
             modeStr = mode.toString();
             if (modeStr == null || modeStr.equals("")) { modeStr = null; }
         }
-        var fontT = Gfx.FONT_NUMBER_MILD;
+        // TINY — a step under SMALL so time matches date / steps·HR weight
+        var fontT = Gfx.FONT_TINY;
         var tw = dc.getTextWidthInPixels(timeString, fontT);
         var chipW = 0;
         if (modeStr != null) {
@@ -144,7 +146,8 @@ module CockpitDrawing {
         if (state == STATE_HYPO) { col = COL_RED; }
         else if (state == STATE_HYPER || state == STATE_HIGH) { col = COL_ORANGE; }
         dc.setColor(col, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx, y, Gfx.FONT_XTINY, tir.toString() + "% TIR", Gfx.TEXT_JUSTIFY_CENTER);
+        // Compact — avoid crowding the trend arrow above
+        dc.drawText(cx, y, Gfx.FONT_XTINY, tir.toString() + "%", Gfx.TEXT_JUSTIFY_CENTER);
     }
 
     function drawGlucoseCockpit(dc, cx, cy, sgvText, auswahlPfeil, state) {
@@ -160,11 +163,11 @@ module CockpitDrawing {
         dc.setColor(col, Gfx.COLOR_TRANSPARENT);
         dc.drawText(cx, bgY, fontBg, sgvText, Gfx.TEXT_JUSTIFY_CENTER);
 
-        // Trend arrow centered under glucose
-        var ah = 28;
+        // Trend arrow under glucose, raised so it clears the TIR line
+        var ah = 24;
         var bmp = AimicoState.classicArrowDrawable(auswahlPfeil);
         if (bmp != null) {
-            dc.drawScaledBitmap(cx - ah / 2, bgY + bgH - 2, ah, ah, bmp);
+            dc.drawScaledBitmap(cx - ah / 2, bgY + bgH - 14, ah, ah, bmp);
         }
 
         if (state == STATE_HYPO) {
@@ -176,7 +179,7 @@ module CockpitDrawing {
         }
     }
 
-    //! Compact graph band: target zone + 3h curve + dotted +60m prediction + time labels.
+    //! Compact graph band: target zone + 3h curve + dotted +60m prediction (no time axis).
     function drawGraphBand(dc, x, y, w, h, past, future, targetNum, state) {
         dc.setColor(0x12161C, 0x12161C);
         dc.fillRoundedRectangle(x, y, w, h, 12);
@@ -188,7 +191,7 @@ module CockpitDrawing {
         var ix = x + 8;
         var iy = y + 8;
         var iw = w - 16;
-        var ih = h - 30; // room for time labels
+        var ih = h - 16; // full band height (time labels removed)
 
         var gmin = 500;
         var gmax = 0;
@@ -208,17 +211,14 @@ module CockpitDrawing {
             gmax = mid + 20;
         }
 
-        // Target zone (shaded band + tag), drawn under the curve
+        // Target zone (silent band only — numeric TGT is in the bottom tile)
         if (targetNum != null) {
             var t = targetNum;
             if (t >= gmin && t <= gmax) {
                 var tnorm = (t - gmin).toFloat() / (gmax - gmin).toFloat();
                 var ty = iy + ih - (tnorm * ih).toNumber();
                 dc.setColor(0x1D2B33, 0x1D2B33);
-                dc.fillRectangle(ix, ty - 9, iw, 18);
-                dc.setColor(0x7FB3C8, Gfx.COLOR_TRANSPARENT);
-                dc.drawText(ix + 4, ty, Gfx.FONT_XTINY, "TGT " + t.toString(),
-                    Gfx.TEXT_JUSTIFY_LEFT | Gfx.TEXT_JUSTIFY_VCENTER);
+                dc.fillRectangle(ix, ty - 8, iw, 16);
             }
         }
 
@@ -267,50 +267,79 @@ module CockpitDrawing {
             }
         }
 
-        dc.setColor(0x666666, Gfx.COLOR_TRANSPARENT);
-        var ly = y + h - 5;
-        dc.drawText(ix, ly, Gfx.FONT_XTINY, "-3h", Gfx.TEXT_JUSTIFY_LEFT | Gfx.TEXT_JUSTIFY_VCENTER);
-        dc.drawText(ix + pastW / 2, ly, Gfx.FONT_XTINY, "-1h", Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
-        dc.drawText(ix + pastW, ly, Gfx.FONT_XTINY, "Now", Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+        // Thin NOW divider between history and forecast (no -3h/-1h labels)
+        dc.setColor(0x333333, Gfx.COLOR_TRANSPARENT);
+        dc.setPenWidth(1);
+        dc.drawLine(ix + pastW, iy + 2, ix + pastW, iy + ih - 2);
     }
 
-    //! Data tile: rounded panel, small label on top, big colored value.
-    function drawTile(dc, x, y, w, h, label, value, valueCol) {
+    //! Tiny bullseye for TGT tile (no dedicated bitmap in resources).
+    function drawTargetIcon(dc, cx, cy, s) {
+        dc.setColor(0x7FB3C8, Gfx.COLOR_TRANSPARENT);
+        dc.setPenWidth(1);
+        dc.drawCircle(cx, cy, s / 2);
+        dc.drawCircle(cx, cy, s / 4);
+        dc.setColor(0x7FB3C8, 0x7FB3C8);
+        dc.fillCircle(cx, cy, 2);
+    }
+
+    //! Tiny Δ glyph for the delta tile.
+    function drawDeltaIcon(dc, cx, cy, col) {
+        dc.setColor(col, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(cx, cy, Gfx.FONT_XTINY, "Δ",
+            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+    }
+
+    //! Data tile: [icon 16px] + value XTINY — same alignment in every cell.
+    //! kind: "iob" | "tbr" | "delta" | "tgt"
+    function drawIconTile(dc, x, y, w, h, kind, value, valueCol) {
         dc.setColor(COL_TILE_BG, COL_TILE_BG);
-        dc.fillRoundedRectangle(x, y, w, h, 10);
+        dc.fillRoundedRectangle(x, y, w, h, 8);
         dc.setColor(COL_TILE_BORDER, Gfx.COLOR_TRANSPARENT);
         dc.setPenWidth(1);
-        dc.drawRoundedRectangle(x, y, w, h, 10);
-        dc.setColor(0x888888, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(x + w / 2, y + 7, Gfx.FONT_XTINY, label, Gfx.TEXT_JUSTIFY_CENTER);
-        var v = value != null ? value : "--";
-        dc.setColor(valueCol, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(x + w / 2, y + h / 2 + 7, Gfx.FONT_SMALL, v,
-            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
-    }
+        dc.drawRoundedRectangle(x, y, w, h, 8);
 
-    //! Loop/state pill (bottom) — Pilot family language.
-    function drawStatePill(dc, cx, y, state, version) {
-        var bw = 180;
-        var bh = 26;
-        var bx = cx - bw / 2;
-        var bg = 0x1A5CFF;
-        var txt = "LOOP · AAPS";
-        if (state == STATE_HYPO) {
-            bg = 0x8B0000;
-            txt = "HYPO · AAPS";
-        } else if (state == STATE_HYPER) {
-            bg = 0xCC5500;
-            txt = "HIGH · AAPS";
+        var fnt = Gfx.FONT_XTINY;
+        var v = value != null ? value : "--";
+        // Shorten long TBR strings (e.g. "0.5/27") so they stay in-cell
+        if (v.length() > 6) {
+            v = v.substring(0, 6);
         }
-        if (version != null && version.equals("") == false) {
-            txt = txt + " " + version;
+        var icon = 16;
+        var gap = 3;
+        var vw = dc.getTextWidthInPixels(v, fnt);
+        var total = icon + gap + vw;
+        if (total > w - 6) {
+            // Value only if still too wide after shortening
+            dc.setColor(valueCol, Gfx.COLOR_TRANSPARENT);
+            dc.drawText(x + w / 2, y + h / 2, fnt, v,
+                Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+            return;
         }
-        dc.setColor(bg, bg);
-        dc.fillRoundedRectangle(bx, y, bw, bh, 13);
-        dc.setColor(0xFFFFFF, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx, y + bh / 2, Gfx.FONT_XTINY, txt,
-            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+        var sx = x + ((w - total) / 2).toNumber();
+        var cy = y + h / 2;
+        var icx = sx + icon / 2;
+        var icy = cy;
+
+        if (kind.equals("iob")) {
+            var bmpI = Ui.loadResource(Rez.Drawables.iob20);
+            if (bmpI != null) {
+                dc.drawScaledBitmap(sx, cy - icon / 2, icon, icon, bmpI);
+            }
+        } else if (kind.equals("tbr")) {
+            var bmpT = Ui.loadResource(Rez.Drawables.tbr20);
+            if (bmpT != null) {
+                dc.drawScaledBitmap(sx, cy - icon / 2, icon, icon, bmpT);
+            }
+        } else if (kind.equals("delta")) {
+            drawDeltaIcon(dc, icx, icy, valueCol);
+        } else if (kind.equals("tgt")) {
+            drawTargetIcon(dc, icx, icy, icon);
+        }
+
+        dc.setColor(valueCol, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(sx + icon + gap, cy, fnt, v,
+            Gfx.TEXT_JUSTIFY_LEFT | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 
     function drawPredictHint(dc, cx, y, predict15, state) {

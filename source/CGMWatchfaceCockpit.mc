@@ -5,8 +5,7 @@ using Toybox.System as Sys;
 
 //! CONCEPT C — Cockpit TIR (layoutStyle=7).
 //! Top strip (date / time + mode chip / steps·HR), hero TIR ring with glucose inside,
-//! compact graph band (target zone + 3h curve + dotted +60m prediction), 4 data tiles,
-//! loop/state pill at the bottom.
+//! compact graph band (target zone + 3h curve + dotted +60m prediction), 4 data tiles.
 module CGMWatchfaceCockpit {
 
     function draw(
@@ -62,18 +61,15 @@ module CGMWatchfaceCockpit {
             targetNum = anzeigeTarget.toNumber();
         }
 
-        // ---- layout (design target 448x486, 16px margins) ----
+        // ---- layout (design target 448x486, 16px margins) — no LOOP pill ----
         var stripY = pad;
         var stripH = 36;
-        var tileH = 54;
+        var tileH = 44; // icon (16) + value row
         var tileGap = 8;
         var tileY = height - pad - tileH;
-        var pillH = 26;
-        var pillGap = 8;
-        var pillY = tileY - pillGap - pillH;
         var bandGap = 10;
-        var bandH = 78;
-        var bandY = pillY - bandGap - bandH;
+        var bandH = 86; // reclaim pill space + no time-axis strip
+        var bandY = tileY - bandGap - bandH;
         var bandX = pad;
         var bandW = width - 2 * pad;
 
@@ -84,7 +80,8 @@ module CGMWatchfaceCockpit {
         if (outerR > maxR) { outerR = maxR; }
         if (outerR < 70) { outerR = 70; }
         var ringCy = ringTop + 4 + outerR;
-        var tirLabelY = ringCy + outerR - 26;
+        // Sit lower in the ring gap so it clears the raised trend arrow
+        var tirLabelY = ringCy + outerR - 14;
 
         CockpitDrawing.drawVignetteBackground(dc, state);
         CockpitDrawing.drawTopStrip(dc, pad, datum, timeString, anzeigeMode, steps, heartrate);
@@ -102,21 +99,26 @@ module CGMWatchfaceCockpit {
 
         CockpitDrawing.drawGraphBand(dc, bandX, bandY, bandW, bandH, past, future, targetNum, state);
 
-        // ---- 4 data tiles: IOB / TBR / Δ / COB ----
+        // ---- 4 data tiles: IOB / TBR / Δ / TGT ----
         var tileW = (bandW - 3 * tileGap) / 4;
         var dStr = deltaNum > 0 ? "+" + deltaNum.toString() : deltaNum.toString();
         var iobVal = anzeigeIOB;
-        if (iobVal == null || iobVal.equals("")) { iobVal = "-- U"; }
+        if (iobVal == null || iobVal.equals("")) { iobVal = "--"; }
+        // Compact IOB: drop trailing " U" so the value fits the tile
+        if (iobVal.length() >= 2) {
+            var iobTail = iobVal.substring(iobVal.length() - 2, iobVal.length());
+            if (iobTail.equals(" U")) {
+                iobVal = iobVal.substring(0, iobVal.length() - 2);
+            }
+        }
         var tbrVal = anzeigeBasal;
         if (tbrVal == null || tbrVal.equals("") || tbrVal.equals("-- %") || tbrVal.equals("--")) { tbrVal = "--"; }
-        var cobVal = anzeigeCOB;
-        if (cobVal == null || cobVal.equals("")) { cobVal = "-- g"; }
-        CockpitDrawing.drawTile(dc, bandX, tileY, tileW, tileH, "IOB", iobVal, 0x33DDFF);
-        CockpitDrawing.drawTile(dc, bandX + (tileW + tileGap), tileY, tileW, tileH, "TBR", tbrVal, 0xFFB020);
-        CockpitDrawing.drawTile(dc, bandX + 2 * (tileW + tileGap), tileY, tileW, tileH, "Δ", dStr, 0x00E065);
-        CockpitDrawing.drawTile(dc, bandX + 3 * (tileW + tileGap), tileY, tileW, tileH, "COB", cobVal, 0xAAAAAA);
-
-        CockpitDrawing.drawStatePill(dc, cx, pillY, state, null);
+        var tgtVal = "--";
+        if (targetNum != null) { tgtVal = targetNum.toString(); }
+        CockpitDrawing.drawIconTile(dc, bandX, tileY, tileW, tileH, "iob", iobVal, 0x33DDFF);
+        CockpitDrawing.drawIconTile(dc, bandX + (tileW + tileGap), tileY, tileW, tileH, "tbr", tbrVal, 0xFFB020);
+        CockpitDrawing.drawIconTile(dc, bandX + 2 * (tileW + tileGap), tileY, tileW, tileH, "delta", dStr, 0x00E065);
+        CockpitDrawing.drawIconTile(dc, bandX + 3 * (tileW + tileGap), tileY, tileW, tileH, "tgt", tgtVal, 0x7FB3C8);
 
         // alert hint / error line between ring and graph band
         var err = AimicoDraw.friendlyError(anzeigeFehler);

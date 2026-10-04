@@ -216,16 +216,20 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 if( punkte[0]["units_hint"] != null ) {
                     masseinheit = punkte[0]["units_hint"].equals("mmol") ? 1 : 0;
                 }
-                // Calculate delta (dates may be seconds or milliseconds)
+                // Calculate delta (dates may be seconds or milliseconds).
+                // Prefer AAPS-provided 5-min delta when present — local recalc with minutes=1
+                // (Libre ~1–3 min spacing) turns a real ±1 mg/dL/5min into ~0.2 → format "%.0f" → 0.
                 var delta_errechnet;
-                if( punkte.size() > 1 && punkte[0]["sgv"] != null && punkte[0]["date"] != null && punkte[1]["sgv"] != null && punkte[1]["date"] != null && punkte[0]["date"] > punkte[1]["date"] ) {
+                if ( punkte[0]["delta"] != null ) {
+                    delta_errechnet = punkte[0]["delta"].toNumber();
+                    if (delta_errechnet == null) { delta_errechnet = punkte[0]["delta"]; }
+                } else if( punkte.size() > 1 && punkte[0]["sgv"] != null && punkte[0]["date"] != null && punkte[1]["sgv"] != null && punkte[1]["date"] != null && punkte[0]["date"] > punkte[1]["date"] ) {
                     var dateDiff = punkte[0]["date"] - punkte[1]["date"];
                     // AAPS seconds diffs are ~300; ms diffs are ~300000
                     var elapsedSec = dateDiff > 100000 ? (dateDiff * 0.001) : dateDiff.toFloat();
                     if (elapsedSec < 1) { elapsedSec = 1; }
-                    delta_errechnet = ( punkte[0]["sgv"] - punkte[1]["sgv"] ) / elapsedSec * minutes * 60;
-                } else if ( punkte[0]["delta"] != null ) {
-                    delta_errechnet = punkte[0]["delta"];
+                    // Always normalize to a 5-minute delta for display (Nightscout convention)
+                    delta_errechnet = ( punkte[0]["sgv"] - punkte[1]["sgv"] ) / elapsedSec * 5 * 60;
                 } else {
                     delta_errechnet = null;
                 }
