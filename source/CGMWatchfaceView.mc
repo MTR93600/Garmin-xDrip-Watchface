@@ -24,6 +24,7 @@ var isAAPS = true;
 var oldAAPS = true;
 var changedAAPS = true;
 var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", anzeigeCOB = "", verzoegerung;
+var anzeigeTarget = null, anzeigeMode = null, anzeigeTbrMins = null;
 var showActivity = 0, counterActivityAnzeige = 0;
 var showNotification = 0;
 var BGFarbe = false, BarsFarbe = true;
@@ -298,6 +299,24 @@ class CGMWatchfaceView extends Ui.WatchFace {
                         anzeigeBasal = "-- %";
                     }
                 }
+                // Cockpit/Atelier/Blueprint: loop target + active mode (AAPS plugin contract:
+                // data[0]["target"] = mg/dL number, data[0]["mode"] = "FCL"/"DINNER"/"LUNCH"/null)
+                if( punkte[0]["target"] != null ) {
+                    anzeigeTarget = punkte[0]["target"].toString();
+                } else {
+                    anzeigeTarget = null;
+                }
+                if( punkte[0]["mode"] != null ) {
+                    var mStr = punkte[0]["mode"].toString();
+                    anzeigeMode = mStr.equals("") ? null : mStr;
+                } else {
+                    anzeigeMode = null;
+                }
+                if( punkte[0]["tbrMins"] != null ) {
+                    anzeigeTbrMins = punkte[0]["tbrMins"].toNumber();
+                } else {
+                    anzeigeTbrMins = null;
+                }
             }
 
             // Delay in minutes, proof if SGV is outdated
@@ -347,8 +366,31 @@ class CGMWatchfaceView extends Ui.WatchFace {
         var layoutStyleProp = App.getApp().getProperty("layoutStyle");
         var layoutStyle = layoutStyleProp != null ? layoutStyleProp.toNumber() : 0;
         if (layoutStyle == null) { layoutStyle = 0; }
-        if (layoutStyle == 1 || layoutStyle == 2 || layoutStyle == 3 || layoutStyle == 4 || layoutStyle == 5) {
-            if (layoutStyle == 5) {
+        if (layoutStyle == 1 || layoutStyle == 2 || layoutStyle == 3 || layoutStyle == 4 || layoutStyle == 5 || layoutStyle == 7) {
+            if (layoutStyle == 7) {
+                CGMWatchfaceCockpit.draw(
+                    self,
+                    dc,
+                    isHighPower,
+                    steps,
+                    heartrate,
+                    timeString,
+                    datum,
+                    punkte,
+                    zielbereichLow,
+                    zielbereichHigh,
+                    anzeigeSGV,
+                    anzeigeDelta,
+                    verzoegerung,
+                    anzeigeIOB,
+                    anzeigeBasal,
+                    anzeigeCOB,
+                    anzeigeFehler,
+                    auswahlPfeil,
+                    anzeigeTarget,
+                    anzeigeMode
+                );
+            } else if (layoutStyle == 5) {
                 CGMWatchfacePilot.draw(
                     self,
                     dc,
