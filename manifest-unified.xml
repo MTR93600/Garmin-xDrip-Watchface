@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<iq:manifest xmlns:iq="http://www.garmin.com/xml/connectiq" version="3">
+    <!-- Unified build: all 9 skins (layoutStyle 0-8), selector in settings -->
+    <!-- Distinct UUID — unified store app, does not replace per-concept builds -->
+    <iq:application entry="CGMWatchfaceApp" id="0891c70e0dfb48b0af678c9fdfa2012a" launcherIcon="@Drawables.LauncherIcon" minSdkVersion="2.4.0" name="@Strings.AppName" type="watchface" version="1.0.0">
+        <iq:products>
+            <iq:product id="venux1"/>
+            <iq:product id="venu3s"/>
+            <iq:product id="venu3"/>
+        </iq:products>
+        <iq:permissions>
+            <iq:uses-permission id="Background"/>
+            <iq:uses-permission id="Communications"/>
+            <iq:uses-permission id="SensorHistory"/>
+            <iq:uses-permission id="UserProfile"/>
+        </iq:permissions>
+        <iq:languages>
+            <iq:language>eng</iq:language>
+        </iq:languages>
+        <iq:barrels/>
+    </iq:application>
+</iq:manifest>

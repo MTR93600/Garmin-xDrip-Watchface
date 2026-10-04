@@ -24,6 +24,7 @@ var isAAPS = true;
 var oldAAPS = true;
 var changedAAPS = true;
 var anzeigeSGV = "", anzeigeBasal = "", anzeigeIOB = "", anzeigeCOB = "", verzoegerung;
+var anzeigeTarget = null, anzeigeMode = null, anzeigeTbrMins = null;
 var showActivity = 0, counterActivityAnzeige = 0;
 var showNotification = 0;
 var BGFarbe = false, BarsFarbe = true;
@@ -215,16 +216,20 @@ class CGMWatchfaceView extends Ui.WatchFace {
                 if( punkte[0]["units_hint"] != null ) {
                     masseinheit = punkte[0]["units_hint"].equals("mmol") ? 1 : 0;
                 }
-                // Calculate delta (dates may be seconds or milliseconds)
+                // Calculate delta (dates may be seconds or milliseconds).
+                // Prefer AAPS-provided 5-min delta when present — local recalc with minutes=1
+                // (Libre ~1–3 min spacing) turns a real ±1 mg/dL/5min into ~0.2 → format "%.0f" → 0.
                 var delta_errechnet;
-                if( punkte.size() > 1 && punkte[0]["sgv"] != null && punkte[0]["date"] != null && punkte[1]["sgv"] != null && punkte[1]["date"] != null && punkte[0]["date"] > punkte[1]["date"] ) {
+                if ( punkte[0]["delta"] != null ) {
+                    delta_errechnet = punkte[0]["delta"].toNumber();
+                    if (delta_errechnet == null) { delta_errechnet = punkte[0]["delta"]; }
+                } else if( punkte.size() > 1 && punkte[0]["sgv"] != null && punkte[0]["date"] != null && punkte[1]["sgv"] != null && punkte[1]["date"] != null && punkte[0]["date"] > punkte[1]["date"] ) {
                     var dateDiff = punkte[0]["date"] - punkte[1]["date"];
                     // AAPS seconds diffs are ~300; ms diffs are ~300000
                     var elapsedSec = dateDiff > 100000 ? (dateDiff * 0.001) : dateDiff.toFloat();
                     if (elapsedSec < 1) { elapsedSec = 1; }
-                    delta_errechnet = ( punkte[0]["sgv"] - punkte[1]["sgv"] ) / elapsedSec * minutes * 60;
-                } else if ( punkte[0]["delta"] != null ) {
-                    delta_errechnet = punkte[0]["delta"];
+                    // Always normalize to a 5-minute delta for display (Nightscout convention)
+                    delta_errechnet = ( punkte[0]["sgv"] - punkte[1]["sgv"] ) / elapsedSec * 5 * 60;
                 } else {
                     delta_errechnet = null;
                 }
@@ -298,6 +303,35 @@ class CGMWatchfaceView extends Ui.WatchFace {
                         anzeigeBasal = "-- %";
                     }
                 }
+
+                // Unified: loop target (mg/dL) + active mode (FCL/DINNER/...) + TBR remaining minutes.
+                // Defensive: the phone plugin may not send these fields yet.
+                anzeigeTarget = null;
+                anzeigeMode = null;
+                anzeigeTbrMins = null;
+                if( punkte[0]["target"] != null ) {
+                    var tgtRaw = punkte[0]["target"];
+                    if( tgtRaw instanceof Lang.String ) {
+                        anzeigeTarget = tgtRaw;
+                    } else {
+                        var tgtNum = tgtRaw.toNumber();
+                        if( tgtNum != null ) {
+                            anzeigeTarget = tgtNum.toString();
+                        }
+                    }
+                }
+                if( punkte[0]["mode"] != null ) {
+                    var modeStr = punkte[0]["mode"].toString();
+                    if( modeStr.length() > 0 && !modeStr.equals("--") ) {
+                        anzeigeMode = modeStr;
+                    }
+                }
+                if( punkte[0]["tbrMins"] != null ) {
+                    var tmNum = punkte[0]["tbrMins"].toNumber();
+                    if( tmNum != null && tmNum > 0 ) {
+                        anzeigeTbrMins = tmNum.toString();
+                    }
+                }
             }
 
             // Delay in minutes, proof if SGV is outdated
@@ -347,8 +381,78 @@ class CGMWatchfaceView extends Ui.WatchFace {
         var layoutStyleProp = App.getApp().getProperty("layoutStyle");
         var layoutStyle = layoutStyleProp != null ? layoutStyleProp.toNumber() : 0;
         if (layoutStyle == null) { layoutStyle = 0; }
-        if (layoutStyle == 1 || layoutStyle == 2 || layoutStyle == 3 || layoutStyle == 4 || layoutStyle == 5) {
-            if (layoutStyle == 5) {
+        if (layoutStyle == 1 || layoutStyle == 2 || layoutStyle == 3 || layoutStyle == 4 || layoutStyle == 5 || layoutStyle == 6 || layoutStyle == 7 || layoutStyle == 8) {
+            if (layoutStyle == 8) {
+                CGMWatchfaceAtelier.draw(
+                    self,
+                    dc,
+                    isHighPower,
+                    steps,
+                    heartrate,
+                    timeString,
+                    datum,
+                    punkte,
+                    zielbereichLow,
+                    zielbereichHigh,
+                    anzeigeSGV,
+                    anzeigeDelta,
+                    verzoegerung,
+                    anzeigeIOB,
+                    anzeigeBasal,
+                    anzeigeCOB,
+                    anzeigeFehler,
+                    auswahlPfeil,
+                    anzeigeTarget,
+                    anzeigeMode,
+                    anzeigeTbrMins
+                );
+            } else if (layoutStyle == 7) {
+                CGMWatchfaceCockpit.draw(
+                    self,
+                    dc,
+                    isHighPower,
+                    steps,
+                    heartrate,
+                    timeString,
+                    datum,
+                    punkte,
+                    zielbereichLow,
+                    zielbereichHigh,
+                    anzeigeSGV,
+                    anzeigeDelta,
+                    verzoegerung,
+                    anzeigeIOB,
+                    anzeigeBasal,
+                    anzeigeCOB,
+                    anzeigeFehler,
+                    auswahlPfeil,
+                    anzeigeTarget,
+                    anzeigeMode
+                );
+            } else if (layoutStyle == 6) {
+                CGMWatchfaceBlueprint.draw(
+                    self,
+                    dc,
+                    isHighPower,
+                    steps,
+                    heartrate,
+                    timeString,
+                    datum,
+                    punkte,
+                    zielbereichLow,
+                    zielbereichHigh,
+                    anzeigeSGV,
+                    anzeigeDelta,
+                    verzoegerung,
+                    anzeigeIOB,
+                    anzeigeBasal,
+                    anzeigeCOB,
+                    anzeigeTarget,
+                    anzeigeMode,
+                    anzeigeFehler,
+                    auswahlPfeil
+                );
+            } else if (layoutStyle == 5) {
                 CGMWatchfacePilot.draw(
                     self,
                     dc,
