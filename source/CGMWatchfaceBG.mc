@@ -107,7 +107,10 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
                         "aaps-ts" => data[0]["aaps-ts"],
                         "iob" => data[0]["iob"],
                         "cob" => data[0]["cob"],
-                        "tbr" => data[0]["tbr"]
+                        "tbr" => data[0]["tbr"],
+                        "target" => data[0]["target"],
+                        "mode" => data[0]["mode"],
+                        "tbrMins" => data[0]["tbrMins"]
                     };
                 }
                 
