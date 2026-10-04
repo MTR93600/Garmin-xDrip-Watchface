@@ -73,47 +73,63 @@ module CGMWatchfaceAtelier {
         // 3. Dial rings (guilloche hint)
         AtelierDrawing.drawDialRings(dc, dialCx, dialCy, dialR);
 
-        // 4. Title + steps/HR
-        AtelierDrawing.drawTitle(dc, cx, pad, steps, heartrate);
+        // 4. Steps (top-left) / HR (top-right)
+        AtelierDrawing.drawTopMetrics(dc, pad, width, steps, heartrate);
 
         // 5. TIR arc over the dial top
         AtelierDrawing.drawTirArc(dc, dialCx, dialCy, dialR + 16, tir, state);
 
-        // 6. Analog hands
+        // 6. Analog hands + trend arrow above the hub
         AtelierDrawing.drawHands(dc, dialCx, dialCy);
+        AtelierDrawing.drawTrendAboveHands(dc, dialCx, dialCy, auswahlPfeil);
 
         // 7. Date window + mode chip at 3 o'clock
         AtelierDrawing.drawDateWindow(dc, dialCx + 66, dialCy - 17, 88, 34, datum, anzeigeMode);
 
-        // 8. Glucose complication at 6 o'clock
+        // 8. Glucose complication at 6 o'clock (no side arrow)
         var sgvText = "--";
         if (anzeigeSGV != null && !anzeigeSGV.equals("") && !anzeigeSGV.equals("--")) {
             sgvText = anzeigeSGV;
         }
-        AtelierDrawing.drawGlucoseAtelier(dc, dialCx, 348, sgvText, auswahlPfeil, state);
+        AtelierDrawing.drawGlucoseAtelier(dc, dialCx, 348, sgvText, state);
 
-        // 9. Therapy line: TBR · remaining min · TGT
-        AtelierDrawing.drawTherapyLine(dc, dialCx, 394, anzeigeBasal, anzeigeTbrMins, anzeigeTarget);
-
-        // 10. Sub-dials: IOB (left) / delta (right)
-        var iobTxt = "IOB -- U";
+        // 9. Sub-dials first (IOB left / Δ right) so TBR is sized to the gap between them
+        var iobVal = "--";
         if (anzeigeIOB != null && !anzeigeIOB.equals("")) {
-            iobTxt = "IOB " + anzeigeIOB;
+            iobVal = anzeigeIOB;
+            // Drop trailing " U" so the value fits under the icon
+            if (iobVal.length() >= 2) {
+                var tail = iobVal.substring(iobVal.length() - 2, iobVal.length());
+                if (tail.equals(" U")) {
+                    iobVal = iobVal.substring(0, iobVal.length() - 2);
+                }
+            }
         }
-        var dStr = "Δ --";
+        var dStr = "--";
         if (deltaNum != null) {
-            dStr = deltaNum > 0 ? ("Δ +" + deltaNum.toString()) : ("Δ " + deltaNum.toString());
+            dStr = deltaNum > 0 ? ("+" + deltaNum.toString()) : deltaNum.toString();
         }
-        AtelierDrawing.drawSubDial(dc, 72, 390, 38, iobTxt);
-        AtelierDrawing.drawSubDial(dc, width - 72, 390, 38, dStr);
+        var subR = 38;
+        var subY = 400;
+        var iobCx = 72;
+        var dltCx = width - 72;
+        AtelierDrawing.drawIobSubDial(dc, iobCx, subY, subR, iobVal);
+        AtelierDrawing.drawSubDial(dc, dltCx, subY, subR, dStr);
+
+        // 10. TBR centered in the clear gap between sub-dials (never overlaps circles)
+        var gapL = iobCx + subR + 10;
+        var gapR = dltCx - subR - 10;
+        var tbrMaxW = gapR - gapL;
+        AtelierDrawing.drawTherapyLine(dc, dialCx, subY - 4, tbrMaxW, anzeigeBasal, anzeigeTbrMins, null);
 
         // 11. Alert extras (pilot language)
         if (alert) {
             PilotDrawing.drawPredictHint(dc, dialCx, 414, predict15, state);
         }
 
-        // 12. State pill (pilot language)
-        PilotDrawing.drawBottomPill(dc, state, "");
+        // 12. Bottom: targetBg (replaces LOOP · AAPS)
+        var tgtY = height - pad - 26;
+        AtelierDrawing.drawTargetBottom(dc, dialCx, tgtY, anzeigeTarget);
 
         // 13. Error line (only when not alert — alert visuals take priority)
         var err = AimicoDraw.friendlyError(anzeigeFehler);

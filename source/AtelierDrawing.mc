@@ -2,21 +2,44 @@ using Toybox.Graphics as Gfx;
 using Toybox.Lang as Lang;
 using Toybox.Math as Math;
 using Toybox.System as Sys;
+using Toybox.WatchUi as Ui;
 
 //! CONCEPT — Atelier (layoutStyle=8).
 //! Elegant horological dial: the 3h glucose curve + dotted +60m prediction
 //! is watermarked (filigrane) behind slim analog hands. Alert states reuse
-//! the Pilot visual language (vignette, ring color, white glucose, pill).
+//! the Pilot visual language (vignette, ring color, white glucose).
 module AtelierDrawing {
 
-    //! Title + steps/HR, centered near the top of the dial.
-    function drawTitle(dc, cx, y, steps, heartrate) {
-        dc.setColor(0xB08D57, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx, y, Gfx.FONT_XTINY, "ATELIER", Gfx.TEXT_JUSTIFY_CENTER);
+    //! Top corners: steps left, heart rate right (no brand title).
+    function drawTopMetrics(dc, pad, width, steps, heartrate) {
+        var y = pad;
         var stepsStr = steps != null ? steps.toString() : "--";
         var hrStr = heartrate != null ? heartrate.toString() : "--";
-        dc.setColor(0x666666, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx, y + 20, Gfx.FONT_XTINY, stepsStr + " · " + hrStr, Gfx.TEXT_JUSTIFY_CENTER);
+        var fnt = Gfx.FONT_XTINY;
+        var icon = 18;
+        var bmpS = Ui.loadResource(Rez.Drawables.steps20);
+        if (bmpS != null) {
+            dc.drawScaledBitmap(pad, y, icon, icon, bmpS);
+        }
+        dc.setColor(0xAAAAAA, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(pad + icon + 6, y + icon / 2, fnt, stepsStr,
+            Gfx.TEXT_JUSTIFY_LEFT | Gfx.TEXT_JUSTIFY_VCENTER);
+        var bmpH = Ui.loadResource(Rez.Drawables.heart20);
+        if (bmpH != null) {
+            dc.drawScaledBitmap(width - pad - icon, y, icon, icon, bmpH);
+        }
+        dc.setColor(0xAAAAAA, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(width - pad - icon - 6, y + icon / 2, fnt, hrStr,
+            Gfx.TEXT_JUSTIFY_RIGHT | Gfx.TEXT_JUSTIFY_VCENTER);
+    }
+
+    //! Trend arrow centered above the analog hands (12 o'clock side of the hub).
+    function drawTrendAboveHands(dc, cx, cyHands, auswahlPfeil) {
+        var bmp = AimicoState.classicArrowDrawable(auswahlPfeil);
+        if (bmp == null) { return; }
+        var ah = 26;
+        var ay = cyHands - 56;
+        dc.drawScaledBitmap(cx - ah / 2, ay, ah, ah, bmp);
     }
 
     //! Thin TIR arc across the top of the dial (120° sweep over 12 o'clock).
@@ -164,8 +187,8 @@ module AtelierDrawing {
         }
     }
 
-    //! Big glucose readout at 6 o'clock with trend arrow (pilot language).
-    function drawGlucoseAtelier(dc, cx, cyCenter, sgvText, auswahlPfeil, state) {
+    //! Big glucose readout at 6 o'clock (trend arrow is drawn above the hands).
+    function drawGlucoseAtelier(dc, cx, cyCenter, sgvText, state) {
         var col = 0x2C8EFF;
         if (state == PilotDrawing.STATE_HYPO || state == PilotDrawing.STATE_HYPER) { col = 0xFFFFFF; }
         var fontBg = Gfx.FONT_NUMBER_MEDIUM;
@@ -173,12 +196,6 @@ module AtelierDrawing {
         var bgY = cyCenter - (bgH / 2).toNumber() - 2;
         dc.setColor(col, Gfx.COLOR_TRANSPARENT);
         dc.drawText(cx, bgY, fontBg, sgvText, Gfx.TEXT_JUSTIFY_CENTER);
-        var bmp = AimicoState.classicArrowDrawable(auswahlPfeil);
-        if (bmp != null) {
-            var tw = dc.getTextWidthInPixels(sgvText, fontBg);
-            var ax = cx + (tw / 2).toNumber() + 8;
-            dc.drawScaledBitmap(ax, bgY + 2, 24, 24, bmp);
-        }
         if (state == PilotDrawing.STATE_HYPO) {
             dc.setColor(0xFF3D57, Gfx.COLOR_TRANSPARENT);
             dc.drawText(cx, bgY - 16, Gfx.FONT_XTINY, "LOW · <70", Gfx.TEXT_JUSTIFY_CENTER);
@@ -188,22 +205,76 @@ module AtelierDrawing {
         }
     }
 
-    //! "TBR 120% · 45 min · TGT 100" — parts omitted when data missing.
-    function drawTherapyLine(dc, cx, y, anzeigeBasal, anzeigeTbrMins, anzeigeTarget) {
-        var parts = "";
-        if (anzeigeBasal != null && !anzeigeBasal.equals("") && !anzeigeBasal.equals("-- %")) {
-            parts = "TBR " + anzeigeBasal;
-            if (anzeigeTbrMins != null && !anzeigeTbrMins.equals("")) {
-                parts = parts + " · " + anzeigeTbrMins + " min";
+    //! Bottom center: targetBg (replaces LOOP · AAPS pill).
+    function drawTargetBottom(dc, cx, y, anzeigeTarget) {
+        var txt = "TGT --";
+        if (anzeigeTarget != null && !anzeigeTarget.equals("")) {
+            txt = "TGT " + anzeigeTarget.toString();
+        }
+        var fnt = Gfx.FONT_XTINY;
+        var tw = dc.getTextWidthInPixels(txt, fnt) + 28;
+        var th = 26;
+        var bx = cx - tw / 2;
+        dc.setColor(0x1A3A5C, 0x1A3A5C);
+        dc.fillRoundedRectangle(bx, y, tw, th, 13);
+        dc.setColor(0x7FB3C8, Gfx.COLOR_TRANSPARENT);
+        dc.setPenWidth(1);
+        dc.drawRoundedRectangle(bx, y, tw, th, 13);
+        dc.setColor(0xFFFFFF, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(cx, y + th / 2, fnt, txt, Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+    }
+
+    //! Compact TBR line, width-capped so it never invades the IOB / Δ sub-dials.
+    //! maxW = clear gap between the two circles (pass 0 to skip drawing).
+    function drawTherapyLine(dc, cx, y, maxW, anzeigeBasal, anzeigeTbrMins, anzeigeTarget) {
+        if (maxW == null || maxW < 40) { return; }
+        var basal = null;
+        if (anzeigeBasal != null && !anzeigeBasal.equals("") && !anzeigeBasal.equals("-- %") && !anzeigeBasal.equals("--")) {
+            basal = anzeigeBasal.toString();
+            // "1.4/254" → keep rate only when very long
+            if (basal.length() > 7) {
+                var slash = -1;
+                var bi = 0;
+                while (bi < basal.length()) {
+                    if (basal.substring(bi, bi + 1).equals("/")) { slash = bi; break; }
+                    bi++;
+                }
+                if (slash > 0) { basal = basal.substring(0, slash); }
             }
         }
-        if (anzeigeTarget != null && !anzeigeTarget.equals("")) {
-            if (!parts.equals("")) { parts = parts + " · "; }
-            parts = parts + "TGT " + anzeigeTarget;
+        var mins = null;
+        if (anzeigeTbrMins != null && !anzeigeTbrMins.equals("")) {
+            mins = anzeigeTbrMins.toString();
         }
-        if (parts.equals("")) { return; }
+        // Longest → shortest until it fits maxW
+        var c0 = "";
+        var c1 = "";
+        var c2 = "";
+        var c3 = "";
+        if (basal != null) {
+            c0 = "TBR " + basal;
+            c1 = basal;
+            if (mins != null) {
+                c0 = "TBR " + basal + " · " + mins + "m";
+                c1 = basal + " · " + mins + "m";
+                c2 = basal;
+                c3 = mins + "m";
+            } else {
+                c2 = basal;
+            }
+        } else if (anzeigeTarget != null && !anzeigeTarget.equals("")) {
+            c0 = "TGT " + anzeigeTarget.toString();
+            c1 = anzeigeTarget.toString();
+        }
+        if (c0.equals("")) { return; }
+        var fnt = Gfx.FONT_XTINY;
+        var txt = c0;
+        if (dc.getTextWidthInPixels(c0, fnt) > maxW && !c1.equals("")) { txt = c1; }
+        if (dc.getTextWidthInPixels(txt, fnt) > maxW && !c2.equals("")) { txt = c2; }
+        if (dc.getTextWidthInPixels(txt, fnt) > maxW && !c3.equals("")) { txt = c3; }
+        if (dc.getTextWidthInPixels(txt, fnt) > maxW) { return; } // still too wide — omit
         dc.setColor(0x888888, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx, y, Gfx.FONT_XTINY, parts, Gfx.TEXT_JUSTIFY_CENTER);
+        dc.drawText(cx, y, fnt, txt, Gfx.TEXT_JUSTIFY_CENTER);
     }
 
     //! Small circular sub-dial with centered label.
@@ -216,6 +287,22 @@ module AtelierDrawing {
             dc.drawText(cx, cy, Gfx.FONT_XTINY, text,
                 Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
         }
+    }
+
+    //! IOB sub-dial: syringe icon + compact value (no "IOB" text — fits the circle).
+    function drawIobSubDial(dc, cx, cy, r, iobValue) {
+        dc.setColor(0x2A2A2A, Gfx.COLOR_TRANSPARENT);
+        dc.setPenWidth(1);
+        dc.drawCircle(cx, cy, r);
+        var v = iobValue != null ? iobValue : "--";
+        var icon = 16;
+        var bmp = Ui.loadResource(Rez.Drawables.iob20);
+        if (bmp != null) {
+            dc.drawScaledBitmap(cx - icon / 2, cy - r + 6, icon, icon, bmp);
+        }
+        dc.setColor(0xCCCCCC, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(cx, cy + 6, Gfx.FONT_XTINY, v,
+            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 
 }
