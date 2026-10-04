@@ -141,7 +141,7 @@ module BlueprintDrawing {
     }
 
     //! Oscilloscope trace: 3h history + dotted +60m prediction (mandatory),
-    //! dashed +180/+70 thresholds, tagged TGT band, time axis.
+    //! dashed +180/+70 guides (no text labels), tagged TGT band.
     function drawOscilloscope(dc, x, y, w, h, past, future, targetNum, state) {
         if (past == null || past.size() < 2) { return; }
         var gmin = 500;
@@ -165,15 +165,19 @@ module BlueprintDrawing {
             gmin = mid - 20;
             gmax = mid + 20;
         }
-        // Threshold lines use fixed clinical cutoffs (mockup: +180/+70 THRESHOLD)
+        // Silent clinical guides (no "+180/+70 THRESHOLD" text — frees the plot)
         var yHi = y + h - (((180 - gmin).toFloat() / (gmax - gmin).toFloat()) * h).toNumber();
         var yLo = y + h - (((70 - gmin).toFloat() / (gmax - gmin).toFloat()) * h).toNumber();
-        dc.setColor(COL_THRESH, Gfx.COLOR_TRANSPARENT);
-        dc.setPenWidth(1);
-        drawDashedLine(dc, x, yHi, x + w, 8, 6);
-        drawDashedLine(dc, x, yLo, x + w, 8, 6);
-        dc.drawText(x + w, yHi - 16, Gfx.FONT_XTINY, "+180 THRESHOLD", Gfx.TEXT_JUSTIFY_RIGHT);
-        dc.drawText(x + w, yLo + 2, Gfx.FONT_XTINY, "+70 THRESHOLD", Gfx.TEXT_JUSTIFY_RIGHT);
+        if (yHi >= y && yHi <= y + h) {
+            dc.setColor(COL_THRESH, Gfx.COLOR_TRANSPARENT);
+            dc.setPenWidth(1);
+            drawDashedLine(dc, x, yHi, x + w, 8, 6);
+        }
+        if (yLo >= y && yLo <= y + h) {
+            dc.setColor(COL_THRESH, Gfx.COLOR_TRANSPARENT);
+            dc.setPenWidth(1);
+            drawDashedLine(dc, x, yLo, x + w, 8, 6);
+        }
         // Target band (target ±10 mg/dL) tagged on its left edge
         if (targetNum != null) {
             var yT2 = y + h - (((targetNum + 10 - gmin).toFloat() / (gmax - gmin).toFloat()) * h).toNumber();
@@ -181,10 +185,9 @@ module BlueprintDrawing {
             if (yT2 < y) { yT2 = y; }
             if (yT1 > y + h) { yT1 = y + h; }
             if (yT1 > yT2) {
+                // Silent band only — numeric TGT lives in the data table (avoid duplicate label)
                 dc.setColor(COL_TGTBAND, COL_TGTBAND);
                 dc.fillRectangle(x, yT2, w, yT1 - yT2);
-                dc.setColor(COL_CYAN, Gfx.COLOR_TRANSPARENT);
-                dc.drawText(x + 4, yT2 + 2, Gfx.FONT_XTINY, "TGT " + targetNum.toString(), Gfx.TEXT_JUSTIFY_LEFT);
             }
         }
         var pastW = (w * 0.75).toNumber();
@@ -240,26 +243,20 @@ module BlueprintDrawing {
                 i++;
             }
         }
-        // Time axis + prediction label
+        // Compact predict cue (no -3H/-2H axis — reclaim vertical space below graph)
         dc.setColor(COL_LABEL, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(x + w, y - 18, Gfx.FONT_XTINY, "PREDICT +60m", Gfx.TEXT_JUSTIFY_RIGHT);
-        var axY = y + h + 2;
-        var labels = ["-3H", "-2H", "-1H", "NOW", "+60m", "PRED"];
-        i = 0;
-        while (i < 6) {
-            var lx = x + ((i.toFloat() / 5.0) * w).toNumber();
-            var just = Gfx.TEXT_JUSTIFY_CENTER;
-            if (i == 0) { just = Gfx.TEXT_JUSTIFY_LEFT; }
-            if (i == 5) { just = Gfx.TEXT_JUSTIFY_RIGHT; }
-            dc.drawText(lx, axY, Gfx.FONT_XTINY, labels[i], just);
-            i++;
-        }
+        dc.drawText(x + w, y + 2, Gfx.FONT_XTINY, "+60m", Gfx.TEXT_JUSTIFY_RIGHT);
+        // Thin NOW divider between history and forecast
+        dc.setColor(COL_GRID, Gfx.COLOR_TRANSPARENT);
+        dc.setPenWidth(1);
+        dc.drawLine(x + pastW, y + 4, x + pastW, y + h - 4);
     }
 
     //! Railway signal lights: green/amber/red, only the active one lit.
+    //! Compact stack + short caption so it never spills into the data table.
     function drawSignalLights(dc, x, y, state) {
-        var r = 8;
-        var gap = 26;
+        var r = 6;
+        var gap = 18;
         var cols = [COL_GREEN, COL_ORANGE, COL_RED];
         var dims = [COL_DIM_GREEN, COL_DIM_AMBER, COL_DIM_RED];
         var lit = 0;
@@ -273,46 +270,50 @@ module BlueprintDrawing {
             dc.fillCircle(x, y + k * gap, r);
             k++;
         }
-        var cap = "OK IN RANGE";
+        // Short caption (XTINY); "OK" when in range — avoids overlapping TIR row
+        var cap = "OK";
         var capC = COL_GREEN;
         if (state == STATE_HYPO) { cap = "LOW"; capC = COL_RED; }
         else if (state == STATE_HYPER || state == STATE_HIGH) { cap = "HIGH"; capC = COL_ORANGE; }
         dc.setColor(capC, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(x, y + 3 * gap - 6, Gfx.FONT_XTINY, cap, Gfx.TEXT_JUSTIFY_CENTER);
+        dc.drawText(x, y + 3 * gap + 1, Gfx.FONT_XTINY, cap, Gfx.TEXT_JUSTIFY_CENTER);
     }
 
-    //! Big glucose readout with trend arrow above (blueprint style: white digits).
+    //! Glucose readout: slightly smaller digits, trend arrow to the RIGHT.
     function drawGlucoseBlueprint(dc, cx, y, sgvText, auswahlPfeil, state) {
         var col = COL_VALUE;
-        var fontBg = Gfx.FONT_NUMBER_HOT;
+        // Prefer MEDIUM over HOT — leaves room for the side arrow without crowding.
+        var fontBg = Gfx.FONT_NUMBER_MEDIUM;
         var bgH = dc.getFontHeight(fontBg);
-        if (bgH > 96) {
-            fontBg = Gfx.FONT_NUMBER_MEDIUM;
+        if (bgH > 88) {
+            fontBg = Gfx.FONT_NUMBER_MILD;
             bgH = dc.getFontHeight(fontBg);
         }
-        // Trend arrow above the digits
-        var ah = 28;
-        var bmp = AimicoState.classicArrowDrawable(auswahlPfeil);
-        if (bmp != null) {
-            dc.drawScaledBitmap(cx - ah / 2, y, ah, ah, bmp);
-        }
-        var bgY = y + ah + 2;
+        var bgY = y;
         dc.setColor(col, Gfx.COLOR_TRANSPARENT);
         dc.drawText(cx, bgY, fontBg, sgvText, Gfx.TEXT_JUSTIFY_CENTER);
-        // Alert label ABOVE the trend arrow (arrow occupies y..y+28)
+        var tw = dc.getTextWidthInPixels(sgvText, fontBg);
+        var ah = 24;
+        var bmp = AimicoState.classicArrowDrawable(auswahlPfeil);
+        if (bmp != null) {
+            var ax = cx + (tw / 2) + 8;
+            var ay = bgY + ((bgH - ah) / 2).toNumber();
+            dc.drawScaledBitmap(ax, ay, ah, ah, bmp);
+        }
         if (state == STATE_HYPO) {
             dc.setColor(COL_RED, Gfx.COLOR_TRANSPARENT);
-            dc.drawText(cx, y - 16, Gfx.FONT_XTINY, "LOW · <70", Gfx.TEXT_JUSTIFY_CENTER);
+            dc.drawText(cx, bgY - 14, Gfx.FONT_XTINY, "LOW · <70", Gfx.TEXT_JUSTIFY_CENTER);
         } else if (state == STATE_HYPER) {
             dc.setColor(COL_ORANGE, Gfx.COLOR_TRANSPARENT);
-            dc.drawText(cx, y - 16, Gfx.FONT_XTINY, "HIGH GLUCOSE", Gfx.TEXT_JUSTIFY_CENTER);
+            dc.drawText(cx, bgY - 14, Gfx.FONT_XTINY, "HIGH GLUCOSE", Gfx.TEXT_JUSTIFY_CENTER);
         }
         return bgY + bgH;
     }
 
-    //! Monospace-style 3x2 data table.
-    function drawDataTable(dc, x, y, w, tir, deltaNum, iob, ageMin, basal, tbrMins) {
-        var rowH = 30;
+    //! Compact 3x2 data table (smaller rows + XTINY labels).
+    //! Row 3 right cell = current target (mg/dL) from AAPS `target`.
+    function drawDataTable(dc, x, y, w, tir, deltaNum, iob, ageMin, basal, targetNum) {
+        var rowH = 24;
         var rows = 3;
         var th = rowH * rows;
         dc.setColor(COL_LINE, Gfx.COLOR_TRANSPARENT);
@@ -324,7 +325,7 @@ module BlueprintDrawing {
             dc.drawLine(x, y + r * rowH, x + w, y + r * rowH);
             r++;
         }
-        var fnt = Gfx.FONT_SMALL;
+        var fnt = Gfx.FONT_XTINY;
         // Row 1: TIR | delta
         drawTableCell(dc, x, y, w / 2, rowH, fnt, "TIR", tir.toString() + "%");
         var dStr = "Δ --";
@@ -339,23 +340,23 @@ module BlueprintDrawing {
         var ageV = "--";
         if (ageMin != null) { ageV = ageMin.toString() + " min"; }
         drawTableValue(dc, x + w / 2, y + rowH, w / 2, rowH, fnt, ageV);
-        // Row 3: TBR | remaining minutes
+        // Row 3: TBR | targetBg
         var tbrV = "--";
         if (basal != null && basal.equals("") == false && basal.equals("-- %") == false) { tbrV = basal; }
         drawTableCell(dc, x, y + 2 * rowH, w / 2, rowH, fnt, "TBR", tbrV);
-        var minsV = "--";
-        if (tbrMins != null) { minsV = tbrMins.toString() + " MIN"; }
-        drawTableValue(dc, x + w / 2, y + 2 * rowH, w / 2, rowH, fnt, minsV);
+        var tgtV = "--";
+        if (targetNum != null) { tgtV = "TGT " + targetNum.toString(); }
+        drawTableValue(dc, x + w / 2, y + 2 * rowH, w / 2, rowH, fnt, tgtV);
     }
 
     //! Left table cell: cyan label + white value.
     function drawTableCell(dc, x, y, w, h, fnt, label, value) {
         var cy = y + h / 2;
         dc.setColor(COL_CYAN, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(x + 12, cy, fnt, label, Gfx.TEXT_JUSTIFY_LEFT | Gfx.TEXT_JUSTIFY_VCENTER);
+        dc.drawText(x + 8, cy, fnt, label, Gfx.TEXT_JUSTIFY_LEFT | Gfx.TEXT_JUSTIFY_VCENTER);
         var lw = dc.getTextWidthInPixels(label, fnt);
         dc.setColor(COL_VALUE, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(x + 12 + lw + 10, cy, fnt, value, Gfx.TEXT_JUSTIFY_LEFT | Gfx.TEXT_JUSTIFY_VCENTER);
+        dc.drawText(x + 8 + lw + 6, cy, fnt, value, Gfx.TEXT_JUSTIFY_LEFT | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 
     //! Right table cell: single centered white value.
@@ -364,23 +365,38 @@ module BlueprintDrawing {
         dc.drawText(x + w / 2, y + h / 2, fnt, value, Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 
-    //! Status bar: STATUS + SENSOR + optional TGT / MODE segments.
+    //! Status bar: compact XTINY line that always fits the bar width.
     function drawStatusBar(dc, x, y, w, state, targetNum, mode) {
-        var bh = 26;
+        var bh = 20;
         dc.setColor(COL_TGTBAND, COL_TGTBAND);
-        dc.fillRoundedRectangle(x, y, w, bh, 6);
+        dc.fillRoundedRectangle(x, y, w, bh, 5);
         dc.setColor(COL_LINE, Gfx.COLOR_TRANSPARENT);
         dc.setPenWidth(1);
-        dc.drawRoundedRectangle(x, y, w, bh, 6);
-        var st = "STATUS: ";
-        if (state == STATE_HYPO) { st += "HYPO"; }
-        else if (state == STATE_HYPER || state == STATE_HIGH) { st += "HIGH"; }
-        else { st += "NORMAL"; }
-        st += "  |  SENSOR: OK";
-        if (targetNum != null) { st += "  |  TGT: " + targetNum.toString(); }
-        if (mode != null && mode.equals("") == false) { st += "  |  MODE: " + mode; }
+        dc.drawRoundedRectangle(x, y, w, bh, 5);
+        // Glucose zone for the face (not AAPS profile / therapy mode)
+        var stLabel = "IN RANGE";
+        if (state == STATE_HYPO) { stLabel = "HYPO"; }
+        else if (state == STATE_HYPER || state == STATE_HIGH) { stLabel = "HIGH"; }
+        var fnt = Gfx.FONT_XTINY;
+        var maxW = w - 10;
+        // Build longest → shortest until it fits (no clipping on rounded edges)
+        var candidates = [
+            stLabel + " · SENSOR OK" +
+                ((mode != null && mode.equals("") == false) ? (" · " + mode) : ""),
+            stLabel + " · SENSOR OK",
+            stLabel
+        ];
+        var st = candidates[candidates.size() - 1];
+        var ci = 0;
+        while (ci < candidates.size()) {
+            if (dc.getTextWidthInPixels(candidates[ci], fnt) <= maxW) {
+                st = candidates[ci];
+                break;
+            }
+            ci++;
+        }
         dc.setColor(COL_LABEL, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(x + w / 2, y + bh / 2, Gfx.FONT_XTINY, st,
+        dc.drawText(x + w / 2, y + bh / 2, fnt, st,
             Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 

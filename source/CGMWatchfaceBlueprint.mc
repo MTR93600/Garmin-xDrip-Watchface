@@ -61,38 +61,42 @@ module CGMWatchfaceBlueprint {
         if (anzeigeTarget != null && anzeigeTarget.equals("") == false) {
             targetNum = anzeigeTarget.toNumber();
         }
-        var tbrMins = null;
-        if (punkte != null && punkte instanceof Lang.Array && punkte.size() > 0 && punkte[0]["tbrMins"] != null) {
-            tbrMins = punkte[0]["tbrMins"].toNumber();
-        }
-
-        // Layout (448x486, pad 16): header -> mode tag -> oscilloscope ->
-        // glucose + signal lights -> data table -> status bar.
+        // Layout (448x486, pad 16): header -> mode tag -> taller oscilloscope
+        // (no time-axis strip) -> glucose + signal lights -> data table -> status.
         // Alert: predict hint between table and status bar.
         var tinyH = dc.getFontHeight(Gfx.FONT_XTINY);
-        // Same number-font guard-rail as BlueprintDrawing.drawGlucoseBlueprint,
-        // measured BEFORE layout so the data table never overlaps the digits.
-        var bgH = dc.getFontHeight(Gfx.FONT_NUMBER_HOT);
-        if (bgH > 96) {
-            bgH = dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM);
+        // Match drawGlucoseBlueprint font choice (MEDIUM, fallback MILD).
+        var bgH = dc.getFontHeight(Gfx.FONT_NUMBER_MEDIUM);
+        if (bgH > 88) {
+            bgH = dc.getFontHeight(Gfx.FONT_NUMBER_MILD);
         }
         var headerY = pad;
         var tagY = headerY + tinyH + 6;
-        var graphY = tagY + 28;
-        var graphH = 132;
-        var axisH = tinyH + 8;
-        var gluY = graphY + graphH + axisH + 10;
-        var tableY = gluY + 30 + bgH + 12;
-        var tableH = 90; // 3 rows x 30
+        var graphY = tagY + 24;
+        var statusH = 20;
+        var statusY = height - pad - statusH;
+        var tableH = 72; // 3 rows x 24 (compact table)
         var alert = (state == BlueprintDrawing.STATE_HYPO || state == BlueprintDrawing.STATE_HYPER);
-        var predictY = tableY + tableH + 6;
-        var statusY = height - pad - 26;
-        if (alert && predictY + tinyH > statusY - 4) {
-            // Squeeze: keep status bar glued to the bottom margin
-            tableY = statusY - 4 - tinyH - 6 - tableH;
-            predictY = tableY + tableH + 6;
-            gluY = tableY - 30 - bgH - 12;
+        var alertReserve = alert ? (tinyH + 10) : 0;
+        // Budget remaining height for graph vs glucose block vs table
+        var tableY = statusY - alertReserve - tableH - 6;
+        // Arrow sits beside digits — no vertical reserve above SGV
+        var gluBlockH = bgH + 10;
+        var gluY = tableY - gluBlockH;
+        var graphH = gluY - graphY - 8;
+        if (graphH < 120) { graphH = 120; }
+        if (graphH > 168) { graphH = 168; }
+        // If graph was clamped, re-center glucose/table under it
+        var afterGraph = graphY + graphH + 8;
+        if (gluY < afterGraph) {
+            gluY = afterGraph;
+            tableY = gluY + gluBlockH;
+            if (tableY + tableH + alertReserve > statusY - 4) {
+                tableY = statusY - 4 - alertReserve - tableH;
+                gluY = tableY - gluBlockH;
+            }
         }
+        var predictY = tableY + tableH + 6;
 
         BlueprintDrawing.drawBlueprintBackground(dc, state);
         BlueprintDrawing.drawHeader(dc, pad, datum, timeString, steps, heartrate);
@@ -103,18 +107,18 @@ module CGMWatchfaceBlueprint {
             past, future, targetNum, state
         );
 
-        // Glucose block: trend arrow above digits, signal lights left of them
+        // Glucose block: digits + arrow; compact signal lights aligned to top of SGV
         var sgvText = "--";
         if (anzeigeSGV != null && anzeigeSGV.equals("") == false && anzeigeSGV.equals("--") == false) {
             sgvText = anzeigeSGV;
         }
         var gluCx = cx + 40;
-        var numBottom = BlueprintDrawing.drawGlucoseBlueprint(dc, gluCx, gluY, sgvText, auswahlPfeil, state);
-        BlueprintDrawing.drawSignalLights(dc, pad + 34, gluY + 34, state);
+        BlueprintDrawing.drawGlucoseBlueprint(dc, gluCx, gluY, sgvText, auswahlPfeil, state);
+        BlueprintDrawing.drawSignalLights(dc, pad + 28, gluY + 2, state);
 
         BlueprintDrawing.drawDataTable(
             dc, pad, tableY, width - 2 * pad,
-            tir, deltaNum, anzeigeIOB, ageMin, anzeigeBasal, tbrMins
+            tir, deltaNum, anzeigeIOB, ageMin, anzeigeBasal, targetNum
         );
         if (alert) {
             BlueprintDrawing.drawPredictHint(dc, cx, predictY, predict15, state);
