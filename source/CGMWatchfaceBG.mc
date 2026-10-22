@@ -110,7 +110,9 @@ class CGMWatchfaceBGServiceDelegate extends Toybox.System.ServiceDelegate {
                         "tbr" => data[0]["tbr"],
                         "target" => data[0]["target"],
                         "mode" => data[0]["mode"],
-                        "tbrMins" => data[0]["tbrMins"]
+                        "tbrMins" => data[0]["tbrMins"],
+                        "basalHistory" => data[0]["basalHistory"],
+                        "smbHistory" => data[0]["smbHistory"]
                     };
                 }
                 
