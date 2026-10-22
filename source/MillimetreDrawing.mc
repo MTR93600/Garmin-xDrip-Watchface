@@ -96,7 +96,9 @@ module MillimetreDrawing {
         return hy + 4;
     }
 
-    //! Rotated rubber-stamp (buffered bitmap + AffineTransform when available).
+    //! Mode rubber-stamp (double red frame).
+    //! NOTE: AffineTransform + createBufferedBitmap + drawBitmap2 crashed Venu X1
+    //! with IQ! as soon as AAPS returned mode=FCL — keep primitives only.
     function drawModeStamp(dc, pad, y, mode, state) {
         var text = null;
         if (state == STATE_HYPO) {
@@ -118,27 +120,8 @@ module MillimetreDrawing {
         var bh = th + 14;
         var px = dc.getWidth() - pad - bw - 8;
         var py = y;
-
-        if ((Gfx has :createBufferedBitmap) && (Gfx has :AffineTransform) && (dc has :drawBitmap2)) {
-            var buf = Gfx.createBufferedBitmap({:width => bw, :height => bh});
-            if (buf != null) {
-                var bdc = buf.getDc();
-                // Transparent buffer so paper shows through the stamp frame
-                bdc.setColor(Gfx.COLOR_TRANSPARENT, Gfx.COLOR_TRANSPARENT);
-                bdc.clear();
-                paintStamp(bdc, 0, 0, bw, bh, text, fnt);
-                var bmp = buf.get();
-                if (bmp != null) {
-                    var transform = new Gfx.AffineTransform();
-                    transform.setToTranslation((px + bw / 2).toFloat(), (py + bh / 2).toFloat());
-                    transform.rotate(Math.toRadians(-8));
-                    transform.translate((-bw / 2).toFloat(), (-bh / 2).toFloat());
-                    dc.drawBitmap2(0, 0, bmp, {:transform => transform});
-                    return;
-                }
-            }
-        }
-        // Fallback: upright stamp (devices without AffineTransform)
+        // Slight offset double-draw mimics a hand stamp without rotation APIs.
+        paintStamp(dc, px + 1, py + 1, bw, bh, text, fnt);
         paintStamp(dc, px, py, bw, bh, text, fnt);
     }
 
@@ -199,27 +182,24 @@ module MillimetreDrawing {
                 drawDashedLine(dc, x, yT2, x + w, 5, 4);
                 drawDashedLine(dc, x, yT1, x + w, 5, 4);
                 dc.setColor(COL_TGT_EDGE, Gfx.COLOR_TRANSPARENT);
-                dc.drawText(x + 4, yT2 + 1, Gfx.FONT_XTINY, "TGT", Gfx.TEXT_JUSTIFY_LEFT);
+                // Include numeric target — label alone was invisible as a value
+                dc.drawText(x + 4, yT2 + 1, Gfx.FONT_XTINY,
+                    "TGT " + targetNum.toString(), Gfx.TEXT_JUSTIFY_LEFT);
             }
         }
 
         var pastW = (w * 0.75).toNumber();
         var futW = w - pastW;
         var nowSec = Time.now().value();
-        var windowSec = 180 * 60; // 3h
+        var windowMin = 180; // 3h
 
+        // Ink curve X = evenly spaced by sample index (same as Blueprint).
+        // Do NOT map via Float32 timestamps: AAPS dates are Long ms; toNumber()
+        // before /1000 destroys precision and stacks every point at one X → "no curve".
         var pastPts = [];
         i = 0;
         while (i < past.size()) {
-            var px;
-            if (pastTs != null && pastTs.size() == past.size() && pastTs[i] != null) {
-                var age = nowSec - pastTs[i];
-                if (age < 0) { age = 0; }
-                if (age > windowSec) { age = windowSec; }
-                px = x + pastW - ((age.toFloat() / windowSec.toFloat()) * pastW).toNumber();
-            } else {
-                px = x + ((i.toFloat() / (past.size() - 1).toFloat()) * pastW).toNumber();
-            }
+            var px = x + ((i.toFloat() / (past.size() - 1).toFloat()) * pastW).toNumber();
             var norm = (past[i] - gmin).toFloat() / (gmax - gmin).toFloat();
             var py = y + plotH - (norm * plotH).toNumber();
             pastPts.add([px, py]);
@@ -271,7 +251,7 @@ module MillimetreDrawing {
         dc.setColor(COL_DIM, Gfx.COLOR_TRANSPARENT);
         dc.drawText(x + w, y + 2, Gfx.FONT_XTINY, "+60m", Gfx.TEXT_JUSTIFY_RIGHT);
 
-        // SMB ticks (margin marks under curve)
+        // SMB ticks (margin marks under curve) — age via Long-safe helper
         var tickY0 = y + plotH + 1;
         var tickY1 = tickY0 + smbH - 2;
         if (smbTs != null && smbTs instanceof Lang.Array) {
@@ -279,22 +259,10 @@ module MillimetreDrawing {
             dc.setPenWidth(2);
             i = 0;
             while (i < smbTs.size()) {
-                var ts = smbTs[i];
-                if (ts != null) {
-                    var tSec = ts;
-                    // AAPS sends ms; watch may get Number large enough
-                    if (tSec > 100000000000.0) {
-                        tSec = (tSec / 1000.0).toNumber();
-                    } else {
-                        tSec = tSec.toNumber();
-                    }
-                    if (tSec != null) {
-                        var ageS = nowSec - tSec;
-                        if (ageS >= 0 && ageS <= windowSec) {
-                            var sx = x + pastW - ((ageS.toFloat() / windowSec.toFloat()) * pastW).toNumber();
-                            dc.drawLine(sx, tickY0, sx, tickY1);
-                        }
-                    }
+                var ageMin = ageMinutes(nowSec, smbTs[i]);
+                if (ageMin != null && ageMin >= 0 && ageMin <= windowMin) {
+                    var sx = x + pastW - ((ageMin.toFloat() / windowMin.toFloat()) * pastW).toNumber();
+                    dc.drawLine(sx, tickY0, sx, tickY1);
                 }
                 i++;
             }
@@ -302,7 +270,7 @@ module MillimetreDrawing {
 
         // Basal staircase
         var basalY = y + plotH + smbH;
-        drawBasalStairs(dc, x, basalY, pastW, basalH, basalSteps, nowSec, windowSec);
+        drawBasalStairs(dc, x, basalY, pastW, basalH, basalSteps, nowSec, windowMin);
 
         // NOW divider
         dc.setColor(COL_DIM, Gfx.COLOR_TRANSPARENT);
@@ -310,7 +278,20 @@ module MillimetreDrawing {
         dc.drawLine(x + pastW, y + 2, x + pastW, y + h - 2);
     }
 
-    function drawBasalStairs(dc, x, y, w, h, basalSteps, nowSec, windowSec) {
+    //! Same magnitude rule as CGMWatchfaceView.minutesFromTimestamp (Long-safe).
+    function ageMinutes(nowSec, timestamp) {
+        if (timestamp == null || nowSec == null) { return null; }
+        var ts = timestamp;
+        var ageSec;
+        if (ts > nowSec + 86400 || ts > 2000000000) {
+            ageSec = nowSec - (ts / 1000);
+        } else {
+            ageSec = nowSec - ts;
+        }
+        return ageSec / 60;
+    }
+
+    function drawBasalStairs(dc, x, y, w, h, basalSteps, nowSec, windowMin) {
         if (basalSteps == null || !(basalSteps instanceof Lang.Array) || basalSteps.size() == 0) {
             return;
         }
@@ -335,28 +316,24 @@ module MillimetreDrawing {
                 i++;
                 continue;
             }
-            var t0 = s["t"];
-            if (t0 > 100000000000.0) { t0 = (t0 / 1000.0).toNumber(); }
-            else { t0 = t0.toNumber(); }
             var p0 = s["p"].toNumber();
-            if (t0 == null || p0 == null) { i++; continue; }
+            if (p0 == null) { i++; continue; }
 
-            var t1Sec = nowSec;
+            var age0 = ageMinutes(nowSec, s["t"]);
+            var age1 = 0;
             if (i + 1 < basalSteps.size() && basalSteps[i + 1] != null && basalSteps[i + 1]["t"] != null) {
-                var t1 = basalSteps[i + 1]["t"];
-                if (t1 > 100000000000.0) { t1Sec = (t1 / 1000.0).toNumber(); }
-                else { t1Sec = t1.toNumber(); }
+                age1 = ageMinutes(nowSec, basalSteps[i + 1]["t"]);
             }
-            var age0 = nowSec - t0;
-            var age1 = nowSec - t1Sec;
+            if (age0 == null) { i++; continue; }
+            if (age1 == null) { age1 = 0; }
             if (age0 < 0) { age0 = 0; }
             if (age1 < 0) { age1 = 0; }
-            if (age0 > windowSec && age1 > windowSec) { i++; continue; }
-            if (age0 > windowSec) { age0 = windowSec; }
-            if (age1 > windowSec) { age1 = windowSec; }
+            if (age0 > windowMin && age1 > windowMin) { i++; continue; }
+            if (age0 > windowMin) { age0 = windowMin; }
+            if (age1 > windowMin) { age1 = windowMin; }
 
-            var x1 = x + w - ((age0.toFloat() / windowSec.toFloat()) * w).toNumber();
-            var x0 = x + w - ((age1.toFloat() / windowSec.toFloat()) * w).toNumber();
+            var x1 = x + w - ((age0.toFloat() / windowMin.toFloat()) * w).toNumber();
+            var x0 = x + w - ((age1.toFloat() / windowMin.toFloat()) * w).toNumber();
             if (x1 < x0) {
                 var tmp = x0; x0 = x1; x1 = tmp;
             }
@@ -428,27 +405,97 @@ module MillimetreDrawing {
         return bgH + 10;
     }
 
-    //! Footer synthesis line: IOB | TBR | Δ | TIR
+    //! Footer synthesis: 4 cells with filets — IOB | TBR | d± | TIR.
+    //! Avoids Greek Δ (CIQ XTINY renders it as a tiny broken glyph) and
+    //! shrinks TBR ("2.5/120" → "120%") so TIR is never clipped.
     function drawFooter(dc, pad, y, w, iob, basal, deltaNum, tir) {
         dc.setColor(COL_RULE, Gfx.COLOR_TRANSPARENT);
         dc.setPenWidth(1);
         dc.drawLine(pad, y, pad + w, y);
-        var cy = y + 6;
-        var iobV = "--";
-        if (iob != null && iob.equals("") == false) { iobV = iob.toString(); }
-        var tbrV = "--";
-        if (basal != null && basal.equals("") == false && basal.equals("-- %") == false) {
-            tbrV = basal.toString();
+
+        var fnt = Gfx.FONT_XTINY;
+        var cy = y + 5 + dc.getFontHeight(fnt) / 2;
+        var cols = 4;
+        var cw = w / cols;
+        var i = 1;
+        while (i < cols) {
+            var fx = pad + i * cw;
+            dc.drawLine(fx, y + 3, fx, y + 3 + dc.getFontHeight(fnt) + 4);
+            i++;
         }
-        var dStr = "Δ --";
+
+        var iobV = compactIob(iob);
+        var tbrV = compactTbr(basal);
+        var dStr = "d--";
         if (deltaNum != null) {
-            dStr = deltaNum > 0 ? ("Δ +" + deltaNum.toString()) : ("Δ " + deltaNum.toString());
+            dStr = deltaNum > 0 ? ("d+" + deltaNum.toString()) : ("d" + deltaNum.toString());
         }
         var tirV = "--";
-        if (tir != null) { tirV = "TIR " + tir.toString() + "%"; }
-        var line = "IOB " + iobV + " | TBR " + tbrV + " | " + dStr + " | " + tirV;
+        if (tir != null) { tirV = tir.toString() + "%"; }
+
+        // Prefer labeled cells; fall back to value-only if the label won't fit.
+        drawFooterCell(dc, pad, cy, cw, fnt, "IOB", iobV);
+        drawFooterCell(dc, pad + cw, cy, cw, fnt, "TBR", tbrV);
+        drawFooterCell(dc, pad + 2 * cw, cy, cw, fnt, null, dStr);
+        drawFooterCell(dc, pad + 3 * cw, cy, cw, fnt, "TIR", tirV);
+    }
+
+    function drawFooterCell(dc, x, cy, cw, fnt, label, value) {
+        var v = value != null ? value : "--";
+        var maxW = cw - 6;
+        var txt = v;
+        if (label != null) {
+            var labeled = label + " " + v;
+            if (dc.getTextWidthInPixels(labeled, fnt) <= maxW) {
+                txt = labeled;
+            }
+        }
+        // Last resort: trim value itself
+        while (dc.getTextWidthInPixels(txt, fnt) > maxW && txt.length() > 2) {
+            txt = txt.substring(0, txt.length() - 1);
+        }
         dc.setColor(COL_LABEL, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(pad, cy, Gfx.FONT_XTINY, line, Gfx.TEXT_JUSTIFY_LEFT);
+        dc.drawText(x + cw / 2, cy, fnt, txt, Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+    }
+
+    //! "0.2 U" / "0,2 U" → "0.2U"
+    function compactIob(iob) {
+        if (iob == null || iob.equals("") ) { return "--"; }
+        var s = iob.toString();
+        if (s.length() >= 2) {
+            var tail = s.substring(s.length() - 2, s.length());
+            if (tail.equals(" U")) {
+                s = s.substring(0, s.length() - 2) + "U";
+            }
+        }
+        return s;
+    }
+
+    //! AAPS "rate/percent" → prefer "120%"; bare number kept as-is.
+    function compactTbr(basal) {
+        if (basal == null || basal.equals("") || basal.equals("-- %") || basal.equals("--")) {
+            return "--";
+        }
+        var s = basal.toString();
+        var slash = -1;
+        var i = 0;
+        while (i < s.length()) {
+            if (s.substring(i, i + 1).equals("/")) {
+                slash = i;
+                break;
+            }
+            i++;
+        }
+        if (slash >= 0 && slash + 1 < s.length()) {
+            return s.substring(slash + 1, s.length()) + "%";
+        }
+        if (s.length() > 0) {
+            var last = s.substring(s.length() - 1, s.length());
+            if (last.equals("%") == false) {
+                return s + "%";
+            }
+        }
+        return s;
     }
 
     function drawPredictHint(dc, cx, y, predict15, state) {

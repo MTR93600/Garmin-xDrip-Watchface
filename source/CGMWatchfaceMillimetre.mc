@@ -76,11 +76,15 @@ module CGMWatchfaceMillimetre {
         MillimetreDrawing.drawSheet(dc, state);
         var afterHeader = MillimetreDrawing.drawHeader(dc, pad, datum, timeString, steps, heartrate);
 
-        // Stamp sits in header band (upper right)
-        MillimetreDrawing.drawModeStamp(dc, pad, afterHeader - tinyH - 2, anzeigeMode, state);
+        // Stamp upper-right, 13 millimetre cells below the header rule
+        MillimetreDrawing.drawModeStamp(
+            dc, pad, afterHeader - tinyH - 2 + (13 * MillimetreDrawing.CELL),
+            anzeigeMode, state
+        );
 
-        var footerH = tinyH + 14;
-        var footerY = height - pad - footerH;
+        // Extra bottom inset: Venu X1 rounded bezel ate the old single-line footer
+        var footerH = tinyH + 16;
+        var footerY = height - pad - footerH - 4;
         var alert = (state == MillimetreDrawing.STATE_HYPO || state == MillimetreDrawing.STATE_HYPER);
         var alertReserve = alert ? (tinyH + 8) : 0;
 
