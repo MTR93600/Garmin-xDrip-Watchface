@@ -5,7 +5,7 @@ using Toybox.Time.Gregorian as Greg;
 
 //! CONCEPT — Téléscripteur (layoutStyle=10).
 //! Green-phosphor AIMI log: scrolling journal + fixed live strip.
-//! No AffineTransform / BufferedBitmap (Venu X1 IQ! lesson).
+//! Layout calibrated for Venu X1 448×486 (no AffineTransform / BufferedBitmap).
 module TeleDrawing {
 
     const STATE_NORMAL = 0;
@@ -30,6 +30,12 @@ module TeleDrawing {
     const KIND_SNAP = 3;
     const KIND_SEP = 4;
 
+    //! Venu X1 448×486: live strip remonté; bottomSafe gère le coin arrondi.
+    const LIVE_H_VENUX1 = 100;
+    const LIVE_H_SMALL = 86;
+    const LOG_LINE_MIN = 12;
+    const CORNER_SAFE = 12; // right inset so TIR clears the bezel
+
     function stateFromSgv(sgv, low, hyper) {
         if (sgv == null) { return STATE_NORMAL; }
         var v = sgv.toNumber();
@@ -50,42 +56,68 @@ module TeleDrawing {
         dc.fillRectangle(0, 0, w, h);
     }
 
-    function drawHeader(dc, pad, datum, timeString) {
+    //! Header without title: date+time left, steps · HR right (corner-safe).
+    function drawHeader(dc, pad, datum, timeString, steps, heartrate) {
         var w = dc.getWidth();
         var y = pad - 2;
         var fnt = Gfx.FONT_XTINY;
-        dc.setColor(COL_DIM, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(pad, y, fnt, "AIMI LOG", Gfx.TEXT_JUSTIFY_LEFT);
-        var mid = "";
-        if (datum != null) { mid = datum.toString() + "  "; }
-        if (timeString != null) { mid = mid + timeString.toString(); }
+        var rightPad = pad + CORNER_SAFE;
+
+        var left = "";
+        if (datum != null) { left = datum.toString(); }
+        if (timeString != null) {
+            if (left.equals("") == false) { left = left + "  "; }
+            left = left + timeString.toString();
+        }
         dc.setColor(COL_MID, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, y, fnt, mid, Gfx.TEXT_JUSTIFY_CENTER);
+        dc.drawText(pad, y, fnt, left, Gfx.TEXT_JUSTIFY_LEFT);
+
+        var stepsStr = steps != null ? steps.toString() : "--";
+        var hrStr = heartrate != null ? heartrate.toString() : "--";
         dc.setColor(COL_DIM, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(w - pad, y, fnt, "CH1", Gfx.TEXT_JUSTIFY_RIGHT);
+        dc.drawText(w - rightPad, y, fnt, stepsStr + " · " + hrStr, Gfx.TEXT_JUSTIFY_RIGHT);
+
         var hy = y + dc.getFontHeight(fnt) + 2;
         dc.setColor(COL_RULE, Gfx.COLOR_TRANSPARENT);
         dc.setPenWidth(1);
-        dc.drawLine(pad, hy, w - pad, hy);
+        dc.drawLine(pad, hy, w - rightPad, hy);
         return hy + 3;
     }
 
+    //! Return recommended live-strip height for this screen.
+    function liveHeight(screenH) {
+        if (screenH >= 460) { return LIVE_H_VENUX1; }
+        return LIVE_H_SMALL;
+    }
+
+    //! Log pitch: XTINY is CIQ floor — compress to ~12–14 px/line on Venu X1.
+    function logLineHeight(dc) {
+        var h = dc.getFontHeight(Gfx.FONT_XTINY) - 5;
+        if (h < LOG_LINE_MIN) { h = LOG_LINE_MIN; }
+        return h;
+    }
+
     //! rows: Array of Dictionaries { "kind", "text" }
-    //! XTINY is the smallest system font — tighten line pitch for a denser "small log" feel.
+    //! Bottom-aligned so WAIT_ sits just above the live strip (no empty gap).
     function drawLog(dc, pad, y, w, h, rows, state) {
         var fnt = Gfx.FONT_XTINY;
-        var lineH = dc.getFontHeight(fnt);
-        if (lineH > 12) { lineH = lineH - 2; } // slightly compressed row height
-        if (lineH < 9) { lineH = 9; }
+        var lineH = logLineHeight(dc);
         var maxLines = h / lineH;
         if (maxLines < 1) { maxLines = 1; }
 
         var start = 0;
-        if (rows != null && rows.size() > maxLines) {
-            start = rows.size() - maxLines;
+        var count = 0;
+        if (rows != null) {
+            count = rows.size();
+            if (count > maxLines) {
+                start = count - maxLines;
+                count = maxLines;
+            }
         }
+        // Anchor last row at bottom of log band
+        var ly = y + h - (count * lineH);
+        if (ly < y) { ly = y; }
         var i = start;
-        var ly = y;
         while (rows != null && i < rows.size()) {
             var row = rows[i];
             if (row != null && row["text"] != null) {
@@ -108,81 +140,69 @@ module TeleDrawing {
         return COL_DIM;
     }
 
-    //! Live strip — two clear rows (no overlap with big SGV):
-    //!   row1: SGV (left) + delta/age/mode (right)
-    //!   row2: TGT | TBR | IOB | TIR
+    //! Live strip — SGV remonté + ligne métriques XTINY compacte (TIR visible).
     function drawLiveStrip(dc, pad, y, w, h, sgvText, deltaNum, ageMin, mode, targetNum, tbr, iob, tir, state) {
         var stripTop = y;
+        var contentRight = pad + w - CORNER_SAFE;
         dc.setColor(COL_RULE, Gfx.COLOR_TRANSPARENT);
         dc.setPenWidth(1);
-        dc.drawLine(pad, stripTop, pad + w, stripTop);
+        dc.drawLine(pad, stripTop, contentRight, stripTop);
 
         var col = COL_HI;
         if (state == STATE_HYPO) { col = COL_RED; }
         else if (state == STATE_HYPER) { col = COL_AMBER; }
 
         var fnt = Gfx.FONT_XTINY;
-        // MILD keeps the live digit readable without eating the metrics row
-        var fontBg = Gfx.FONT_NUMBER_MILD;
+        var tinyH = dc.getFontHeight(fnt);
+        // MEDIUM leaves room for metrics under the glyph; LARGE overlapped row2 on device
+        var fontBg = Gfx.FONT_MEDIUM;
         var bgH = dc.getFontHeight(fontBg);
 
-        var row1Y = stripTop + 3;
+        var sgvY = stripTop + 2;
         dc.setColor(col, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(pad, row1Y, fontBg, sgvText, Gfx.TEXT_JUSTIFY_LEFT);
+        dc.drawText(pad, sgvY, fontBg, sgvText, Gfx.TEXT_JUSTIFY_LEFT);
 
         var tw = dc.getTextWidthInPixels(sgvText, fontBg);
-        var metaX = pad + tw + 10;
-        if (metaX > pad + w - 80) { metaX = pad + w / 2 + 10; }
-
         var dStr = "d--";
         if (deltaNum != null) {
             dStr = deltaNum > 0 ? ("d+" + deltaNum.toString()) : ("d" + deltaNum.toString());
         }
         var ageStr = "--";
         if (ageMin != null) { ageStr = ageMin.toString() + "m"; }
-        dc.setColor(COL_MID, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(metaX, row1Y + 4, fnt, "-> " + dStr + " " + ageStr, Gfx.TEXT_JUSTIFY_LEFT);
-        var modeStr = "mg/dL";
+        var meta = dStr + " " + ageStr;
+        var unitStr = "mg/dL";
         if (mode != null && mode.equals("") == false) {
-            modeStr = "mg/dL " + mode.toString();
+            unitStr = mode.toString();
         }
-        dc.setColor(COL_DIM, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(metaX, row1Y + 4 + dc.getFontHeight(fnt) + 1, fnt, modeStr, Gfx.TEXT_JUSTIFY_LEFT);
-
-        // Metrics row — always below the SGV block
-        var cellY = row1Y + bgH + 2;
-        if (cellY + dc.getFontHeight(fnt) > stripTop + h - 2) {
-            cellY = stripTop + h - dc.getFontHeight(fnt) - 2;
+        var metaY = sgvY + ((bgH - tinyH) / 2);
+        var metaX = pad + tw + 8;
+        dc.setColor(COL_MID, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(metaX, metaY, fnt, meta, Gfx.TEXT_JUSTIFY_LEFT);
+        var unitX = metaX + dc.getTextWidthInPixels(meta, fnt) + 6;
+        if (unitX + dc.getTextWidthInPixels(unitStr, fnt) <= contentRight) {
+            dc.setColor(COL_DIM, Gfx.COLOR_TRANSPARENT);
+            dc.drawText(unitX, metaY, fnt, unitStr, Gfx.TEXT_JUSTIFY_LEFT);
         }
-        dc.setColor(COL_RULE, Gfx.COLOR_TRANSPARENT);
-        dc.drawLine(pad, cellY - 2, pad + w, cellY - 2);
 
-        var cw = w / 4;
-        var tgtV = "--";
-        if (targetNum != null) { tgtV = targetNum.toString(); }
+        // Metrics: compact separators, no char-chop (that was cutting "TIR --" → "TIR-")
+        var row2Y = sgvY + bgH;
+        if (row2Y + tinyH > stripTop + h - 3) {
+            row2Y = stripTop + h - tinyH - 3;
+        }
+        var tgtV = targetNum != null ? targetNum.toString() : "--";
         var tbrV = compactTbr(tbr);
         var iobV = compactIob(iob);
-        var tirV = "--";
-        if (tir != null) { tirV = tir.toString() + "%"; }
-
-        drawMetric(dc, pad, cellY, cw, fnt, "TGT", tgtV);
-        drawMetric(dc, pad + cw, cellY, cw, fnt, "TBR", tbrV);
-        drawMetric(dc, pad + 2 * cw, cellY, cw, fnt, "IOB", iobV);
-        drawMetric(dc, pad + 3 * cw, cellY, cw, fnt, "TIR", tirV);
-    }
-
-    function drawMetric(dc, x, y, cw, fnt, label, value) {
-        var labelW = dc.getTextWidthInPixels(label, fnt);
-        dc.setColor(COL_DIM, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(x + 2, y, fnt, label, Gfx.TEXT_JUSTIFY_LEFT);
-        dc.setColor(COL_MID, Gfx.COLOR_TRANSPARENT);
-        var vx = x + 2 + labelW + 3;
-        var v = value != null ? value : "--";
-        // Truncate value if needed
-        while (dc.getTextWidthInPixels(v, fnt) > cw - (vx - x) - 2 && v.length() > 2) {
-            v = v.substring(0, v.length() - 1);
+        var tirV = tir != null ? (tir.toString() + "%") : "--";
+        var metrics = "TGT " + tgtV + " · TBR " + tbrV + " · IOB " + iobV + " · TIR " + tirV;
+        var maxW = contentRight - pad;
+        if (dc.getTextWidthInPixels(metrics, fnt) > maxW) {
+            metrics = "TGT " + tgtV + " TBR " + tbrV + " IOB " + iobV + " TIR " + tirV;
         }
-        dc.drawText(vx, y, fnt, v, Gfx.TEXT_JUSTIFY_LEFT);
+        if (dc.getTextWidthInPixels(metrics, fnt) > maxW) {
+            metrics = tgtV + " " + tbrV + " " + iobV + " TIR " + tirV;
+        }
+        dc.setColor(COL_MID, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(pad, row2Y, fnt, metrics, Gfx.TEXT_JUSTIFY_LEFT);
     }
 
     function compactIob(iob) {
@@ -218,7 +238,6 @@ module TeleDrawing {
     function formatHm(sec) {
         if (sec == null) { return "--:--"; }
         var s = sec;
-        // ms → sec
         if (s > 2000000000) {
             s = s / 1000;
         }
@@ -231,7 +250,7 @@ module TeleDrawing {
         return hs + ":" + ms;
     }
 
-    //! Same magnitude rule as View.minutesFromTimestamp.
+    //! Same magnitude rule as CGMWatchfaceView.minutesFromTimestamp.
     function toEpochSec(timestamp) {
         if (timestamp == null) { return null; }
         var now = Time.now().value();

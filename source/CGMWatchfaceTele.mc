@@ -32,8 +32,11 @@ module CGMWatchfaceTele {
 
         var width = dc.getWidth();
         var height = dc.getHeight();
-        var pad = 12;
-        if (width < 400) { pad = 10; }
+        // Extra pad + bottom safe: Venu X1 rounded corners clip ~8–12 px
+        var pad = 14;
+        if (width < 400) { pad = 12; }
+        var bottomSafe = 30;
+        if (height < 400) { bottomSafe = 22; }
 
         var hyperProp = App.getApp().getProperty("hyperThreshold");
         var hyper = hyperProp != null ? hyperProp.toNumber() : 250;
@@ -45,7 +48,7 @@ module CGMWatchfaceTele {
         }
         var state = TeleDrawing.stateFromSgv(sgvMgdl, zielbereichLow, hyper);
         var deltaNum = deltaFromAaps(punkte, anzeigeDelta);
-        var tir = tirFromAaps(punkte);
+        var tir = tirFromAaps(punkte, zielbereichLow, zielbereichHigh);
         var targetNum = null;
         if (anzeigeTarget != null && anzeigeTarget.equals("") == false) {
             targetNum = anzeigeTarget.toNumber();
@@ -62,20 +65,17 @@ module CGMWatchfaceTele {
         }
 
         TeleDrawing.drawSheet(dc);
-        var afterHeader = TeleDrawing.drawHeader(dc, pad, datum, timeString);
+        var afterHeader = TeleDrawing.drawHeader(dc, pad, datum, timeString, steps, heartrate);
 
         var tinyH = dc.getFontHeight(Gfx.FONT_XTINY);
-        // Two-row live strip: SGV block + metrics line (needs ~80–90 px)
-        var liveH = 88;
-        if (height < 400) { liveH = 78; }
-        var liveY = height - pad - liveH;
+        // Live strip remonte (liveH 78 + bottomSafe 22) → comble le vide sous WAIT_
+        var liveH = TeleDrawing.liveHeight(height);
+        var liveY = height - bottomSafe - liveH;
         var logY = afterHeader;
         var logH = liveY - logY - 4;
         if (logH < 80) { logH = 80; }
 
-        var rows = buildLogRows(
-            smbTs, anzeigeMode, anzeigeIOB, targetNum, anzeigeBasal, tir
-        );
+        var rows = buildLogRows(smbTs, anzeigeMode, logH, TeleDrawing.logLineHeight(dc));
         rows.add({"kind" => TeleDrawing.KIND_SEP, "text" => "WAIT_"});
 
         TeleDrawing.drawLog(dc, pad, logY, width - 2 * pad, logH, rows, state);
@@ -92,8 +92,9 @@ module CGMWatchfaceTele {
         }
     }
 
-    //! Chronological log: SGV rows + SMB + mode + snapshot (string-key dicts only).
-    function buildLogRows(smbTs, mode, iob, targetNum, basal, tir) {
+    //! Chronological log: SGV + SMB (+ mode). No SESSION/SNAP — frees space; metrics live in footer.
+    //! Cap rows so WAIT_ still fits: leave 1 line for WAIT (caller adds it).
+    function buildLogRows(smbTs, mode, logH, lineH) {
         var events = [];
         var samples = collectSamples();
         var i = 0;
@@ -108,7 +109,6 @@ module CGMWatchfaceTele {
                 var item = smbTs[i];
                 var sec = null;
                 var units = null;
-                // New AAPS shape: {t,u} — legacy: bare timestamp
                 if (item instanceof Lang.Dictionary) {
                     sec = TeleDrawing.toEpochSec(item["t"]);
                     if (item["u"] != null) { units = item["u"]; }
@@ -124,9 +124,16 @@ module CGMWatchfaceTele {
 
         events = sortByTime(events);
 
-        if (events.size() > 16) {
+        // Budget: logH can hold N lines; keep 1 for WAIT_ (+ optional MODE)
+        var maxEvents = 5;
+        if (lineH > 0 && logH > 0) {
+            maxEvents = (logH / lineH) - 2; // WAIT + breathing room
+            if (maxEvents < 4) { maxEvents = 4; }
+            if (maxEvents > 7) { maxEvents = 7; } // one fewer line → room for live strip
+        }
+        if (events.size() > maxEvents) {
             var trimmed = [];
-            var start = events.size() - 16;
+            var start = events.size() - maxEvents;
             i = start;
             while (i < events.size()) {
                 trimmed.add(events[i]);
@@ -136,9 +143,6 @@ module CGMWatchfaceTele {
         }
 
         var rows = [];
-        rows.add({"kind" => TeleDrawing.KIND_SEP, "text" => "-- SESSION ---------------"});
-
-        var lastIob = TeleDrawing.compactIob(iob);
         i = 0;
         while (i < events.size()) {
             var ev = events[i];
@@ -150,12 +154,13 @@ module CGMWatchfaceTele {
                 if (dlt != null) {
                     dStr = dlt > 0 ? ("d+" + dlt.toString()) : ("d" + dlt.toString());
                 }
-                var line = hm + "  SGV  " + pad3(sgv) + "  " + dStr + "  IOB " + lastIob;
-                rows.add({"kind" => TeleDrawing.KIND_SGV, "text" => line});
+                rows.add({"kind" => TeleDrawing.KIND_SGV, "text" => hm + " SGV " + pad3(sgv) + " " + dStr});
             } else if (ev["kind"] == TeleDrawing.KIND_SMB) {
-                var smbLine = hm + "  * SMB";
+                var smbLine = hm + " * SMB";
                 if (ev["u"] != null) {
-                    smbLine = smbLine + "  " + formatSmbU(ev["u"]);
+                    smbLine = smbLine + " " + formatSmbU(ev["u"]);
+                } else {
+                    smbLine = smbLine + " --U";
                 }
                 rows.add({"kind" => TeleDrawing.KIND_SMB, "text" => smbLine});
             }
@@ -165,17 +170,9 @@ module CGMWatchfaceTele {
         if (mode != null && mode.equals("") == false) {
             rows.add({
                 "kind" => TeleDrawing.KIND_MODE,
-                "text" => TeleDrawing.formatHm(Time.now().value()) + "  * MODE " + mode.toString()
+                "text" => TeleDrawing.formatHm(Time.now().value()) + " * MODE " + mode.toString()
             });
         }
-
-        var tgt = "--";
-        if (targetNum != null) { tgt = targetNum.toString(); }
-        var tbr = TeleDrawing.compactTbr(basal);
-        var tirV = "--";
-        if (tir != null) { tirV = tir.toString() + "%"; }
-        var snap = TeleDrawing.formatHm(Time.now().value()) + "  TGT " + tgt + "  TBR " + tbr + "  TIR " + tirV;
-        rows.add({"kind" => TeleDrawing.KIND_SNAP, "text" => snap});
 
         return rows;
     }
@@ -193,6 +190,7 @@ module CGMWatchfaceTele {
                     var v = pt["sgv"].toNumber();
                     var sec = TeleDrawing.toEpochSec(pt["date"]);
                     if (v != null && v >= 20 && v <= 600 && sec != null) {
+                        // History points from BG only keep date+sgv — delta filled below
                         var dlt = null;
                         if (pt["delta"] != null) { dlt = pt["delta"].toNumber(); }
                         out.add({"t" => sec, "sgv" => v, "delta" => dlt});
@@ -201,7 +199,22 @@ module CGMWatchfaceTele {
                 i--;
             }
         }
-        return sortSamples(out);
+        out = sortSamples(out);
+        // Derive 5-min deltas from consecutive samples when AAPS didn't attach them
+        var j = 1;
+        while (j < out.size()) {
+            if (out[j]["delta"] == null && out[j - 1]["sgv"] != null && out[j]["sgv"] != null) {
+                var dt = out[j]["t"] - out[j - 1]["t"];
+                if (dt > 0) {
+                    var raw = (out[j]["sgv"] - out[j - 1]["sgv"]).toFloat();
+                    // Normalize to ~5 min window (Nightscout convention)
+                    var d5 = (raw / dt.toFloat()) * 300.0;
+                    out[j]["delta"] = d5.toNumber();
+                }
+            }
+            j++;
+        }
+        return out;
     }
 
     function sortSamples(arr) {
@@ -281,7 +294,8 @@ module CGMWatchfaceTele {
         return n;
     }
 
-    function tirFromAaps(punkte) {
+    //! Prefer AAPS `tir`; fall back to local % of accumulated samples in [low, high].
+    function tirFromAaps(punkte, low, high) {
         if (punkte != null && punkte instanceof Lang.Array && punkte.size() > 0 && punkte[0]["tir"] != null) {
             var t = punkte[0]["tir"].toNumber();
             if (t != null) {
@@ -290,7 +304,29 @@ module CGMWatchfaceTele {
                 return t;
             }
         }
-        return null;
+        return calcTirLocal(low, high);
+    }
+
+    function calcTirLocal(low, high) {
+        var samples = collectSamples();
+        if (samples == null || samples.size() == 0) { return null; }
+        var lo = low != null ? low.toNumber() : 70;
+        var hi = high != null ? high.toNumber() : 180;
+        if (lo == null) { lo = 70; }
+        if (hi == null) { hi = 180; }
+        if (lo > hi) {
+            var tmp = lo;
+            lo = hi;
+            hi = tmp;
+        }
+        var inRange = 0;
+        var i = 0;
+        while (i < samples.size()) {
+            var v = samples[i]["sgv"];
+            if (v != null && v >= lo && v <= hi) { inRange++; }
+            i++;
+        }
+        return ((inRange * 100) / samples.size()).toNumber();
     }
 
     function sanitizeAge(verzoegerung) {
