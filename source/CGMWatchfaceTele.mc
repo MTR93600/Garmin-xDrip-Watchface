@@ -65,8 +65,9 @@ module CGMWatchfaceTele {
         var afterHeader = TeleDrawing.drawHeader(dc, pad, datum, timeString);
 
         var tinyH = dc.getFontHeight(Gfx.FONT_XTINY);
-        var liveH = 68;
-        if (height < 400) { liveH = 60; }
+        // Two-row live strip: SGV block + metrics line (needs ~80–90 px)
+        var liveH = 88;
+        if (height < 400) { liveH = 78; }
         var liveY = height - pad - liveH;
         var logY = afterHeader;
         var logH = liveY - logY - 4;
@@ -104,9 +105,18 @@ module CGMWatchfaceTele {
         if (smbTs != null && smbTs instanceof Lang.Array) {
             i = 0;
             while (i < smbTs.size()) {
-                var sec = TeleDrawing.toEpochSec(smbTs[i]);
+                var item = smbTs[i];
+                var sec = null;
+                var units = null;
+                // New AAPS shape: {t,u} — legacy: bare timestamp
+                if (item instanceof Lang.Dictionary) {
+                    sec = TeleDrawing.toEpochSec(item["t"]);
+                    if (item["u"] != null) { units = item["u"]; }
+                } else {
+                    sec = TeleDrawing.toEpochSec(item);
+                }
                 if (sec != null) {
-                    events.add({"t" => sec, "kind" => TeleDrawing.KIND_SMB, "sgv" => null, "delta" => null});
+                    events.add({"t" => sec, "kind" => TeleDrawing.KIND_SMB, "sgv" => null, "delta" => null, "u" => units});
                 }
                 i++;
             }
@@ -143,7 +153,11 @@ module CGMWatchfaceTele {
                 var line = hm + "  SGV  " + pad3(sgv) + "  " + dStr + "  IOB " + lastIob;
                 rows.add({"kind" => TeleDrawing.KIND_SGV, "text" => line});
             } else if (ev["kind"] == TeleDrawing.KIND_SMB) {
-                rows.add({"kind" => TeleDrawing.KIND_SMB, "text" => hm + "  * SMB"});
+                var smbLine = hm + "  * SMB";
+                if (ev["u"] != null) {
+                    smbLine = smbLine + "  " + formatSmbU(ev["u"]);
+                }
+                rows.add({"kind" => TeleDrawing.KIND_SMB, "text" => smbLine});
             }
             i++;
         }
@@ -228,6 +242,28 @@ module CGMWatchfaceTele {
         if (s.length() == 1) { return "  " + s; }
         if (s.length() == 2) { return " " + s; }
         return s;
+    }
+
+    //! Format SMB units for the log, e.g. 0.35 -> "0.35U"
+    function formatSmbU(u) {
+        if (u == null) { return ""; }
+        var n = u.toFloat();
+        if (n == null) {
+            return u.toString() + "U";
+        }
+        // One or two decimals without trailing noise
+        var cent = (n * 100.0 + 0.5).toNumber();
+        if (cent == null) { return n.toString() + "U"; }
+        var whole = cent / 100;
+        var frac = cent - whole * 100;
+        if (frac < 0) { frac = -frac; }
+        if (frac == 0) {
+            return whole.toString() + "U";
+        }
+        if (frac < 10) {
+            return whole.toString() + ".0" + frac.toString() + "U";
+        }
+        return whole.toString() + "." + frac.toString() + "U";
     }
 
     function deltaFromAaps(punkte, anzeigeDelta) {

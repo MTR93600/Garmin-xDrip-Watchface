@@ -259,7 +259,13 @@ module MillimetreDrawing {
             dc.setPenWidth(2);
             i = 0;
             while (i < smbTs.size()) {
-                var ageMin = ageMinutes(nowSec, smbTs[i]);
+                var item = smbTs[i];
+                var tsVal = item;
+                // AAPS now sends {t,u}; legacy was a bare timestamp
+                if (item instanceof Lang.Dictionary) {
+                    tsVal = item["t"];
+                }
+                var ageMin = ageMinutes(nowSec, tsVal);
                 if (ageMin != null && ageMin >= 0 && ageMin <= windowMin) {
                     var sx = x + pastW - ((ageMin.toFloat() / windowMin.toFloat()) * pastW).toNumber();
                     dc.drawLine(sx, tickY0, sx, tickY1);

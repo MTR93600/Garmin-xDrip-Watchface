@@ -71,10 +71,12 @@ module TeleDrawing {
     }
 
     //! rows: Array of Dictionaries { "kind", "text" }
+    //! XTINY is the smallest system font — tighten line pitch for a denser "small log" feel.
     function drawLog(dc, pad, y, w, h, rows, state) {
         var fnt = Gfx.FONT_XTINY;
-        var lineH = dc.getFontHeight(fnt) + 1;
-        if (lineH < 11) { lineH = 11; }
+        var lineH = dc.getFontHeight(fnt);
+        if (lineH > 12) { lineH = lineH - 2; } // slightly compressed row height
+        if (lineH < 9) { lineH = 9; }
         var maxLines = h / lineH;
         if (maxLines < 1) { maxLines = 1; }
 
@@ -106,7 +108,9 @@ module TeleDrawing {
         return COL_DIM;
     }
 
-    //! Live strip: big SGV + meta + 4 metric cells.
+    //! Live strip — two clear rows (no overlap with big SGV):
+    //!   row1: SGV (left) + delta/age/mode (right)
+    //!   row2: TGT | TBR | IOB | TIR
     function drawLiveStrip(dc, pad, y, w, h, sgvText, deltaNum, ageMin, mode, targetNum, tbr, iob, tir, state) {
         var stripTop = y;
         dc.setColor(COL_RULE, Gfx.COLOR_TRANSPARENT);
@@ -117,19 +121,19 @@ module TeleDrawing {
         if (state == STATE_HYPO) { col = COL_RED; }
         else if (state == STATE_HYPER) { col = COL_AMBER; }
 
-        var fontBg = Gfx.FONT_NUMBER_MEDIUM;
+        var fnt = Gfx.FONT_XTINY;
+        // MILD keeps the live digit readable without eating the metrics row
+        var fontBg = Gfx.FONT_NUMBER_MILD;
         var bgH = dc.getFontHeight(fontBg);
-        if (bgH > 72) {
-            fontBg = Gfx.FONT_NUMBER_MILD;
-            bgH = dc.getFontHeight(fontBg);
-        }
-        var sgvY = stripTop + 4;
+
+        var row1Y = stripTop + 3;
         dc.setColor(col, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(pad, sgvY, fontBg, sgvText, Gfx.TEXT_JUSTIFY_LEFT);
+        dc.drawText(pad, row1Y, fontBg, sgvText, Gfx.TEXT_JUSTIFY_LEFT);
 
         var tw = dc.getTextWidthInPixels(sgvText, fontBg);
-        var metaX = pad + tw + 8;
-        var fnt = Gfx.FONT_XTINY;
+        var metaX = pad + tw + 10;
+        if (metaX > pad + w - 80) { metaX = pad + w / 2 + 10; }
+
         var dStr = "d--";
         if (deltaNum != null) {
             dStr = deltaNum > 0 ? ("d+" + deltaNum.toString()) : ("d" + deltaNum.toString());
@@ -137,16 +141,22 @@ module TeleDrawing {
         var ageStr = "--";
         if (ageMin != null) { ageStr = ageMin.toString() + "m"; }
         dc.setColor(COL_MID, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(metaX, sgvY + 6, fnt, "→ " + dStr + " · " + ageStr, Gfx.TEXT_JUSTIFY_LEFT);
+        dc.drawText(metaX, row1Y + 4, fnt, "-> " + dStr + " " + ageStr, Gfx.TEXT_JUSTIFY_LEFT);
         var modeStr = "mg/dL";
         if (mode != null && mode.equals("") == false) {
-            modeStr = "mg/dL · " + mode.toString();
+            modeStr = "mg/dL " + mode.toString();
         }
         dc.setColor(COL_DIM, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(metaX, sgvY + 6 + dc.getFontHeight(fnt) + 1, fnt, modeStr, Gfx.TEXT_JUSTIFY_LEFT);
+        dc.drawText(metaX, row1Y + 4 + dc.getFontHeight(fnt) + 1, fnt, modeStr, Gfx.TEXT_JUSTIFY_LEFT);
 
-        // 4 metric cells
-        var cellY = stripTop + h - dc.getFontHeight(fnt) - 4;
+        // Metrics row — always below the SGV block
+        var cellY = row1Y + bgH + 2;
+        if (cellY + dc.getFontHeight(fnt) > stripTop + h - 2) {
+            cellY = stripTop + h - dc.getFontHeight(fnt) - 2;
+        }
+        dc.setColor(COL_RULE, Gfx.COLOR_TRANSPARENT);
+        dc.drawLine(pad, cellY - 2, pad + w, cellY - 2);
+
         var cw = w / 4;
         var tgtV = "--";
         if (targetNum != null) { tgtV = targetNum.toString(); }
@@ -162,14 +172,17 @@ module TeleDrawing {
     }
 
     function drawMetric(dc, x, y, cw, fnt, label, value) {
-        var txt = label + " " + value;
-        if (dc.getTextWidthInPixels(txt, fnt) > cw - 4) {
-            txt = value;
-        }
+        var labelW = dc.getTextWidthInPixels(label, fnt);
         dc.setColor(COL_DIM, Gfx.COLOR_TRANSPARENT);
-        // draw label dimmer by drawing value only centered — full string in MID
+        dc.drawText(x + 2, y, fnt, label, Gfx.TEXT_JUSTIFY_LEFT);
         dc.setColor(COL_MID, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(x + cw / 2, y, fnt, txt, Gfx.TEXT_JUSTIFY_CENTER);
+        var vx = x + 2 + labelW + 3;
+        var v = value != null ? value : "--";
+        // Truncate value if needed
+        while (dc.getTextWidthInPixels(v, fnt) > cw - (vx - x) - 2 && v.length() > 2) {
+            v = v.substring(0, v.length() - 1);
+        }
+        dc.drawText(vx, y, fnt, v, Gfx.TEXT_JUSTIFY_LEFT);
     }
 
     function compactIob(iob) {
