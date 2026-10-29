@@ -179,18 +179,25 @@ module CGMWatchfaceTele {
 
     function collectSamples() {
         var out = [];
-        if (bgReadingsAccumulated != null && bgReadingsAccumulated instanceof Lang.Array) {
-            var n = bgReadingsAccumulated.size();
+        // Prefer fresh AAPS batch (punkte) — bgReadingsAccumulated can freeze when
+        // Float32 date compares stop seeing "newer" after a watch firmware update.
+        var src = null;
+        if (punkte != null && punkte instanceof Lang.Array && punkte.size() > 1) {
+            src = punkte;
+        } else if (bgReadingsAccumulated != null && bgReadingsAccumulated instanceof Lang.Array) {
+            src = bgReadingsAccumulated;
+        }
+        if (src != null) {
+            var n = src.size();
             var start = 0;
             if (n > 24) { start = n - 24; }
             var i = n - 1;
             while (i >= start) {
-                var pt = bgReadingsAccumulated[i];
+                var pt = src[i];
                 if (pt != null && pt["sgv"] != null && pt["date"] != null) {
                     var v = pt["sgv"].toNumber();
                     var sec = TeleDrawing.toEpochSec(pt["date"]);
                     if (v != null && v >= 20 && v <= 600 && sec != null) {
-                        // History points from BG only keep date+sgv — delta filled below
                         var dlt = null;
                         if (pt["delta"] != null) { dlt = pt["delta"].toNumber(); }
                         out.add({"t" => sec, "sgv" => v, "delta" => dlt});

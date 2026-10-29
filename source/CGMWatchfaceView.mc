@@ -199,17 +199,26 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     bgReadingsAccumulated = temp;
                     App.Storage.setValue("bgReadingsAccumulatedWatchface", bgReadingsAccumulated);
                 }
-                if( bgReadingsAccumulated[0]["date"] < punkte[0]["date"] ) {    
+                // Compare in Long epoch-seconds — Float32 ms/sec lose precision (~2 min / ~2 min)
+                // and used to freeze the journal while live SGV kept updating.
+                var accSec = epochSecLong(bgReadingsAccumulated[0]["date"]);
+                var pktSec = epochSecLong(punkte[0]["date"]);
+                var accSgv = bgReadingsAccumulated[0]["sgv"];
+                var pktSgv = punkte[0]["sgv"];
+                var newer = accSec < pktSec;
+                var sameTickNewSgv = (accSec == pktSec && accSgv != null && pktSgv != null && accSgv != pktSgv);
+                if( newer || sameTickNewSgv ) {
                     for( var i = numberValuesTotal-1; i >= punkte.size(); i-- ) {
                         var k = i-newValues;
                         bgReadingsAccumulated[i]["date"] = bgReadingsAccumulated[k]["date"] ? bgReadingsAccumulated[k]["date"] : 0;
                         bgReadingsAccumulated[i]["sgv"] = bgReadingsAccumulated[k]["sgv"] ? bgReadingsAccumulated[k]["sgv"] : 0;
                     }
                     for( var i = 0; i < punkte.size(); i++ ) {
-                        bgReadingsAccumulated[i]["date"] = punkte[i]["date"];
+                        // Persist as Long so Storage round-trips stay comparable
+                        bgReadingsAccumulated[i]["date"] = punkte[i]["date"] != null ? punkte[i]["date"].toLong() : 0;
                         bgReadingsAccumulated[i]["sgv"] = punkte[i]["sgv"];
                     }
-                    App.Storage.setValue("bgReadingsAccumulatedWatchface", bgReadingsAccumulated); 
+                    App.Storage.setValue("bgReadingsAccumulatedWatchface", bgReadingsAccumulated);
                 }
 
                 // Units: mmol/l or mg/dl
@@ -1107,6 +1116,17 @@ class CGMWatchfaceView extends Ui.WatchFace {
             ageSec = now - ts;
         }
         return ageSec / 60;
+    }
+
+    //! Long epoch-seconds for safe ordering (avoids Float32 ms collapsing ~2 min apart).
+    function epochSecLong(timestamp) {
+        if (timestamp == null) { return 0; }
+        var ts = timestamp.toLong();
+        var now = Time.now().value().toLong();
+        if (ts > now + 86400 || ts > 2000000000) {
+            return ts / 1000;
+        }
+        return ts;
     }
 
 }
