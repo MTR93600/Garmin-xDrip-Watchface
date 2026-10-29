@@ -184,7 +184,8 @@ module TeleDrawing {
             dc.drawText(unitX, metaY, fnt, unitStr, Gfx.TEXT_JUSTIFY_LEFT);
         }
 
-        // Metrics: compact separators, no char-chop (that was cutting "TIR --" → "TIR-")
+        // Metrics: 1-char key + value (never bare numbers — that made TGT look like SGV)
+        //   T = target · B = basal% · I = IOB · R = TIR%
         var row2Y = sgvY + bgH;
         if (row2Y + tinyH > stripTop + h - 3) {
             row2Y = stripTop + h - tinyH - 3;
@@ -193,16 +194,43 @@ module TeleDrawing {
         var tbrV = compactTbr(tbr);
         var iobV = compactIob(iob);
         var tirV = tir != null ? (tir.toString() + "%") : "--";
-        var metrics = "TGT " + tgtV + " · TBR " + tbrV + " · IOB " + iobV + " · TIR " + tirV;
-        var maxW = contentRight - pad;
-        if (dc.getTextWidthInPixels(metrics, fnt) > maxW) {
-            metrics = "TGT " + tgtV + " TBR " + tbrV + " IOB " + iobV + " TIR " + tirV;
+        drawTaggedMetrics(dc, pad, row2Y, contentRight - pad, fnt, tgtV, tbrV, iobV, tirV);
+    }
+
+    //! Draw "T92 · B90% · I5.0 · R97%" with dim keys and mid values.
+    function drawTaggedMetrics(dc, x, y, maxW, fnt, tgtV, tbrV, iobV, tirV) {
+        var keys = ["T", "B", "I", "R"];
+        var vals = [tgtV, tbrV, iobV, tirV];
+        var gap = " · ";
+        var gapW = dc.getTextWidthInPixels(gap, fnt);
+        // Measure full width; drop gaps first if needed, never drop keys
+        var total = 0;
+        var i = 0;
+        while (i < 4) {
+            total += dc.getTextWidthInPixels(keys[i], fnt);
+            total += dc.getTextWidthInPixels(vals[i], fnt);
+            if (i < 3) { total += gapW; }
+            i++;
         }
-        if (dc.getTextWidthInPixels(metrics, fnt) > maxW) {
-            metrics = tgtV + " " + tbrV + " " + iobV + " TIR " + tirV;
+        var useGap = total <= maxW;
+        var cx = x;
+        i = 0;
+        while (i < 4) {
+            dc.setColor(COL_DIM, Gfx.COLOR_TRANSPARENT);
+            dc.drawText(cx, y, fnt, keys[i], Gfx.TEXT_JUSTIFY_LEFT);
+            cx += dc.getTextWidthInPixels(keys[i], fnt);
+            dc.setColor(COL_MID, Gfx.COLOR_TRANSPARENT);
+            dc.drawText(cx, y, fnt, vals[i], Gfx.TEXT_JUSTIFY_LEFT);
+            cx += dc.getTextWidthInPixels(vals[i], fnt);
+            if (useGap && i < 3) {
+                dc.setColor(COL_DIM, Gfx.COLOR_TRANSPARENT);
+                dc.drawText(cx, y, fnt, gap, Gfx.TEXT_JUSTIFY_LEFT);
+                cx += gapW;
+            } else if (i < 3) {
+                cx += 4; // tight space between pairs
+            }
+            i++;
         }
-        dc.setColor(COL_MID, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(pad, row2Y, fnt, metrics, Gfx.TEXT_JUSTIFY_LEFT);
     }
 
     function compactIob(iob) {
