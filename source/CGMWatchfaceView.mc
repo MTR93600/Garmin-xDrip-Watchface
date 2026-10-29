@@ -364,6 +364,21 @@ class CGMWatchfaceView extends Ui.WatchFace {
         var layoutStyleProp = App.getApp().getProperty("layoutStyle");
         var layoutStyle = layoutStyleProp != null ? layoutStyleProp.toNumber() : 0;
         if (layoutStyle == null) { layoutStyle = 0; }
+        // Product PRGs bake a unique AppName. Force the matching layout so a stale
+        // Connect setting / list-default Classic(0) cannot win (Téléscripteur bug).
+        try {
+            var bakedName = Ui.loadResource(Rez.Strings.AppName);
+            if (bakedName != null) {
+                if (bakedName.find("cripteur") != null) {
+                    layoutStyle = 10;
+                } else if (bakedName.find("Millim") != null) {
+                    layoutStyle = 9;
+                } else if (bakedName.find("Blueprint") != null) {
+                    layoutStyle = 6;
+                }
+            }
+        } catch (e) {
+        }
         if (layoutStyle == 1 || layoutStyle == 2 || layoutStyle == 3 || layoutStyle == 4 || layoutStyle == 5 || layoutStyle == 6 || layoutStyle == 9 || layoutStyle == 10) {
             if (layoutStyle == 10) {
                 CGMWatchfaceTele.draw(

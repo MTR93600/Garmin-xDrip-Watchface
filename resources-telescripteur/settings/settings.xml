@@ -1,0 +1,20 @@
+<settings>
+	<!-- Product skin: only Téléscripteur — prevents Classic (0) from winning as list default -->
+	<setting propertyKey="@Properties.layoutStyle" title="@Strings.layoutStyleTitle" prompt="@Strings.AllgemeinPrompt">
+           <settingConfig type="list">
+               <listEntry value="10">@Strings.opt_layoutStyle_10</listEntry>
+           </settingConfig>
+	</setting>
+	<setting propertyKey="@Properties.xDripSpike" title="@Strings.xDripSpikeTitle"  prompt="@Strings.AllgemeinPrompt">
+    	<settingConfig type="list">
+        	<listEntry value="0">@Strings.opt_xDripSpike_1</listEntry>
+            <listEntry value="4">@Strings.opt_xDripSpike_2</listEntry>
+            <listEntry value="1">@Strings.opt_xDripSpike_3</listEntry>
+            <listEntry value="2">@Strings.opt_xDripSpike_4</listEntry>
+            <listEntry value="3">@Strings.opt_xDripSpike_5</listEntry>
+        </settingConfig>
+    </setting>
+	<setting propertyKey="@Properties.hyperThreshold" title="@Strings.hyperThresholdTitle">
+           <settingConfig type="numeric" min="200" max="400"/>
+	</setting>
+</settings>

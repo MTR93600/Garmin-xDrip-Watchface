@@ -55,7 +55,7 @@ module TeleDrawing {
         var y = pad - 2;
         var fnt = Gfx.FONT_XTINY;
         dc.setColor(COL_DIM, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(pad, y, fnt, "AIMI·LOG", Gfx.TEXT_JUSTIFY_LEFT);
+        dc.drawText(pad, y, fnt, "AIMI LOG", Gfx.TEXT_JUSTIFY_LEFT);
         var mid = "";
         if (datum != null) { mid = datum.toString() + "  "; }
         if (timeString != null) { mid = mid + timeString.toString(); }
@@ -70,7 +70,7 @@ module TeleDrawing {
         return hy + 3;
     }
 
-    //! rows: Array of Dictionaries { :kind, :text }
+    //! rows: Array of Dictionaries { "kind", "text" }
     function drawLog(dc, pad, y, w, h, rows, state) {
         var fnt = Gfx.FONT_XTINY;
         var lineH = dc.getFontHeight(fnt) + 1;
@@ -86,15 +86,14 @@ module TeleDrawing {
         var ly = y;
         while (rows != null && i < rows.size()) {
             var row = rows[i];
-            if (row != null && row[:text] != null) {
-                var col = colorForKind(row[:kind], state);
+            if (row != null && row["text"] != null) {
+                var col = colorForKind(row["kind"], state);
                 dc.setColor(col, Gfx.COLOR_TRANSPARENT);
-                dc.drawText(pad, ly, fnt, row[:text], Gfx.TEXT_JUSTIFY_LEFT);
+                dc.drawText(pad, ly, fnt, row["text"], Gfx.TEXT_JUSTIFY_LEFT);
             }
             ly += lineH;
             i++;
         }
-        // blinking cursor on last blank wait line is drawn by caller as last row
     }
 
     function colorForKind(kind, state) {

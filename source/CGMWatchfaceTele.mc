@@ -45,7 +45,7 @@ module CGMWatchfaceTele {
         }
         var state = TeleDrawing.stateFromSgv(sgvMgdl, zielbereichLow, hyper);
         var deltaNum = deltaFromAaps(punkte, anzeigeDelta);
-        var tir = tirFromAaps(punkte, zielbereichLow, zielbereichHigh);
+        var tir = tirFromAaps(punkte);
         var targetNum = null;
         if (anzeigeTarget != null && anzeigeTarget.equals("") == false) {
             targetNum = anzeigeTarget.toNumber();
@@ -73,10 +73,9 @@ module CGMWatchfaceTele {
         if (logH < 80) { logH = 80; }
 
         var rows = buildLogRows(
-            punkte, smbTs, anzeigeMode, anzeigeIOB, targetNum, anzeigeBasal, tir, deltaNum
+            smbTs, anzeigeMode, anzeigeIOB, targetNum, anzeigeBasal, tir
         );
-        // Trailing WAIT cursor line
-        rows.add({:kind => TeleDrawing.KIND_SEP, :text => "WAIT_"});
+        rows.add({"kind" => TeleDrawing.KIND_SEP, "text" => "WAIT_"});
 
         TeleDrawing.drawLog(dc, pad, logY, width - 2 * pad, logH, rows, state);
         TeleDrawing.drawLiveStrip(
@@ -92,34 +91,29 @@ module CGMWatchfaceTele {
         }
     }
 
-    //! Merge SGV samples + SMB + mode + snapshot into chronological log rows (oldest→newest).
-    function buildLogRows(punkte, smbTs, mode, iob, targetNum, basal, tir, deltaNum) {
-        var events = []; // { :t, :kind, :payload }
-
-        // SGV from accumulated buffer (oldest→newest)
+    //! Chronological log: SGV rows + SMB + mode + snapshot (string-key dicts only).
+    function buildLogRows(smbTs, mode, iob, targetNum, basal, tir) {
+        var events = [];
         var samples = collectSamples();
         var i = 0;
         while (i < samples.size()) {
-            events.add({:t => samples[i][:t], :kind => TeleDrawing.KIND_SGV, :payload => samples[i]});
+            events.add({"t" => samples[i]["t"], "kind" => TeleDrawing.KIND_SGV, "sgv" => samples[i]["sgv"], "delta" => samples[i]["delta"]});
             i++;
         }
 
-        // SMB timestamps
         if (smbTs != null && smbTs instanceof Lang.Array) {
             i = 0;
             while (i < smbTs.size()) {
                 var sec = TeleDrawing.toEpochSec(smbTs[i]);
                 if (sec != null) {
-                    events.add({:t => sec, :kind => TeleDrawing.KIND_SMB, :payload => null});
+                    events.add({"t" => sec, "kind" => TeleDrawing.KIND_SMB, "sgv" => null, "delta" => null});
                 }
                 i++;
             }
         }
 
-        // Sort by time ascending (simple insertion — n is small)
         events = sortByTime(events);
 
-        // Cap samples so log stays readable (~18 events before mode/snap)
         if (events.size() > 16) {
             var trimmed = [];
             var start = events.size() - 16;
@@ -132,46 +126,42 @@ module CGMWatchfaceTele {
         }
 
         var rows = [];
-        rows.add({:kind => TeleDrawing.KIND_SEP, :text => "── SESSION ────────────────"});
+        rows.add({"kind" => TeleDrawing.KIND_SEP, "text" => "-- SESSION ---------------"});
 
-        var lastIob = compactIob(iob);
+        var lastIob = TeleDrawing.compactIob(iob);
         i = 0;
         while (i < events.size()) {
             var ev = events[i];
-            var hm = TeleDrawing.formatHm(ev[:t]);
-            if (ev[:kind] == TeleDrawing.KIND_SGV) {
-                var p = ev[:payload];
-                var sgv = p[:sgv];
-                var dlt = p[:delta];
+            var hm = TeleDrawing.formatHm(ev["t"]);
+            if (ev["kind"] == TeleDrawing.KIND_SGV) {
+                var sgv = ev["sgv"];
+                var dlt = ev["delta"];
                 var dStr = "d--";
                 if (dlt != null) {
                     dStr = dlt > 0 ? ("d+" + dlt.toString()) : ("d" + dlt.toString());
                 }
                 var line = hm + "  SGV  " + pad3(sgv) + "  " + dStr + "  IOB " + lastIob;
-                rows.add({:kind => TeleDrawing.KIND_SGV, :text => line});
-            } else if (ev[:kind] == TeleDrawing.KIND_SMB) {
-                rows.add({:kind => TeleDrawing.KIND_SMB, :text => hm + "  * SMB"});
+                rows.add({"kind" => TeleDrawing.KIND_SGV, "text" => line});
+            } else if (ev["kind"] == TeleDrawing.KIND_SMB) {
+                rows.add({"kind" => TeleDrawing.KIND_SMB, "text" => hm + "  * SMB"});
             }
             i++;
         }
 
-        // Mode annotation (current only — no history)
         if (mode != null && mode.equals("") == false) {
             rows.add({
-                :kind => TeleDrawing.KIND_MODE,
-                :text => TeleDrawing.formatHm(Time.now().value()) + "  * MODE " + mode.toString()
+                "kind" => TeleDrawing.KIND_MODE,
+                "text" => TeleDrawing.formatHm(Time.now().value()) + "  * MODE " + mode.toString()
             });
         }
 
-        // System snapshot
-        var snap = TeleDrawing.formatHm(Time.now().value()) + "  ";
         var tgt = "--";
         if (targetNum != null) { tgt = targetNum.toString(); }
         var tbr = TeleDrawing.compactTbr(basal);
         var tirV = "--";
         if (tir != null) { tirV = tir.toString() + "%"; }
-        snap = snap + "TGT " + tgt + "  TBR " + tbr + "  TIR " + tirV;
-        rows.add({:kind => TeleDrawing.KIND_SNAP, :text => snap});
+        var snap = TeleDrawing.formatHm(Time.now().value()) + "  TGT " + tgt + "  TBR " + tbr + "  TIR " + tirV;
+        rows.add({"kind" => TeleDrawing.KIND_SNAP, "text" => snap});
 
         return rows;
     }
@@ -182,7 +172,6 @@ module CGMWatchfaceTele {
             var n = bgReadingsAccumulated.size();
             var start = 0;
             if (n > 24) { start = n - 24; }
-            // accumulated is newest-first typically after merge — walk reverse to oldest→newest
             var i = n - 1;
             while (i >= start) {
                 var pt = bgReadingsAccumulated[i];
@@ -192,19 +181,13 @@ module CGMWatchfaceTele {
                     if (v != null && v >= 20 && v <= 600 && sec != null) {
                         var dlt = null;
                         if (pt["delta"] != null) { dlt = pt["delta"].toNumber(); }
-                        out.add({:t => sec, :sgv => v, :delta => dlt});
+                        out.add({"t" => sec, "sgv" => v, "delta" => dlt});
                     }
                 }
                 i--;
             }
         }
-        // If still empty / reversed wrong, try punkte newest-first → reverse
-        if (out.size() < 2) {
-            // keep what we have
-        }
-        // Ensure chronological oldest→newest by time
-        out = sortSamples(out);
-        return out;
+        return sortSamples(out);
     }
 
     function sortSamples(arr) {
@@ -213,7 +196,7 @@ module CGMWatchfaceTele {
         while (a < n) {
             var key = arr[a];
             var b = a - 1;
-            while (b >= 0 && arr[b][:t] > key[:t]) {
+            while (b >= 0 && arr[b]["t"] > key["t"]) {
                 arr[b + 1] = arr[b];
                 b--;
             }
@@ -229,7 +212,7 @@ module CGMWatchfaceTele {
         while (a < n) {
             var key = arr[a];
             var b = a - 1;
-            while (b >= 0 && arr[b][:t] > key[:t]) {
+            while (b >= 0 && arr[b]["t"] > key["t"]) {
                 arr[b + 1] = arr[b];
                 b--;
             }
@@ -247,10 +230,6 @@ module CGMWatchfaceTele {
         return s;
     }
 
-    function compactIob(iob) {
-        return TeleDrawing.compactIob(iob);
-    }
-
     function deltaFromAaps(punkte, anzeigeDelta) {
         if (punkte != null && punkte instanceof Lang.Array && punkte.size() > 0 && punkte[0]["delta"] != null) {
             var raw = punkte[0]["delta"].toNumber();
@@ -266,7 +245,7 @@ module CGMWatchfaceTele {
         return n;
     }
 
-    function tirFromAaps(punkte, low, high) {
+    function tirFromAaps(punkte) {
         if (punkte != null && punkte instanceof Lang.Array && punkte.size() > 0 && punkte[0]["tir"] != null) {
             var t = punkte[0]["tir"].toNumber();
             if (t != null) {
