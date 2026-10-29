@@ -11,6 +11,7 @@
     <string id="opt_layoutStyle_3">V2 Color-aware (TIR + sparkline)</string>
     <string id="opt_layoutStyle_6">Blueprint Signal</string>
     <string id="opt_layoutStyle_9">Millimétré</string>
+    <string id="opt_layoutStyle_10">Téléscripteur</string>
     <string id="hyperThresholdTitle">Hyper threshold (mg/dL)</string>
     <string id="showTirRingTitle">Show TIR ring (V2)</string>
     <string id="opt_showTirRing_0">Off</string>

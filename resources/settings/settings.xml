@@ -7,6 +7,7 @@
                <listEntry value="3">@Strings.opt_layoutStyle_3</listEntry>
                <listEntry value="6">@Strings.opt_layoutStyle_6</listEntry>
                <listEntry value="9">@Strings.opt_layoutStyle_9</listEntry>
+               <listEntry value="10">@Strings.opt_layoutStyle_10</listEntry>
            </settingConfig>
 	</setting>
 	<setting propertyKey="@Properties.showMascot" title="@Strings.showMascotTitle" prompt="@Strings.AllgemeinPrompt">

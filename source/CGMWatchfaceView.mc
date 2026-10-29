@@ -364,8 +364,31 @@ class CGMWatchfaceView extends Ui.WatchFace {
         var layoutStyleProp = App.getApp().getProperty("layoutStyle");
         var layoutStyle = layoutStyleProp != null ? layoutStyleProp.toNumber() : 0;
         if (layoutStyle == null) { layoutStyle = 0; }
-        if (layoutStyle == 1 || layoutStyle == 2 || layoutStyle == 3 || layoutStyle == 4 || layoutStyle == 5 || layoutStyle == 6 || layoutStyle == 9) {
-            if (layoutStyle == 9) {
+        if (layoutStyle == 1 || layoutStyle == 2 || layoutStyle == 3 || layoutStyle == 4 || layoutStyle == 5 || layoutStyle == 6 || layoutStyle == 9 || layoutStyle == 10) {
+            if (layoutStyle == 10) {
+                CGMWatchfaceTele.draw(
+                    self,
+                    dc,
+                    isHighPower,
+                    steps,
+                    heartrate,
+                    timeString,
+                    datum,
+                    punkte,
+                    zielbereichLow,
+                    zielbereichHigh,
+                    anzeigeSGV,
+                    anzeigeDelta,
+                    verzoegerung,
+                    anzeigeIOB,
+                    anzeigeBasal,
+                    anzeigeCOB,
+                    anzeigeTarget,
+                    anzeigeMode,
+                    anzeigeFehler,
+                    auswahlPfeil
+                );
+            } else if (layoutStyle == 9) {
                 CGMWatchfaceMillimetre.draw(
                     self,
                     dc,
