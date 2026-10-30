@@ -188,38 +188,22 @@ class CGMWatchfaceView extends Ui.WatchFace {
                     }
                     punkte = trimmed;
                 }
-                if( bgReadingsAccumulated.size() != numberValuesTotal ) {
-                    var temp = new [numberValuesTotal];
-                    for( var i = 0; i < punkte.size(); i++ ) {
-                        temp[i] = punkte[i];
+                // Always mirror this AAPS/xDrip batch into the accumulator.
+                // Gating on date compares (even Long) left the Téléscripteur journal
+                // hours behind while live SGV kept updating after firmware changes.
+                var rebuilt = new [numberValuesTotal];
+                for( var i = 0; i < numberValuesTotal; i++ ) {
+                    if( i < punkte.size() && punkte[i] != null && punkte[i]["date"] != null ) {
+                        rebuilt[i] = {
+                            "date" => punkte[i]["date"].toLong(),
+                            "sgv" => punkte[i]["sgv"]
+                        };
+                    } else {
+                        rebuilt[i] = { "date" => 0, "sgv" => 0 };
                     }
-                    for( var i = punkte.size(); i < numberValuesTotal; i++) {
-                        temp[i] = { "date" => 0, "sgv" => 0};
-                    }
-                    bgReadingsAccumulated = temp;
-                    App.Storage.setValue("bgReadingsAccumulatedWatchface", bgReadingsAccumulated);
                 }
-                // Compare in Long epoch-seconds — Float32 ms/sec lose precision (~2 min / ~2 min)
-                // and used to freeze the journal while live SGV kept updating.
-                var accSec = epochSecLong(bgReadingsAccumulated[0]["date"]);
-                var pktSec = epochSecLong(punkte[0]["date"]);
-                var accSgv = bgReadingsAccumulated[0]["sgv"];
-                var pktSgv = punkte[0]["sgv"];
-                var newer = accSec < pktSec;
-                var sameTickNewSgv = (accSec == pktSec && accSgv != null && pktSgv != null && accSgv != pktSgv);
-                if( newer || sameTickNewSgv ) {
-                    for( var i = numberValuesTotal-1; i >= punkte.size(); i-- ) {
-                        var k = i-newValues;
-                        bgReadingsAccumulated[i]["date"] = bgReadingsAccumulated[k]["date"] ? bgReadingsAccumulated[k]["date"] : 0;
-                        bgReadingsAccumulated[i]["sgv"] = bgReadingsAccumulated[k]["sgv"] ? bgReadingsAccumulated[k]["sgv"] : 0;
-                    }
-                    for( var i = 0; i < punkte.size(); i++ ) {
-                        // Persist as Long so Storage round-trips stay comparable
-                        bgReadingsAccumulated[i]["date"] = punkte[i]["date"] != null ? punkte[i]["date"].toLong() : 0;
-                        bgReadingsAccumulated[i]["sgv"] = punkte[i]["sgv"];
-                    }
-                    App.Storage.setValue("bgReadingsAccumulatedWatchface", bgReadingsAccumulated);
-                }
+                bgReadingsAccumulated = rebuilt;
+                App.Storage.setValue("bgReadingsAccumulatedWatchface", bgReadingsAccumulated);
 
                 // Units: mmol/l or mg/dl
                 if( punkte[0]["units_hint"] != null ) {
@@ -1116,17 +1100,6 @@ class CGMWatchfaceView extends Ui.WatchFace {
             ageSec = now - ts;
         }
         return ageSec / 60;
-    }
-
-    //! Long epoch-seconds for safe ordering (avoids Float32 ms collapsing ~2 min apart).
-    function epochSecLong(timestamp) {
-        if (timestamp == null) { return 0; }
-        var ts = timestamp.toLong();
-        var now = Time.now().value().toLong();
-        if (ts > now + 86400 || ts > 2000000000) {
-            return ts / 1000;
-        }
-        return ts;
     }
 
 }

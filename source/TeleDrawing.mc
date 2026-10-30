@@ -278,11 +278,11 @@ module TeleDrawing {
         return hs + ":" + ms;
     }
 
-    //! Same magnitude rule as CGMWatchfaceView.minutesFromTimestamp.
+    //! Long epoch-seconds — Float division scrambled journal ordering on Venu X1.
     function toEpochSec(timestamp) {
         if (timestamp == null) { return null; }
-        var now = Time.now().value();
-        var ts = timestamp;
+        var now = Time.now().value().toLong();
+        var ts = timestamp.toLong();
         if (ts > now + 86400 || ts > 2000000000) {
             return ts / 1000;
         }

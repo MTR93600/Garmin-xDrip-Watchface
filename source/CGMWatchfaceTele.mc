@@ -179,34 +179,43 @@ module CGMWatchfaceTele {
 
     function collectSamples() {
         var out = [];
-        // Prefer fresh AAPS batch (punkte) — bgReadingsAccumulated can freeze when
-        // Float32 date compares stop seeing "newer" after a watch firmware update.
+        // Always prefer the latest AAPS batch (even size==1). Accumulator is rebuilt
+        // every fetch in View, but reading punkte directly avoids any Storage lag.
         var src = null;
-        if (punkte != null && punkte instanceof Lang.Array && punkte.size() > 1) {
+        if (punkte != null && punkte instanceof Lang.Array && punkte.size() > 0) {
             src = punkte;
         } else if (bgReadingsAccumulated != null && bgReadingsAccumulated instanceof Lang.Array) {
             src = bgReadingsAccumulated;
         }
         if (src != null) {
             var n = src.size();
-            var start = 0;
-            if (n > 24) { start = n - 24; }
-            var i = n - 1;
-            while (i >= start) {
+            var i = 0;
+            while (i < n) {
                 var pt = src[i];
                 if (pt != null && pt["sgv"] != null && pt["date"] != null) {
                     var v = pt["sgv"].toNumber();
                     var sec = TeleDrawing.toEpochSec(pt["date"]);
-                    if (v != null && v >= 20 && v <= 600 && sec != null) {
+                    if (v != null && v >= 20 && v <= 600 && sec != null && sec > 0) {
                         var dlt = null;
                         if (pt["delta"] != null) { dlt = pt["delta"].toNumber(); }
                         out.add({"t" => sec, "sgv" => v, "delta" => dlt});
                     }
                 }
-                i--;
+                i++;
             }
         }
         out = sortSamples(out);
+        // Keep last 24 chronological samples for the journal window
+        if (out.size() > 24) {
+            var trimmed = [];
+            var start = out.size() - 24;
+            var k = start;
+            while (k < out.size()) {
+                trimmed.add(out[k]);
+                k++;
+            }
+            out = trimmed;
+        }
         // Derive 5-min deltas from consecutive samples when AAPS didn't attach them
         var j = 1;
         while (j < out.size()) {
