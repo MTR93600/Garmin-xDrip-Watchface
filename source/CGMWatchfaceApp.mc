@@ -85,38 +85,54 @@ class CGMWatchfaceApp extends App.AppBase {
         fehler = data.toString().substring(0,1).equals("[") ? false : true;
         var lastTime = Background.getLastTemporalEventTime();
         var calcDuration = 0;
+        var xDripSpike = 0;
+        var spikeProp = App.getApp().getProperty("xDripSpike");
+        if (spikeProp != null) {
+            xDripSpike = spikeProp.toNumber();
+        }
+        if (xDripSpike == null) {
+            xDripSpike = 0;
+        }
         if( fehler == false && data != null && data instanceof Toybox.Lang.Array && data.size() > 0 && data[0]["date"] != null ) {
+            if (data[0]["hrSentUntil"] != null) {
+                App.Storage.setValue("aapsHrSentUntil", data[0]["hrSentUntil"]);
+            }
             punkte = data;
             App.Storage.setValue("punkteWatchface", punkte);
             calculation = true;
-            // date may be unix-seconds (AAPS) or milliseconds (xDrip/NS)
-            var rawDate = data[0]["date"];
-            var dateSec = rawDate;
-            if (rawDate > Time.now().value() + 86400 || rawDate > 2000000000) {
-                dateSec = rawDate / 1000;
-            }
-            var differenz = Time.now().value() - dateSec;
-            if( delay == 999 || (minutes != null && minutes == 1) ) {
-                // Time adjustment deactivated or BG values per minute
+            // AAPS polls on a fixed 5-minute grid. Other sources stay aligned on the glucose time.
+            if (xDripSpike == 4) {
                 calcDuration = 300;
-            } else if( differenz != null && differenz > (40 + delay)) {
-                // Delay greater than 40 seconds,
-                // adjust the time by waiting up to 10 minutes
-                adjustTime = true;
-                calcDuration = 600 - differenz + 15 + delay;              
             } else {
-                // Distance to measurement very small or correct
-                adjustTime = false;
-                calcDuration = differenz != null && differenz < (10 + delay) ? 300 + 15 + delay : 300;
-            }
-            if( calcDuration < 0 ) {
-                // If the last measurement is more than 10 minutes ago,
-                // a negative difference occurs; sett 300 sec to avoid exception
-                calcDuration = 300;
-            } else if( calcDuration < 300 ) {
-                // Distance to measurement greater than 5 minutes,
-                // thus the difference is less than 5 minutes
-                calcDuration = calcDuration + 300;
+                // date may be unix-seconds (AAPS) or milliseconds (xDrip/NS)
+                var rawDate = data[0]["date"];
+                var dateSec = rawDate;
+                if (rawDate > Time.now().value() + 86400 || rawDate > 2000000000) {
+                    dateSec = rawDate / 1000;
+                }
+                var differenz = Time.now().value() - dateSec;
+                if( delay == 999 || (minutes != null && minutes == 1) ) {
+                    // Time adjustment deactivated or BG values per minute
+                    calcDuration = 300;
+                } else if( differenz != null && differenz > (40 + delay)) {
+                    // Delay greater than 40 seconds,
+                    // adjust the time by waiting up to 10 minutes
+                    adjustTime = true;
+                    calcDuration = 600 - differenz + 15 + delay;
+                } else {
+                    // Distance to measurement very small or correct
+                    adjustTime = false;
+                    calcDuration = differenz != null && differenz < (10 + delay) ? 300 + 15 + delay : 300;
+                }
+                if( calcDuration < 0 ) {
+                    // If the last measurement is more than 10 minutes ago,
+                    // a negative difference occurs; sett 300 sec to avoid exception
+                    calcDuration = 300;
+                } else if( calcDuration < 300 ) {
+                    // Distance to measurement greater than 5 minutes,
+                    // thus the difference is less than 5 minutes
+                    calcDuration = calcDuration + 300;
+                }
             }
         } else {
             // Error during query, try again in 5 minutes
